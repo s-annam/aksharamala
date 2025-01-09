@@ -136,13 +136,15 @@ func parseSection(scanner *bufio.Scanner, sectionName string) (Section, error) {
 			return section, nil
 		}
 
-		// Handle section-level comments
+		// Handle section-level comments before mappings
 		if strings.HasPrefix(line, "//") {
+			trimmedComment := strings.TrimPrefix(line, "//")
 			if len(section.Mappings) == 0 {
-				// Associate comment as a section-level comment if no mappings yet
-				section.Comments = append(section.Comments, strings.TrimPrefix(line, "//"))
+				// Assign to section-level comments if no mappings yet
+				section.Comments = append(section.Comments, trimmedComment)
 			} else {
-				pendingComment = strings.TrimPrefix(line, "//")
+				// Treat as pending mapping-level comment
+				pendingComment = trimmedComment
 			}
 			continue
 		}

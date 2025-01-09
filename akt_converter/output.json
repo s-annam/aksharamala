@@ -1,154 +1,135 @@
 {
-  "id": "rdeva#",
-  "name": "Devanagari Reversliteration#",
-  "language": "Devanagari#",
-  "scheme": "Unicode#",
+  "comments": [
+    " ==================================================================",
+    " Copyright (c) 2001-2002 Deshweb.com Pvt. Ltd.",
+    " =================================================================="
+  ],
+  "id": "rdeva",
+  "name": "Devanagari Reversliteration",
+  "language": "Devanagari",
+  "scheme": "Unicode",
   "metadata": {
-    "virama": "0x0, smart#",
-    "font_name": "",
-    "font_size": 0,
-    "icon_enabled": "",
-    "icon_disabled": ""
+    "virama": "0x0, smart"
   },
-  "mappings": [
-    {
-      "lhs": "ँ",
-      "rhs": [
-        ".N",
-        "//",
-        "candrabindu"
-      ]
-    },
-    {
-      "lhs": "अ",
-      "rhs": [
-        "a[v]",
-        "[][a]{a}[v]"
-      ]
-    },
-    {
-      "lhs": "आ",
-      "rhs": [
-        "A[v]",
-        "[][a]{A}[v]"
-      ]
-    },
-    {
-      "lhs": "क",
-      "rhs": [
-        "k[a]",
-        "[][a]ak[a]"
-      ]
-    },
-    {
-      "lhs": "ख",
-      "rhs": [
-        "kh[a]",
-        "[][a]akh[a]"
-      ]
-    },
-    {
-      "lhs": "र्‍",
-      "rhs": [
-        "R",
-        "[][a]aR",
-        "//",
-        "marathi",
-        "half-R",
-        "(as",
-        "in",
-        "daRyaa)"
-      ]
-    },
-    {
-      "lhs": "क्ष",
-      "rhs": [
-        "x[a]",
-        "[][a]ax[a]",
-        "//",
-        "x",
-        "=",
-        "ksh"
-      ]
-    },
-    {
-      "lhs": "ज्ञ",
-      "rhs": [
-        "GY[a]",
-        "[][a]aGY[a]",
-        "//",
-        "GY",
-        "=",
-        "dny"
-      ]
-    },
-    {
-      "lhs": "ऽ",
-      "rhs": [
-        ".a"
-      ]
-    },
-    {
-      "lhs": "ा",
-      "rhs": [
-        "aa[v]"
-      ]
-    },
-    {
-      "lhs": "क़",
-      "rhs": [
-        "q[a]",
-        "[][a]aq[a]"
-      ]
-    },
-    {
-      "lhs": "।",
-      "rhs": [
-        ".",
-        "//",
-        "danda"
-      ]
-    },
-    {
-      "lhs": "०",
-      "rhs": [
-        "0"
-      ]
-    },
-    {
-      "lhs": "१",
-      "rhs": [
-        "1"
-      ]
-    },
-    {
-      "lhs": "॰",
-      "rhs": [
-        "ABBR",
-        "//",
-        "devanagari",
-        "abbreviation",
-        "sign"
-      ]
-    },
-    {
-      "lhs": ".",
-      "rhs": [
-        "\\.",
-        "//",
-        "ASCII",
-        "period"
+  "categories": {
+    "others": {
+      "mappings": [
+        {
+          "lhs": "ँ",
+          "rhs": [
+            ".N"
+          ],
+          "comment": "candrabindu"
+        },
+        {
+          "lhs": "अ",
+          "rhs": [
+            "a[v]",
+            "[][a]{a}[v]"
+          ],
+          "comment": " =*= vowels =*="
+        },
+        {
+          "lhs": "आ",
+          "rhs": [
+            "A[v]",
+            "[][a]{A}[v]"
+          ]
+        },
+        {
+          "lhs": "क",
+          "rhs": [
+            "k[a]",
+            "[][a]ak[a]"
+          ],
+          "comment": " =*= consonants"
+        },
+        {
+          "lhs": "ख",
+          "rhs": [
+            "kh[a]",
+            "[][a]akh[a]"
+          ]
+        },
+        {
+          "lhs": "र्‍",
+          "rhs": [
+            "R",
+            "[][a]aR"
+          ],
+          "comment": "marathi half-R (as in daRyaa)"
+        },
+        {
+          "lhs": "क्ष",
+          "rhs": [
+            "x[a]",
+            "[][a]ax[a]"
+          ],
+          "comment": "x = ksh"
+        },
+        {
+          "lhs": "ज्ञ",
+          "rhs": [
+            "GY[a]",
+            "[][a]aGY[a]"
+          ],
+          "comment": "GY = dny"
+        },
+        {
+          "lhs": "ऽ",
+          "rhs": [
+            ".a"
+          ]
+        },
+        {
+          "lhs": "ा",
+          "rhs": [
+            "aa[v]"
+          ],
+          "comment": " vowel signs"
+        },
+        {
+          "lhs": "क़",
+          "rhs": [
+            "q[a]",
+            "[][a]aq[a]"
+          ]
+        },
+        {
+          "lhs": "।",
+          "rhs": [
+            "."
+          ],
+          "comment": "danda"
+        },
+        {
+          "lhs": "०",
+          "rhs": [
+            "0"
+          ],
+          "comment": " =*= DIGITS =*="
+        },
+        {
+          "lhs": "१",
+          "rhs": [
+            "1"
+          ]
+        },
+        {
+          "lhs": "॰",
+          "rhs": [
+            "ABBR"
+          ],
+          "comment": "devanagari abbreviation sign"
+        },
+        {
+          "lhs": ".",
+          "rhs": [
+            "\\."
+          ],
+          "comment": "ASCII period"
+        }
       ]
     }
-  ],
-  "comments": [
-    "==================================================================",
-    "Copyright (c) 2001-2002 Deshweb.com Pvt. Ltd.",
-    "==================================================================",
-    "No valid mappings found.",
-    "=*= vowels =*=",
-    "=*= consonants",
-    "vowel signs",
-    "=*= DIGITS =*="
-  ]
+  }
 }

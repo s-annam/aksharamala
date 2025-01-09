@@ -6,29 +6,36 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
 // Struct for JSON output
-type TransliterationScheme struct {
-	ID       string    `json:"id"`
-	Name     string    `json:"name"`
-	Language string    `json:"language"`
-	Scheme   string    `json:"scheme"`
-	Metadata Metadata  `json:"metadata"`
-	Mappings []Mapping `json:"mappings"`
-	Comments []string  `json:"comments"`
-}
-
 type Metadata struct {
-	Virama       string `json:"virama"`
-	FontName     string `json:"font_name"`
-	FontSize     int    `json:"font_size"`
-	IconEnabled  string `json:"icon_enabled"`
-	IconDisabled string `json:"icon_disabled"`
+	Virama       string `json:"virama,omitempty"`        // Omit if empty
+	FontName     string `json:"font_name,omitempty"`     // Omit if empty
+	FontSize     int    `json:"font_size,omitempty"`     // Omit if 0
+	IconEnabled  string `json:"icon_enabled,omitempty"`  // Omit if empty
+	IconDisabled string `json:"icon_disabled,omitempty"` // Omit if empty
 }
 
+type CategoryEntry struct {
+	LHS     string   `json:"lhs"`
+	RHS     []string `json:"rhs"`
+	Comment string   `json:"comment,omitempty"` // Omit if no comment
+}
+type Section struct {
+	Comments []string        `json:"comments,omitempty"` // Section-level comments
+	Mappings []CategoryEntry `json:"mappings"`
+}
+type TransliterationScheme struct {
+	Comments   []string           `json:"comments,omitempty"` // File-level comments
+	ID         string             `json:"id"`
+	Name       string             `json:"name"`
+	Language   string             `json:"language"`
+	Scheme     string             `json:"scheme"`
+	Metadata   Metadata           `json:"metadata"`
+	Categories map[string]Section `json:"categories"`
+}
 type Mapping struct {
 	LHS     string   `json:"lhs"`
 	RHS     []string `json:"rhs"`
@@ -62,12 +69,134 @@ func validateMandatoryFields(scheme *TransliterationScheme) error {
 	return nil
 }
 
-func main() {
-	// Input and output files
-	inputFile := "example.akt"  // Replace with your AKT file path
-	outputFile := "output.json" // Output JSON file
+// Main parsing function
+func parseFile(file *os.File) (TransliterationScheme, error) {
+	scanner := bufio.NewScanner(file)
+	scheme := TransliterationScheme{
+		Categories: make(map[string]Section),
+	}
 
-	// Open the AKT file
+	sectionPattern := regexp.MustCompile(`^#(\w+)#`)
+	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
+
+	// Temporary storage for file-level comments
+	var fileComments []string
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+
+		// Match file-level comments (// ...)
+		if strings.HasPrefix(line, "//") {
+			fileComments = append(fileComments, strings.TrimPrefix(line, "//"))
+			continue
+		}
+
+		// Stop collecting comments as soon as a non-comment "#" line is found
+		if strings.HasPrefix(line, "#") {
+			// Check if it's metadata
+			if match := metadataPattern.FindStringSubmatch(line); match != nil {
+				parseMetadata(line, &scheme)
+				continue
+			}
+
+			// Check if it's a section header
+			if match := sectionPattern.FindStringSubmatch(line); match != nil {
+				sectionName := match[1]
+				section, err := parseSection(scanner, line)
+				if err != nil {
+					return scheme, err
+				}
+				scheme.Categories[sectionName] = section
+				continue
+			}
+		}
+	}
+
+	// Validate mandatory fields
+	if err := validateMandatoryFields(&scheme); err != nil {
+		return scheme, err
+	}
+
+	// Assign file-level comments to the scheme
+	scheme.Comments = fileComments
+	return scheme, scanner.Err()
+}
+
+// Parse a section with comments and mappings
+func parseSection(scanner *bufio.Scanner, sectionName string) (Section, error) {
+	section := Section{}
+	var pendingComment string
+	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+
+		// Detect a new section or end of file
+		if strings.HasPrefix(line, "#") && line != sectionName {
+			return section, nil
+		}
+
+		// Handle section-level comments
+		if strings.HasPrefix(line, "//") {
+			if len(section.Mappings) == 0 {
+				// Associate comment as a section-level comment if no mappings yet
+				section.Comments = append(section.Comments, strings.TrimPrefix(line, "//"))
+			} else {
+				pendingComment = strings.TrimPrefix(line, "//")
+			}
+			continue
+		}
+
+		// Match mappings with inline comments
+		match := mappingPattern.FindStringSubmatch(line)
+		if match != nil {
+			entry := CategoryEntry{
+				LHS:     match[1],
+				RHS:     strings.Fields(match[2]),
+				Comment: match[3], // Inline comment
+			}
+
+			// Attach pending comment
+			if pendingComment != "" {
+				entry.Comment = pendingComment
+				pendingComment = ""
+			}
+
+			section.Mappings = append(section.Mappings, entry)
+		}
+	}
+
+	return section, scanner.Err()
+}
+
+func parseMetadata(line string, scheme *TransliterationScheme) {
+	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
+	match := metadataPattern.FindStringSubmatch(line)
+	if match == nil {
+		return
+	}
+
+	key := strings.ToLower(match[1])
+	value := strings.TrimSpace(strings.TrimRight(match[2], "#"))
+
+	switch key {
+	case "id":
+		scheme.ID = value
+	case "name":
+		scheme.Name = value
+	case "language":
+		scheme.Language = value
+	case "scheme":
+		scheme.Scheme = value
+	case "virama":
+		scheme.Metadata.Virama = value
+	}
+}
+
+func main() {
+	inputFile := "example.akt"
+	outputFile := "output.json"
+
 	file, err := os.Open(inputFile)
 	if err != nil {
 		fmt.Printf("Error opening file: %v\n", err)
@@ -75,102 +204,12 @@ func main() {
 	}
 	defer file.Close()
 
-	// Initialize struct to hold data
-	var scheme TransliterationScheme
-	scheme.Mappings = []Mapping{}
-	scheme.Comments = []string{}
-
-	// Regex patterns
-	metadataPattern := regexp.MustCompile(`#([a-zA-Z_]+)\s*=\s*(.*)`)
-	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*)$`) // LHS and RHS
-	commentPattern := regexp.MustCompile(`^//(.*)$`)
-
-	// Read the file line-by-line
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-
-		// Skip empty lines
-		if line == "" {
-			continue
-		}
-
-		// Match comments
-		if match := commentPattern.FindStringSubmatch(line); match != nil {
-			scheme.Comments = append(scheme.Comments, strings.TrimSpace(match[1]))
-			continue
-		}
-
-		// Match metadata
-		if match := metadataPattern.FindStringSubmatch(line); match != nil {
-			key := strings.ToLower(match[1])
-			value := strings.TrimSpace(match[2])
-			switch key {
-			case "id":
-				scheme.ID = value
-			case "name":
-				scheme.Name = value
-			case "language":
-				scheme.Language = value
-			case "scheme":
-				scheme.Scheme = value
-			case "virama":
-				scheme.Metadata.Virama = value
-			case "font_name":
-				scheme.Metadata.FontName = value
-			case "font_size":
-				// Parse font size if possible
-				if fontSize, err := strconv.Atoi(value); err == nil {
-					scheme.Metadata.FontSize = fontSize
-				}
-			case "icon_enabled":
-				scheme.Metadata.IconEnabled = value
-			case "icon_disabled":
-				scheme.Metadata.IconDisabled = value
-			}
-			continue
-		}
-
-		// Match mappings with validation
-		if match := mappingPattern.FindStringSubmatch(line); match != nil {
-			lhs := strings.TrimSpace(match[1])
-			rhs := strings.Fields(strings.TrimSpace(match[2]))
-
-			// Validate mapping
-			if lhs != "" && len(rhs) > 0 {
-				mapping := Mapping{LHS: lhs, RHS: rhs}
-				scheme.Mappings = append(scheme.Mappings, mapping)
-			} else {
-				fmt.Printf("Invalid mapping skipped: %s\n", line)
-			}
-		} else if strings.HasPrefix(line, "#") {
-			fmt.Printf("Unrecognized metadata key skipped: %s\n", line)
-		} else if strings.HasPrefix(line, "//") {
-			// Include comments for documentation
-			scheme.Comments = append(scheme.Comments, strings.TrimPrefix(line, "//"))
-		} else {
-			fmt.Printf("Malformed or unexpected line skipped: %s\n", line)
-		}
-
-		// If no valid mappings are found
-		if len(scheme.Mappings) == 0 {
-			scheme.Comments = append(scheme.Comments, "No valid mappings found.")
-		}
-	}
-
-	// Handle scanning errors
-	if err := scanner.Err(); err != nil {
-		fmt.Printf("Error reading file: %v\n", err)
+	scheme, err := parseFile(file)
+	if err != nil {
+		fmt.Printf("Error parsing file: %v\n", err)
 		return
 	}
 
-	// Validate mandatory fields after parsing
-	if err := validateMandatoryFields(&scheme); err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1) // Terminate the program if mandatory fields are missing
-	}
-
-	// Write to JSON file
 	output, err := os.Create(outputFile)
 	if err != nil {
 		fmt.Printf("Error creating output file: %v\n", err)
@@ -179,7 +218,7 @@ func main() {
 	defer output.Close()
 
 	encoder := json.NewEncoder(output)
-	encoder.SetIndent("", "  ") // Pretty-print JSON
+	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(scheme); err != nil {
 		fmt.Printf("Error encoding JSON: %v\n", err)
 		return

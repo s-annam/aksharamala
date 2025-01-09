@@ -69,6 +69,19 @@ func validateMandatoryFields(scheme *TransliterationScheme) error {
 	return nil
 }
 
+func parseMapping(line string) *CategoryEntry {
+	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
+	match := mappingPattern.FindStringSubmatch(line)
+	if match != nil {
+		return &CategoryEntry{
+			LHS:     match[1],
+			RHS:     strings.Fields(match[2]),
+			Comment: match[3], // Inline comment
+		}
+	}
+	return nil
+}
+
 // Main parsing function
 func parseFile(file *os.File) (TransliterationScheme, error) {
 	scanner := bufio.NewScanner(file)
@@ -76,39 +89,71 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 		Categories: make(map[string]Section),
 	}
 
-	sectionPattern := regexp.MustCompile(`^#(\w+)#`)
-	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
-
-	// Temporary storage for file-level comments
 	var fileComments []string
+	var currentPseudoCategory string
+	var pseudoCategoryMappings []CategoryEntry
+
+	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
+	sectionPattern := regexp.MustCompile(`^#(\w+)#`)
+	pseudoSectionPattern := regexp.MustCompile(`(?i)^//\s*=*\*\s*(\w+)(?:\s*=*\*)?$`)
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 
-		// Match file-level comments (// ...)
+		// Match file-level comments
 		if strings.HasPrefix(line, "//") {
-			fileComments = append(fileComments, strings.TrimPrefix(line, "//"))
+			// Check for pseudo-sections
+			if match := pseudoSectionPattern.FindStringSubmatch(line); match != nil {
+				// Save the current pseudo-category mappings before switching
+				if currentPseudoCategory != "" && len(pseudoCategoryMappings) > 0 {
+					scheme.Categories[currentPseudoCategory] = Section{
+						Comments: []string{},
+						Mappings: pseudoCategoryMappings,
+					}
+					pseudoCategoryMappings = nil // Reset mappings for the new pseudo-category
+				}
+				currentPseudoCategory = strings.ToLower(match[1]) + "-no-virama"
+				continue
+			}
+
+			// Add file-level comments
+			if currentPseudoCategory == "" {
+				fileComments = append(fileComments, strings.TrimPrefix(line, "//"))
+			}
 			continue
 		}
 
-		// Stop collecting comments as soon as a non-comment "#" line is found
-		if strings.HasPrefix(line, "#") {
-			// Check if it's metadata
-			if match := metadataPattern.FindStringSubmatch(line); match != nil {
-				parseMetadata(line, &scheme)
-				continue
-			}
+		// Match metadata
+		if match := metadataPattern.FindStringSubmatch(line); match != nil {
+			parseMetadata(line, &scheme)
+			continue
+		}
 
-			// Check if it's a section header
-			if match := sectionPattern.FindStringSubmatch(line); match != nil {
-				sectionName := match[1]
-				section, err := parseSection(scanner, line)
-				if err != nil {
-					return scheme, err
-				}
-				scheme.Categories[sectionName] = section
-				continue
+		// Match regular sections
+		if match := sectionPattern.FindStringSubmatch(line); match != nil {
+			sectionName := match[1]
+			section, err := parseSection(scanner, line)
+			if err != nil {
+				return scheme, err
 			}
+			scheme.Categories[sectionName] = section
+			continue
+		}
+
+		// Collect mappings for the current pseudo-category
+		if currentPseudoCategory != "" {
+			entry := parseMapping(line)
+			if entry != nil {
+				pseudoCategoryMappings = append(pseudoCategoryMappings, *entry)
+			}
+		}
+	}
+
+	// Save the last pseudo-category mappings
+	if currentPseudoCategory != "" && len(pseudoCategoryMappings) > 0 {
+		scheme.Categories[currentPseudoCategory] = Section{
+			Comments: []string{},
+			Mappings: pseudoCategoryMappings,
 		}
 	}
 

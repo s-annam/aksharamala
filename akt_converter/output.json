@@ -1,0 +1,156 @@
+{
+  "id": "",
+  "name": "",
+  "language": "",
+  "scheme": "",
+  "metadata": {
+    "virama": "",
+    "font_name": "",
+    "font_size": 0,
+    "icon_enabled": "",
+    "icon_disabled": ""
+  },
+  "mappings": [
+    {
+      "lhs": "\"documentation\":",
+      "rhs": [
+        "{"
+      ]
+    },
+    {
+      "lhs": "\"virama\":",
+      "rhs": [
+        "{"
+      ]
+    },
+    {
+      "lhs": "\"description\":",
+      "rhs": [
+        "\"Represents",
+        "the",
+        "virama",
+        "character",
+        "used",
+        "for",
+        "halant",
+        "or",
+        "similar",
+        "functionality,",
+        "along",
+        "with",
+        "its",
+        "operational",
+        "mode.\","
+      ]
+    },
+    {
+      "lhs": "\"examples\":",
+      "rhs": [
+        "["
+      ]
+    },
+    {
+      "lhs": "\"0x094D,",
+      "rhs": [
+        "smart\","
+      ]
+    },
+    {
+      "lhs": "\"0x09CD,",
+      "rhs": [
+        "none\","
+      ]
+    },
+    {
+      "lhs": "\"0xf7,",
+      "rhs": [
+        "smart\","
+      ]
+    },
+    {
+      "lhs": "\"0x094D,",
+      "rhs": [
+        "normal\","
+      ]
+    },
+    {
+      "lhs": "\"0x0,",
+      "rhs": [
+        "smart\""
+      ]
+    },
+    {
+      "lhs": "\"scheme\":",
+      "rhs": [
+        "{"
+      ]
+    },
+    {
+      "lhs": "\"description\":",
+      "rhs": [
+        "\"The",
+        "transliteration",
+        "scheme",
+        "used.\","
+      ]
+    },
+    {
+      "lhs": "\"examples\":",
+      "rhs": [
+        "[\"ASCII\",",
+        "\"RTS\",",
+        "\"ITRANS\",",
+        "\"EPATRA\"]"
+      ]
+    },
+    {
+      "lhs": "\"language\":",
+      "rhs": [
+        "{"
+      ]
+    },
+    {
+      "lhs": "\"description\":",
+      "rhs": [
+        "\"The",
+        "language",
+        "for",
+        "the",
+        "transliteration",
+        "scheme.\","
+      ]
+    },
+    {
+      "lhs": "\"examples\":",
+      "rhs": [
+        "[\"Telugu\",",
+        "\"Devanagari\"]"
+      ]
+    },
+    {
+      "lhs": "\"id\":",
+      "rhs": [
+        "{"
+      ]
+    },
+    {
+      "lhs": "\"description\":",
+      "rhs": [
+        "\"A",
+        "unique",
+        "identifier",
+        "for",
+        "the",
+        "transliteration",
+        "scheme.\","
+      ]
+    },
+    {
+      "lhs": "\"examples\":",
+      "rhs": [
+        "["
+      ]
+    }
+  ],
+  "comments": []
+}

@@ -1,0 +1,33 @@
+{
+  "documentation": {
+    "virama": {
+      "description": "Represents the virama character used for halant or similar functionality, along with its operational mode.",
+      "examples": [
+        "0x094D, smart",
+        "0x09CD, none",
+        "0xf7, smart",
+        "0x094D, normal",
+        "0x0, smart"
+      ]
+    },
+    "scheme": {
+      "description": "The transliteration scheme used.",
+      "examples": ["ASCII", "RTS", "ITRANS", "EPATRA"]
+    },
+    "language": {
+      "description": "The language for the transliteration scheme.",
+      "examples": ["Telugu", "Devanagari"]
+    },
+    "id": {
+      "description": "A unique identifier for the transliteration scheme.",
+      "examples": [
+        "fullhindi",
+        "epatra",
+        "chanakya",
+        "asciiex",
+        "fulldeva",
+        "bengali",
+      ]
+    }
+  }
+}

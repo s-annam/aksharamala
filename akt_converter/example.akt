@@ -1,33 +1,51 @@
-{
-  "documentation": {
-    "virama": {
-      "description": "Represents the virama character used for halant or similar functionality, along with its operational mode.",
-      "examples": [
-        "0x094D, smart",
-        "0x09CD, none",
-        "0xf7, smart",
-        "0x094D, normal",
-        "0x0, smart"
-      ]
-    },
-    "scheme": {
-      "description": "The transliteration scheme used.",
-      "examples": ["ASCII", "RTS", "ITRANS", "EPATRA"]
-    },
-    "language": {
-      "description": "The language for the transliteration scheme.",
-      "examples": ["Telugu", "Devanagari"]
-    },
-    "id": {
-      "description": "A unique identifier for the transliteration scheme.",
-      "examples": [
-        "fullhindi",
-        "epatra",
-        "chanakya",
-        "asciiex",
-        "fulldeva",
-        "bengali",
-      ]
-    }
-  }
-}
+// ==================================================================
+// Copyright (c) 2001-2002 Deshweb.com Pvt. Ltd.
+// ==================================================================
+
+#id = rdeva#
+#virama = 0x0, smart#
+#name = Devanagari Reversliteration#
+#icons = 3341, 3342#
+#language = Devanagari#
+#scheme = Unicode#
+#encoding = ITRANS#
+
+#others#
+
+ँ		.N              // candrabindu
+
+// =*= vowels =*=
+
+अ		a[v]    [][a]{a}[v]
+आ		A[v]    [][a]{A}[v]
+
+// =*= consonants
+
+क		k[a]    [][a]ak[a]
+ख		kh[a]   [][a]akh[a]
+
+र्‍   R       [][a]aR         // marathi half-R (as in daRyaa)
+क्ष   x[a]    [][a]ax[a]      // x = ksh
+ज्ञ   GY[a]   [][a]aGY[a]     // GY = dny
+
+ऽ		    .a
+
+// vowel signs
+
+ा		aa[v]
+
+क़		q[a]    [][a]aq[a]
+क़
+
+।		.               // danda
+
+// =*= DIGITS =*=
+
+०		0
+१		1
+
+॰		ABBR            // devanagari abbreviation sign
+
+.       \.              // ASCII period
+
+#end

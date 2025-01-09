@@ -35,6 +35,33 @@ type Mapping struct {
 	Context string   `json:"context,omitempty"`
 }
 
+// Validate mandatory fields
+func validateMandatoryFields(scheme *TransliterationScheme) error {
+	missingFields := []string{}
+
+	if scheme.ID == "" {
+		missingFields = append(missingFields, "id")
+		scheme.ID = "unknown_id" // Assign default if required
+	}
+	if scheme.Name == "" {
+		missingFields = append(missingFields, "name")
+		scheme.Name = "Unnamed Transliteration"
+	}
+	if scheme.Language == "" {
+		missingFields = append(missingFields, "language")
+		scheme.Language = "unknown_language"
+	}
+	if scheme.Scheme == "" {
+		missingFields = append(missingFields, "scheme")
+		scheme.Scheme = "unknown_scheme"
+	}
+
+	if len(missingFields) > 0 {
+		return fmt.Errorf("mandatory fields missing: %s", strings.Join(missingFields, ", "))
+	}
+	return nil
+}
+
 func main() {
 	// Input and output files
 	inputFile := "example.akt"  // Replace with your AKT file path
@@ -104,12 +131,30 @@ func main() {
 			continue
 		}
 
-		// Match mappings
+		// Match mappings with validation
 		if match := mappingPattern.FindStringSubmatch(line); match != nil {
-			lhs := match[1]
-			rhs := strings.Fields(match[2]) // Split RHS into separate mappings
-			mapping := Mapping{LHS: lhs, RHS: rhs}
-			scheme.Mappings = append(scheme.Mappings, mapping)
+			lhs := strings.TrimSpace(match[1])
+			rhs := strings.Fields(strings.TrimSpace(match[2]))
+
+			// Validate mapping
+			if lhs != "" && len(rhs) > 0 {
+				mapping := Mapping{LHS: lhs, RHS: rhs}
+				scheme.Mappings = append(scheme.Mappings, mapping)
+			} else {
+				fmt.Printf("Invalid mapping skipped: %s\n", line)
+			}
+		} else if strings.HasPrefix(line, "#") {
+			fmt.Printf("Unrecognized metadata key skipped: %s\n", line)
+		} else if strings.HasPrefix(line, "//") {
+			// Include comments for documentation
+			scheme.Comments = append(scheme.Comments, strings.TrimPrefix(line, "//"))
+		} else {
+			fmt.Printf("Malformed or unexpected line skipped: %s\n", line)
+		}
+
+		// If no valid mappings are found
+		if len(scheme.Mappings) == 0 {
+			scheme.Comments = append(scheme.Comments, "No valid mappings found.")
 		}
 	}
 
@@ -117,6 +162,12 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
 		return
+	}
+
+	// Validate mandatory fields after parsing
+	if err := validateMandatoryFields(&scheme); err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1) // Terminate the program if mandatory fields are missing
 	}
 
 	// Write to JSON file

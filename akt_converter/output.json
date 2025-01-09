@@ -1,10 +1,10 @@
 {
-  "id": "",
-  "name": "",
-  "language": "",
-  "scheme": "",
+  "id": "rdeva#",
+  "name": "Devanagari Reversliteration#",
+  "language": "Devanagari#",
+  "scheme": "Unicode#",
   "metadata": {
-    "virama": "",
+    "virama": "0x0, smart#",
     "font_name": "",
     "font_size": 0,
     "icon_enabled": "",
@@ -12,145 +12,143 @@
   },
   "mappings": [
     {
-      "lhs": "\"documentation\":",
+      "lhs": "ँ",
       "rhs": [
-        "{"
+        ".N",
+        "//",
+        "candrabindu"
       ]
     },
     {
-      "lhs": "\"virama\":",
+      "lhs": "अ",
       "rhs": [
-        "{"
+        "a[v]",
+        "[][a]{a}[v]"
       ]
     },
     {
-      "lhs": "\"description\":",
+      "lhs": "आ",
       "rhs": [
-        "\"Represents",
-        "the",
-        "virama",
-        "character",
-        "used",
-        "for",
-        "halant",
-        "or",
-        "similar",
-        "functionality,",
-        "along",
-        "with",
-        "its",
-        "operational",
-        "mode.\","
+        "A[v]",
+        "[][a]{A}[v]"
       ]
     },
     {
-      "lhs": "\"examples\":",
+      "lhs": "क",
       "rhs": [
-        "["
+        "k[a]",
+        "[][a]ak[a]"
       ]
     },
     {
-      "lhs": "\"0x094D,",
+      "lhs": "ख",
       "rhs": [
-        "smart\","
+        "kh[a]",
+        "[][a]akh[a]"
       ]
     },
     {
-      "lhs": "\"0x09CD,",
+      "lhs": "र्‍",
       "rhs": [
-        "none\","
+        "R",
+        "[][a]aR",
+        "//",
+        "marathi",
+        "half-R",
+        "(as",
+        "in",
+        "daRyaa)"
       ]
     },
     {
-      "lhs": "\"0xf7,",
+      "lhs": "क्ष",
       "rhs": [
-        "smart\","
+        "x[a]",
+        "[][a]ax[a]",
+        "//",
+        "x",
+        "=",
+        "ksh"
       ]
     },
     {
-      "lhs": "\"0x094D,",
+      "lhs": "ज्ञ",
       "rhs": [
-        "normal\","
+        "GY[a]",
+        "[][a]aGY[a]",
+        "//",
+        "GY",
+        "=",
+        "dny"
       ]
     },
     {
-      "lhs": "\"0x0,",
+      "lhs": "ऽ",
       "rhs": [
-        "smart\""
+        ".a"
       ]
     },
     {
-      "lhs": "\"scheme\":",
+      "lhs": "ा",
       "rhs": [
-        "{"
+        "aa[v]"
       ]
     },
     {
-      "lhs": "\"description\":",
+      "lhs": "क़",
       "rhs": [
-        "\"The",
-        "transliteration",
-        "scheme",
-        "used.\","
+        "q[a]",
+        "[][a]aq[a]"
       ]
     },
     {
-      "lhs": "\"examples\":",
+      "lhs": "।",
       "rhs": [
-        "[\"ASCII\",",
-        "\"RTS\",",
-        "\"ITRANS\",",
-        "\"EPATRA\"]"
+        ".",
+        "//",
+        "danda"
       ]
     },
     {
-      "lhs": "\"language\":",
+      "lhs": "०",
       "rhs": [
-        "{"
+        "0"
       ]
     },
     {
-      "lhs": "\"description\":",
+      "lhs": "१",
       "rhs": [
-        "\"The",
-        "language",
-        "for",
-        "the",
-        "transliteration",
-        "scheme.\","
+        "1"
       ]
     },
     {
-      "lhs": "\"examples\":",
+      "lhs": "॰",
       "rhs": [
-        "[\"Telugu\",",
-        "\"Devanagari\"]"
+        "ABBR",
+        "//",
+        "devanagari",
+        "abbreviation",
+        "sign"
       ]
     },
     {
-      "lhs": "\"id\":",
+      "lhs": ".",
       "rhs": [
-        "{"
-      ]
-    },
-    {
-      "lhs": "\"description\":",
-      "rhs": [
-        "\"A",
-        "unique",
-        "identifier",
-        "for",
-        "the",
-        "transliteration",
-        "scheme.\","
-      ]
-    },
-    {
-      "lhs": "\"examples\":",
-      "rhs": [
-        "["
+        "\\.",
+        "//",
+        "ASCII",
+        "period"
       ]
     }
   ],
-  "comments": []
+  "comments": [
+    "==================================================================",
+    "Copyright (c) 2001-2002 Deshweb.com Pvt. Ltd.",
+    "==================================================================",
+    "No valid mappings found.",
+    "=*= vowels =*=",
+    "=*= consonants",
+    "vowel signs",
+    "=*= DIGITS =*="
+  ]
 }

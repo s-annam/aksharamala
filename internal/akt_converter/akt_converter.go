@@ -11,6 +11,8 @@ import (
 	"aks.go/internal/types"
 )
 
+const currentVersion = "2025.1" // Define the current version for the JSON format
+
 // Validate mandatory fields
 func validateMandatoryFields(scheme *types.TransliterationScheme) error {
 	missingFields := []string{}
@@ -38,6 +40,7 @@ func validateMandatoryFields(scheme *types.TransliterationScheme) error {
 	return nil
 }
 
+// Parse mappings and handle multiple LHS
 func parseMapping(line string, lastMapping *types.CategoryEntry) *types.CategoryEntry {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
 	lhsOnlyPattern := regexp.MustCompile(`^(\S+)$`)
@@ -47,7 +50,7 @@ func parseMapping(line string, lastMapping *types.CategoryEntry) *types.Category
 		return &types.CategoryEntry{
 			LHS:     []string{match[1]},
 			RHS:     strings.Fields(match[2]),
-			Comment: match[3], // Inline comment
+			Comment: match[3],
 		}
 	}
 
@@ -62,10 +65,11 @@ func parseMapping(line string, lastMapping *types.CategoryEntry) *types.Category
 	return nil
 }
 
-// Main parsing function
+// Parse the AKT file into TransliterationScheme
 func parseFile(file *os.File) (types.TransliterationScheme, error) {
 	scanner := bufio.NewScanner(file)
 	scheme := types.TransliterationScheme{
+		Version:    currentVersion, // Assign the current version
 		Categories: make(map[string]types.Section),
 	}
 
@@ -83,7 +87,7 @@ func parseFile(file *os.File) (types.TransliterationScheme, error) {
 
 		// Check for end-of-file marker
 		if strings.EqualFold(line, "#end") {
-			break // Stop processing
+			break
 		}
 
 		// Match metadata
@@ -149,6 +153,7 @@ func parseFile(file *os.File) (types.TransliterationScheme, error) {
 	return scheme, scanner.Err()
 }
 
+// Parse metadata fields from the AKT file
 func parseMetadata(line string, scheme *types.TransliterationScheme) {
 	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
 	match := metadataPattern.FindStringSubmatch(line)
@@ -175,7 +180,7 @@ func parseMetadata(line string, scheme *types.TransliterationScheme) {
 
 func main() {
 	inputFile := "example.akt"
-	outputFile := "output.json"
+	outputFile := "output.aktj"
 
 	file, err := os.Open(inputFile)
 	if err != nil {

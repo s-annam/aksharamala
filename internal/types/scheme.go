@@ -2,13 +2,14 @@ package types
 
 // TransliterationScheme represents a keymap for transliteration.
 type TransliterationScheme struct {
+	Comments   []string           `json:"comments,omitempty"`
+	Version    string             `json:"version"`
 	ID         string             `json:"id"`
 	Name       string             `json:"name"`
 	Language   string             `json:"language"`
 	Scheme     string             `json:"scheme"`
 	Metadata   Metadata           `json:"metadata"`
 	Categories map[string]Section `json:"categories"`
-	Comments   []string           `json:"comments,omitempty"`
 }
 
 // Metadata contains additional configuration for a transliteration scheme.

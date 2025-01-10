@@ -1,10 +1,36 @@
 # Aksharamala (aks.go)
 
-Aksharamala is a versatile transliteration framework designed to convert text across multiple languages and scripts using customizable keymaps. This project builds upon the legacy of the original Aksharamala, introduced in 1989 as an undergraduate project and later expanded in 2000 with a C++ implementation.
+Aksharamala is a versatile transliteration framework designed to convert text 
+across multiple languages and scripts using customizable keymaps. This project 
+builds upon the legacy of the original Aksharamala, introduced in 1989 as an 
+undergraduate project and later expanded in 2000 with a C++ implementation.
 
 This Go-based implementation modernizes the transliteration process with:
 - JSON-based keymaps for flexibility and compatibility.
 - Command-line tools for managing and applying transliteration schemes.
+
+## License
+
+This project is licensed under the GNU Affero General Public License (AGPL),
+version 3 or later. See the [LICENSE](./LICENSE) file for details.
+
+## History
+
+- **1989**: Original Aksharamala developed as an undergraduate project. This
+  was written in Turbo Pascal, to generate characters on a CRT and dot-matrix
+  printers to type in Telugu. The solution was certainly matching that era.
+- **2000-2003**: Built a brand new C++ version for Windows as a keyboard hook
+  (or colloquially referred to as IME, Input Method Editor) and sold under the
+  banner Deshweb.com Pvt. Ltd.
+- **2025**: Reimagined as an open-source Go project with a focus on modularity
+  and modern workflows. Largely reusing the concepts of transliteration while
+  taking support from ChatGPT, Claude and Gemini to develop code using LLMs.
+  The architecture otherwise has been evolved (for example, taking AKT text
+  files into a JSON based format etc.) to fit today's needs.
+
+### Contributors
+Special acknowledgment to collaborators and contractors who contributed to the
+development of the two original Aksharamala projects.
 
 ## Installation
 

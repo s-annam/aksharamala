@@ -1,17 +1,37 @@
+// This file is part of Aksharamala (aks.go).
+//
+// Aksharamala is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// Aksharamala is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with Aksharamala. If not, see <https://www.gnu.org/licenses/>.
+
 package main
 
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
 	"aks.go/internal/types"
 )
 
-const currentVersion = "2025.1" // Define the current version for the JSON format
+const (
+	defaultVersion = "2025.1"            // Version for the generated file
+	defaultLicense = "AGPL-3.0-or-later" // License for the generated file
+)
 
 // Validate mandatory fields
 func validateMandatoryFields(scheme *types.TransliterationScheme) error {
@@ -69,7 +89,8 @@ func parseMapping(line string, lastMapping *types.CategoryEntry) *types.Category
 func parseFile(file *os.File) (types.TransliterationScheme, error) {
 	scanner := bufio.NewScanner(file)
 	scheme := types.TransliterationScheme{
-		Version:    currentVersion, // Assign the current version
+		Version:    defaultVersion, // Assign the current version
+		License:    defaultLicense, // Assign the default license
 		Categories: make(map[string]types.Section),
 	}
 
@@ -179,25 +200,51 @@ func parseMetadata(line string, scheme *types.TransliterationScheme) {
 }
 
 func main() {
-	inputFile := "example.akt"
-	outputFile := "output.aktj"
+	// Default paths
+	defaultInput := "../../examples/example.akt"
+	defaultOutput := "../../examples/example.aktj"
 
+	// Command-line arguments
+	flag.Parse()
+	args := flag.Args()
+
+	inputFile := defaultInput
+	if len(args) > 0 {
+		inputFile = args[0]
+	}
+
+	outputFile := defaultOutput
+	if len(args) > 1 {
+		outputFile = args[1]
+	}
+
+	// Open and parse the input AKT file
 	file, err := os.Open(inputFile)
 	if err != nil {
-		fmt.Printf("Error opening file: %v\n", err)
+		fmt.Printf("Error opening input file '%s': %v\n", inputFile, err)
 		return
 	}
 	defer file.Close()
 
 	scheme, err := parseFile(file)
 	if err != nil {
-		fmt.Printf("Error parsing file: %v\n", err)
+		fmt.Printf("Error parsing AKT file: %v\n", err)
 		return
 	}
 
+	// Override comments
+	sourceFile := filepath.Base(inputFile)
+	scheme.Comments = []string{
+		fmt.Sprintf("Keymap generated from %s. "+
+			"Manually reviewed and refined for accuracy.", sourceFile),
+		"Distributed under GNU Affero General Public License (AGPL) " +
+			"as with the rest of the Aksharamala project.",
+	}
+
+	// Create the output JSON file
 	output, err := os.Create(outputFile)
 	if err != nil {
-		fmt.Printf("Error creating output file: %v\n", err)
+		fmt.Printf("Error creating output file '%s': %v\n", outputFile, err)
 		return
 	}
 	defer output.Close()
@@ -205,9 +252,9 @@ func main() {
 	encoder := json.NewEncoder(output)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(scheme); err != nil {
-		fmt.Printf("Error encoding JSON: %v\n", err)
+		fmt.Printf("Error encoding JSON to output file: %v\n", err)
 		return
 	}
 
-	fmt.Printf("AKT file converted to JSON successfully: %s\n", outputFile)
+	fmt.Printf("AKT file '%s' converted to JSON successfully: %s\n", inputFile, outputFile)
 }

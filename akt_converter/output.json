@@ -2,7 +2,8 @@
   "comments": [
     " ==================================================================",
     " Copyright (c) 2001-2002 Deshweb.com Pvt. Ltd.",
-    " =================================================================="
+    " ==================================================================",
+    " vowel signs"
   ],
   "id": "rdeva",
   "name": "Devanagari Reversliteration",
@@ -12,37 +13,14 @@
     "virama": "0x0, smart"
   },
   "categories": {
-    "others": {
+    "consonants": {
       "mappings": [
-        {
-          "lhs": "ँ",
-          "rhs": [
-            ".N"
-          ],
-          "comment": "candrabindu"
-        },
-        {
-          "lhs": "अ",
-          "rhs": [
-            "a[v]",
-            "[][a]{a}[v]"
-          ],
-          "comment": " =*= vowels =*="
-        },
-        {
-          "lhs": "आ",
-          "rhs": [
-            "A[v]",
-            "[][a]{A}[v]"
-          ]
-        },
         {
           "lhs": "क",
           "rhs": [
             "k[a]",
             "[][a]ak[a]"
-          ],
-          "comment": " =*= consonants"
+          ]
         },
         {
           "lhs": "ख",
@@ -85,8 +63,7 @@
           "lhs": "ा",
           "rhs": [
             "aa[v]"
-          ],
-          "comment": " vowel signs"
+          ]
         },
         {
           "lhs": "क़",
@@ -101,13 +78,16 @@
             "."
           ],
           "comment": "danda"
-        },
+        }
+      ]
+    },
+    "digits": {
+      "mappings": [
         {
           "lhs": "०",
           "rhs": [
             "0"
-          ],
-          "comment": " =*= DIGITS =*="
+          ]
         },
         {
           "lhs": "१",
@@ -128,6 +108,35 @@
             "\\."
           ],
           "comment": "ASCII period"
+        }
+      ]
+    },
+    "others": {
+      "mappings": [
+        {
+          "lhs": "ँ",
+          "rhs": [
+            ".N"
+          ],
+          "comment": "candrabindu"
+        }
+      ]
+    },
+    "vowels": {
+      "mappings": [
+        {
+          "lhs": "अ",
+          "rhs": [
+            "a[v]",
+            "[][a]{a}[v]"
+          ]
+        },
+        {
+          "lhs": "आ",
+          "rhs": [
+            "A[v]",
+            "[][a]{A}[v]"
+          ]
         }
       ]
     }

@@ -16,21 +16,27 @@
     "consonants": {
       "mappings": [
         {
-          "lhs": "क",
+          "lhs": [
+            "क"
+          ],
           "rhs": [
             "k[a]",
             "[][a]ak[a]"
           ]
         },
         {
-          "lhs": "ख",
+          "lhs": [
+            "ख"
+          ],
           "rhs": [
             "kh[a]",
             "[][a]akh[a]"
           ]
         },
         {
-          "lhs": "र्‍",
+          "lhs": [
+            "र्‍"
+          ],
           "rhs": [
             "R",
             "[][a]aR"
@@ -38,7 +44,9 @@
           "comment": "marathi half-R (as in daRyaa)"
         },
         {
-          "lhs": "क्ष",
+          "lhs": [
+            "क्ष"
+          ],
           "rhs": [
             "x[a]",
             "[][a]ax[a]"
@@ -46,7 +54,9 @@
           "comment": "x = ksh"
         },
         {
-          "lhs": "ज्ञ",
+          "lhs": [
+            "ज्ञ"
+          ],
           "rhs": [
             "GY[a]",
             "[][a]aGY[a]"
@@ -54,26 +64,35 @@
           "comment": "GY = dny"
         },
         {
-          "lhs": "ऽ",
+          "lhs": [
+            "ऽ"
+          ],
           "rhs": [
             ".a"
           ]
         },
         {
-          "lhs": "ा",
+          "lhs": [
+            "ा"
+          ],
           "rhs": [
             "aa[v]"
           ]
         },
         {
-          "lhs": "क़",
+          "lhs": [
+            "क़",
+            "क़"
+          ],
           "rhs": [
             "q[a]",
             "[][a]aq[a]"
           ]
         },
         {
-          "lhs": "।",
+          "lhs": [
+            "।"
+          ],
           "rhs": [
             "."
           ],
@@ -84,26 +103,35 @@
     "digits": {
       "mappings": [
         {
-          "lhs": "०",
+          "lhs": [
+            "०"
+          ],
           "rhs": [
             "0"
           ]
         },
         {
-          "lhs": "१",
+          "lhs": [
+            "१"
+          ],
           "rhs": [
             "1"
           ]
         },
         {
-          "lhs": "॰",
+          "lhs": [
+            "॰"
+          ],
           "rhs": [
             "ABBR"
           ],
           "comment": "devanagari abbreviation sign"
         },
         {
-          "lhs": ".",
+          "lhs": [
+            ".",
+            "#end"
+          ],
           "rhs": [
             "\\."
           ],
@@ -114,7 +142,9 @@
     "others": {
       "mappings": [
         {
-          "lhs": "ँ",
+          "lhs": [
+            "ँ"
+          ],
           "rhs": [
             ".N"
           ],
@@ -125,14 +155,18 @@
     "vowels": {
       "mappings": [
         {
-          "lhs": "अ",
+          "lhs": [
+            "अ"
+          ],
           "rhs": [
             "a[v]",
             "[][a]{a}[v]"
           ]
         },
         {
-          "lhs": "आ",
+          "lhs": [
+            "आ"
+          ],
           "rhs": [
             "A[v]",
             "[][a]{A}[v]"

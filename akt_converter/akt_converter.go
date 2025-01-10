@@ -19,9 +19,9 @@ type Metadata struct {
 }
 
 type CategoryEntry struct {
-	LHS     string   `json:"lhs"`
+	LHS     []string `json:"lhs"` // Updated to a slice for multiple LHSs
 	RHS     []string `json:"rhs"`
-	Comment string   `json:"comment,omitempty"` // Omit if no comment
+	Comment string   `json:"comment,omitempty"`
 }
 type Section struct {
 	Comments []string        `json:"comments,omitempty"` // Section-level comments
@@ -69,16 +69,27 @@ func validateMandatoryFields(scheme *TransliterationScheme) error {
 	return nil
 }
 
-func parseMapping(line string) *CategoryEntry {
+func parseMapping(line string, lastMapping *CategoryEntry) *CategoryEntry {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
-	match := mappingPattern.FindStringSubmatch(line)
-	if match != nil {
+	lhsOnlyPattern := regexp.MustCompile(`^(\S+)$`)
+
+	// Match full mappings
+	if match := mappingPattern.FindStringSubmatch(line); match != nil {
 		return &CategoryEntry{
-			LHS:     match[1],
+			LHS:     []string{match[1]},
 			RHS:     strings.Fields(match[2]),
 			Comment: match[3], // Inline comment
 		}
 	}
+
+	// Match LHS-only lines and attach to the last mapping
+	if match := lhsOnlyPattern.FindStringSubmatch(line); match != nil {
+		if lastMapping != nil {
+			lastMapping.LHS = append(lastMapping.LHS, match[1])
+		}
+		return nil
+	}
+
 	return nil
 }
 
@@ -96,6 +107,7 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 	var currentCategory string
 	var section Section
 	var fileComments []string
+	var lastMapping *CategoryEntry
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -116,6 +128,7 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 			// Start a new section
 			currentCategory = match[1]
 			section = Section{}
+			lastMapping = nil // Reset last mapping for the new section
 			continue
 		}
 
@@ -129,6 +142,7 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 			// Start a new (pseudo) section
 			currentCategory = strings.ToLower(match[1])
 			section = Section{}
+			lastMapping = nil // Reset last mapping for the new section
 			continue
 		}
 
@@ -139,9 +153,10 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 		}
 
 		// Match mappings within the current section
-		entry := parseMapping(line)
+		entry := parseMapping(line, lastMapping)
 		if entry != nil {
 			section.Mappings = append(section.Mappings, *entry)
+			lastMapping = &section.Mappings[len(section.Mappings)-1] // Track last mapping
 		}
 	}
 

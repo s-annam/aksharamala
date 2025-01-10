@@ -1,6 +1,4 @@
-### **`documentation.md`**
-
-#### **AKT-to-JSON Converter Documentation**
+## **AKT-to-JSON Converter Documentation**
 
 ---
 
@@ -53,6 +51,7 @@ Sections are defined with a header like `#vowels#`:
 #### **Pseudo-Sections**
 Pseudo-sections are defined within comments:
 
+```
 #others#
 
 // =*= vowels =*=
@@ -62,13 +61,16 @@ Pseudo-sections are defined within comments:
 // =*= DIGITS =*=
 ०   0 
 १   1
+```
 
 #### **Multiple LHS Entries**
 Lines with only an LHS (no RHS) are attached to the previous mapping:
 
+```
 aa  0x0906 0x093E
 A
 i   0x0907 0x093F
+```
 
 #### **End Marker**
 The `#end` marker signifies the end of the file:
@@ -96,6 +98,7 @@ Each section or pseudo-section is represented as a category:
     ]
   }
 }
+```
 
 ### Examples
 #### Input AKT

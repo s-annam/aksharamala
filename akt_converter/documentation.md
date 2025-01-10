@@ -89,7 +89,7 @@ The `#end` marker signifies the end of the file:
 Each section or pseudo-section is represented as a category:
 ```json
 "categories": {
-  "vowels-no-virama": {
+  "vowels": {
     "mappings": [
       { "lhs": ["aa", "A"], "rhs": ["0x0906", "0x093E"] },
       { "lhs": ["i"], "rhs": ["0x0907", "0x093F"] }
@@ -131,7 +131,7 @@ Each section or pseudo-section is represented as a category:
         { "lhs": ["आ"], "rhs": ["A[v]"] }
       ]
     },
-    "digits-no-virama": {
+    "digits": {
       "mappings": [
         { "lhs": ["०"], "rhs": ["0"] },
         { "lhs": ["१"], "rhs": ["1"] }

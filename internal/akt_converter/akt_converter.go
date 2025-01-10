@@ -7,43 +7,12 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"aks.go/internal/types"
 )
 
-// Struct for JSON output
-type Metadata struct {
-	Virama       string `json:"virama,omitempty"`        // Omit if empty
-	FontName     string `json:"font_name,omitempty"`     // Omit if empty
-	FontSize     int    `json:"font_size,omitempty"`     // Omit if 0
-	IconEnabled  string `json:"icon_enabled,omitempty"`  // Omit if empty
-	IconDisabled string `json:"icon_disabled,omitempty"` // Omit if empty
-}
-
-type CategoryEntry struct {
-	LHS     []string `json:"lhs"` // Updated to a slice for multiple LHSs
-	RHS     []string `json:"rhs"`
-	Comment string   `json:"comment,omitempty"`
-}
-type Section struct {
-	Comments []string        `json:"comments,omitempty"` // Section-level comments
-	Mappings []CategoryEntry `json:"mappings"`
-}
-type TransliterationScheme struct {
-	Comments   []string           `json:"comments,omitempty"` // File-level comments
-	ID         string             `json:"id"`
-	Name       string             `json:"name"`
-	Language   string             `json:"language"`
-	Scheme     string             `json:"scheme"`
-	Metadata   Metadata           `json:"metadata"`
-	Categories map[string]Section `json:"categories"`
-}
-type Mapping struct {
-	LHS     string   `json:"lhs"`
-	RHS     []string `json:"rhs"`
-	Context string   `json:"context,omitempty"`
-}
-
 // Validate mandatory fields
-func validateMandatoryFields(scheme *TransliterationScheme) error {
+func validateMandatoryFields(scheme *types.TransliterationScheme) error {
 	missingFields := []string{}
 
 	if scheme.ID == "" {
@@ -69,13 +38,13 @@ func validateMandatoryFields(scheme *TransliterationScheme) error {
 	return nil
 }
 
-func parseMapping(line string, lastMapping *CategoryEntry) *CategoryEntry {
+func parseMapping(line string, lastMapping *types.CategoryEntry) *types.CategoryEntry {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
 	lhsOnlyPattern := regexp.MustCompile(`^(\S+)$`)
 
 	// Match full mappings
 	if match := mappingPattern.FindStringSubmatch(line); match != nil {
-		return &CategoryEntry{
+		return &types.CategoryEntry{
 			LHS:     []string{match[1]},
 			RHS:     strings.Fields(match[2]),
 			Comment: match[3], // Inline comment
@@ -94,10 +63,10 @@ func parseMapping(line string, lastMapping *CategoryEntry) *CategoryEntry {
 }
 
 // Main parsing function
-func parseFile(file *os.File) (TransliterationScheme, error) {
+func parseFile(file *os.File) (types.TransliterationScheme, error) {
 	scanner := bufio.NewScanner(file)
-	scheme := TransliterationScheme{
-		Categories: make(map[string]Section),
+	scheme := types.TransliterationScheme{
+		Categories: make(map[string]types.Section),
 	}
 
 	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
@@ -105,9 +74,9 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 	pseudoSectionPattern := regexp.MustCompile(`^\/\/\s*=\*=\s*(\w+)(?:\s*=\*=\s*)?$`) // Pseudo-sections
 
 	var currentCategory string
-	var section Section
+	var section types.Section
 	var fileComments []string
-	var lastMapping *CategoryEntry
+	var lastMapping *types.CategoryEntry
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -132,7 +101,7 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 
 			// Start a new section
 			currentCategory = match[1]
-			section = Section{}
+			section = types.Section{}
 			lastMapping = nil // Reset last mapping for the new section
 			continue
 		}
@@ -146,7 +115,7 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 
 			// Start a new (pseudo) section
 			currentCategory = strings.ToLower(match[1])
-			section = Section{}
+			section = types.Section{}
 			lastMapping = nil // Reset last mapping for the new section
 			continue
 		}
@@ -180,7 +149,7 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 	return scheme, scanner.Err()
 }
 
-func parseMetadata(line string, scheme *TransliterationScheme) {
+func parseMetadata(line string, scheme *types.TransliterationScheme) {
 	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
 	match := metadataPattern.FindStringSubmatch(line)
 	if match == nil {

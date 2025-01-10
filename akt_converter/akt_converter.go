@@ -112,6 +112,11 @@ func parseFile(file *os.File) (TransliterationScheme, error) {
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 
+		// Check for end-of-file marker
+		if strings.EqualFold(line, "#end") {
+			break // Stop processing
+		}
+
 		// Match metadata
 		if match := metadataPattern.FindStringSubmatch(line); match != nil {
 			parseMetadata(line, &scheme)

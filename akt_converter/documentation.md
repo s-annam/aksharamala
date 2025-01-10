@@ -89,6 +89,7 @@ The `#end` marker signifies the end of the file:
 
 #### **Categories**
 Each section or pseudo-section is represented as a category:
+
 ```json
 "categories": {
   "vowels": {
@@ -123,7 +124,7 @@ Each section or pseudo-section is represented as a category:
 
 #### Generated JSON
 
-```
+```json
 {
   "id": "example_id",
   "name": "Example Transliteration",

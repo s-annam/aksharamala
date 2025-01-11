@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"aks.go/internal/types"
@@ -60,7 +61,53 @@ func validateMandatoryFields(scheme *types.TransliterationScheme) error {
 	return nil
 }
 
-func handleFormattedChars(value string) string {
+// Convert 0x-prefixed hexadecimal Unicode values to their corresponding characters
+func convertUnicode(value string) string {
+	// Recognize optional context markers around the Unicode values
+	match := regexp.MustCompile(`^((?:\([^)]*\))*)([^()]+)((?:\([^)]*\))*)?$`).FindStringSubmatch(value)
+	var before, middle, after string
+
+	if len(match) > 1 {
+		before = match[1]
+	}
+	if len(match) > 2 {
+		middle = match[2]
+	}
+	if len(match) > 3 {
+		after = match[3]
+	}
+
+	// Split by commas to handle multiple values
+	parts := strings.Split(middle, ",")
+	var result strings.Builder
+
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if strings.HasPrefix(part, "0x") {
+			// Parse the hexadecimal value
+			codePoint, err := strconv.ParseInt(part[2:], 16, 32)
+			if err == nil {
+				result.WriteRune(rune(codePoint)) // Append the Unicode character
+			}
+		} else {
+			// Append non-Unicode parts as-is
+			result.WriteString(part)
+		}
+	}
+
+	// Combine the parts with the context markers
+	return before + result.String() + after
+}
+
+func handleMappingMatch(part string) []string {
+	splits := strings.Fields(part)
+	for i, split := range splits {
+		splits[i] = handleSingleMapping(split)
+	}
+	return splits
+}
+
+func handleSingleMapping(value string) string {
 	// Handle left and right square brackets
 	value = strings.ReplaceAll(value, "\\[", "\\u005C\\u005B")
 	value = strings.ReplaceAll(value, "\\]", "\\u005C\\u005D")
@@ -76,9 +123,12 @@ func handleFormattedChars(value string) string {
 	value = strings.ReplaceAll(value, "}", "\\u007D")
 	value = strings.ReplaceAll(value, "\\{", "\\u005C\\u007B")
 	value = strings.ReplaceAll(value, "\\}", "\\u005C\\u007D")
+
 	// Handle escaped backslashes
 	value = strings.ReplaceAll(value, "\\\\", "\\u005C")
-	return value
+
+	// Handle old-style Unicode strings
+	return convertUnicode(value)
 }
 
 // Parse mappings and handle multiple LHS
@@ -89,8 +139,8 @@ func parseMapping(line string, lastMapping *types.CategoryEntry) *types.Category
 	// Match full mappings
 	if match := mappingPattern.FindStringSubmatch(line); match != nil {
 		return &types.CategoryEntry{
-			LHS:     []string{handleFormattedChars(match[1])},
-			RHS:     strings.Fields(handleFormattedChars(match[2])),
+			LHS:     handleMappingMatch(match[1]),
+			RHS:     handleMappingMatch(match[2]),
 			Comment: match[3],
 		}
 	}
@@ -98,7 +148,9 @@ func parseMapping(line string, lastMapping *types.CategoryEntry) *types.Category
 	// Match LHS-only lines and attach to the last mapping
 	if match := lhsOnlyPattern.FindStringSubmatch(line); match != nil {
 		if lastMapping != nil {
-			lastMapping.LHS = append(lastMapping.LHS, handleFormattedChars(match[1]))
+			// Append the new LHS to the last mapping's LHS
+			x := handleMappingMatch(match[1])[0]
+			lastMapping.LHS = append(lastMapping.LHS, x)
 		}
 		return nil
 	}

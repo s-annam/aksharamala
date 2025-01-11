@@ -1,5 +1,8 @@
 {
-  "comments": ["Keymap generated from example.akt. Manually reviewed and refined for accuracy.","Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."],
+  "comments": [
+    "Keymap generated from example.akt. Manually reviewed and refined for accuracy.",
+    "Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."
+  ],
   "version": "2025.1",
   "id": "rdeva",
   "name": "Devanagari Reversliteration",
@@ -8,12 +11,6 @@
   "scheme": "Unicode",
   "metadata": {"virama":"0x0, smart"},
   "categories": {
-    "others": [
-    ],
-    "vowels": [
-      {"lhs":["अ"],"rhs":["a(v)","()(a)\\u007Ba\\u007D(v)"]},
-      {"lhs":["आ"],"rhs":["A(v)","()(a)\\u007BA\\u007D(v)"]}
-    ],
     "consonants": [
       {"lhs":["क"],"rhs":["k(a)","()(a)ak(a)"]},
       {"lhs":["ख"],"rhs":["kh(a)","()(a)akh(a)"]},
@@ -30,6 +27,12 @@
       {"lhs":["१"],"rhs":["1"]},
       {"comment":"devanagari abbreviation sign","lhs":["॰"],"rhs":["ABBR"]},
       {"comment":"ASCII period","lhs":["."],"rhs":["\\."]}
+    ],
+    "others": [
+    ],
+    "vowels": [
+      {"lhs":["अ"],"rhs":["a(v)","()(a)\\u007Ba\\u007D(v)"]},
+      {"lhs":["आ"],"rhs":["A(v)","()(a)\\u007BA\\u007D(v)"]}
     ]
   }
 }

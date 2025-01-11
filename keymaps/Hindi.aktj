@@ -1,0 +1,755 @@
+{
+  "comments": [
+    "Keymap generated from Hindi.akt. Manually reviewed and refined for accuracy.",
+    "Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."
+  ],
+  "version": "2025.1",
+  "id": "hindi",
+  "name": "Hindi Transliteration Scheme",
+  "license": "AGPL-3.0-or-later",
+  "language": "Devanagari",
+  "scheme": "ITRANS",
+  "metadata": {
+    "virama": "0x094D, smart"
+  },
+  "categories": {
+    "consonants": {
+      "mappings": [
+        {
+          "lhs": [
+            "k"
+          ],
+          "rhs": [
+            "0x0915"
+          ]
+        },
+        {
+          "lhs": [
+            "kh"
+          ],
+          "rhs": [
+            "0x0916"
+          ]
+        },
+        {
+          "lhs": [
+            "g"
+          ],
+          "rhs": [
+            "0x0917"
+          ]
+        },
+        {
+          "lhs": [
+            "gh"
+          ],
+          "rhs": [
+            "0x0918"
+          ]
+        },
+        {
+          "lhs": [
+            "~N",
+            "N^"
+          ],
+          "rhs": [
+            "0x0919"
+          ]
+        },
+        {
+          "lhs": [
+            "ch",
+            "c"
+          ],
+          "rhs": [
+            "0x091A"
+          ]
+        },
+        {
+          "lhs": [
+            "Ch",
+            "chh",
+            "C"
+          ],
+          "rhs": [
+            "0x091B"
+          ]
+        },
+        {
+          "lhs": [
+            "j"
+          ],
+          "rhs": [
+            "0x091C"
+          ]
+        },
+        {
+          "lhs": [
+            "jh"
+          ],
+          "rhs": [
+            "0x091D"
+          ]
+        },
+        {
+          "lhs": [
+            "~n",
+            "JN"
+          ],
+          "rhs": [
+            "0x091E"
+          ]
+        },
+        {
+          "lhs": [
+            "T"
+          ],
+          "rhs": [
+            "0x091F"
+          ]
+        },
+        {
+          "lhs": [
+            "Th"
+          ],
+          "rhs": [
+            "0x0920"
+          ]
+        },
+        {
+          "lhs": [
+            "D"
+          ],
+          "rhs": [
+            "0x0921"
+          ]
+        },
+        {
+          "lhs": [
+            "Dh"
+          ],
+          "rhs": [
+            "0x0922"
+          ]
+        },
+        {
+          "lhs": [
+            "N"
+          ],
+          "rhs": [
+            "0x0923",
+            "[t]0x0919"
+          ]
+        },
+        {
+          "lhs": [
+            "t"
+          ],
+          "rhs": [
+            "0x0924"
+          ]
+        },
+        {
+          "lhs": [
+            "th"
+          ],
+          "rhs": [
+            "0x0925"
+          ]
+        },
+        {
+          "lhs": [
+            "d"
+          ],
+          "rhs": [
+            "0x0926"
+          ]
+        },
+        {
+          "lhs": [
+            "dh"
+          ],
+          "rhs": [
+            "0x0927"
+          ]
+        },
+        {
+          "lhs": [
+            "n"
+          ],
+          "rhs": [
+            "0x0928",
+            "[t]0x0919"
+          ]
+        },
+        {
+          "lhs": [
+            "p"
+          ],
+          "rhs": [
+            "0x092A"
+          ]
+        },
+        {
+          "lhs": [
+            "ph",
+            "P"
+          ],
+          "rhs": [
+            "0x092B"
+          ]
+        },
+        {
+          "lhs": [
+            "b"
+          ],
+          "rhs": [
+            "0x092C"
+          ]
+        },
+        {
+          "lhs": [
+            "bh",
+            "B"
+          ],
+          "rhs": [
+            "0x092D"
+          ]
+        },
+        {
+          "lhs": [
+            "m"
+          ],
+          "rhs": [
+            "0x092E"
+          ]
+        },
+        {
+          "lhs": [
+            "y"
+          ],
+          "rhs": [
+            "0x092F"
+          ]
+        },
+        {
+          "lhs": [
+            "r"
+          ],
+          "rhs": [
+            "0x0930"
+          ]
+        },
+        {
+          "lhs": [
+            "l"
+          ],
+          "rhs": [
+            "0x0932"
+          ]
+        },
+        {
+          "lhs": [
+            "v",
+            "w"
+          ],
+          "rhs": [
+            "0x0935"
+          ]
+        },
+        {
+          "lhs": [
+            "sh",
+            "S"
+          ],
+          "rhs": [
+            "0x0936"
+          ]
+        },
+        {
+          "lhs": [
+            "Sh",
+            "shh"
+          ],
+          "rhs": [
+            "0x0937"
+          ]
+        },
+        {
+          "lhs": [
+            "s"
+          ],
+          "rhs": [
+            "0x0938"
+          ]
+        },
+        {
+          "lhs": [
+            "h"
+          ],
+          "rhs": [
+            "0x0939"
+          ]
+        },
+        {
+          "lhs": [
+            "L"
+          ],
+          "rhs": [
+            "0x0933"
+          ]
+        },
+        {
+          "lhs": [
+            "q"
+          ],
+          "rhs": [
+            "0x0958"
+          ]
+        },
+        {
+          "lhs": [
+            "K"
+          ],
+          "rhs": [
+            "0x0959"
+          ]
+        },
+        {
+          "lhs": [
+            "G"
+          ],
+          "rhs": [
+            "0x095A"
+          ]
+        },
+        {
+          "lhs": [
+            "z",
+            "J"
+          ],
+          "rhs": [
+            "0x095B"
+          ]
+        },
+        {
+          "lhs": [
+            ".D"
+          ],
+          "rhs": [
+            "0x095C"
+          ]
+        },
+        {
+          "lhs": [
+            ".Dh"
+          ],
+          "rhs": [
+            "0x095D"
+          ]
+        },
+        {
+          "lhs": [
+            "f"
+          ],
+          "rhs": [
+            "0x095E"
+          ]
+        },
+        {
+          "lhs": [
+            "Y"
+          ],
+          "rhs": [
+            "0x095F"
+          ]
+        },
+        {
+          "lhs": [
+            "x",
+            "ksh"
+          ],
+          "rhs": [
+            "0x0915,0x094D,0x0937"
+          ]
+        },
+        {
+          "lhs": [
+            "GY",
+            "dny"
+          ],
+          "rhs": [
+            "0x091C,0x094D,0x091E"
+          ]
+        },
+        {
+          "lhs": [
+            ".r",
+            "^r"
+          ],
+          "rhs": [
+            "0xffff",
+            "[r]0x0930,0x094d"
+          ]
+        }
+      ]
+    },
+    "others": {
+      "mappings": [
+        {
+          "lhs": [
+            "_"
+          ],
+          "rhs": [
+            "0x0"
+          ],
+          "comment": "=*= SPECIAL HANDLING =*="
+        },
+        {
+          "lhs": [
+            "\\##"
+          ],
+          "rhs": [
+            "0xfffe"
+          ],
+          "comment": "=*= ENGLISH \u003c-\u003e ITRANS HINDI"
+        },
+        {
+          "lhs": [
+            "0"
+          ],
+          "rhs": [
+            "0x0966"
+          ],
+          "comment": "zero"
+        },
+        {
+          "lhs": [
+            "1"
+          ],
+          "rhs": [
+            "0x0967"
+          ],
+          "comment": "one"
+        },
+        {
+          "lhs": [
+            "2"
+          ],
+          "rhs": [
+            "0x0968"
+          ],
+          "comment": "two"
+        },
+        {
+          "lhs": [
+            "3"
+          ],
+          "rhs": [
+            "0x0969"
+          ],
+          "comment": "three"
+        },
+        {
+          "lhs": [
+            "4"
+          ],
+          "rhs": [
+            "0x096A"
+          ],
+          "comment": "four"
+        },
+        {
+          "lhs": [
+            "5"
+          ],
+          "rhs": [
+            "0x096B"
+          ],
+          "comment": "five"
+        },
+        {
+          "lhs": [
+            "6"
+          ],
+          "rhs": [
+            "0x096C"
+          ],
+          "comment": "six"
+        },
+        {
+          "lhs": [
+            "7"
+          ],
+          "rhs": [
+            "0x096D"
+          ],
+          "comment": "seven"
+        },
+        {
+          "lhs": [
+            "8"
+          ],
+          "rhs": [
+            "0x096E"
+          ],
+          "comment": "eight"
+        },
+        {
+          "lhs": [
+            "9"
+          ],
+          "rhs": [
+            "0x096F"
+          ],
+          "comment": "nine"
+        },
+        {
+          "lhs": [
+            "."
+          ],
+          "rhs": [
+            "0x0964"
+          ],
+          "comment": "danda"
+        },
+        {
+          "lhs": [
+            ".."
+          ],
+          "rhs": [
+            "0x0965"
+          ],
+          "comment": "double danda"
+        },
+        {
+          "lhs": [
+            "\\\\."
+          ],
+          "rhs": [
+            "'.'"
+          ],
+          "comment": "ASCII period"
+        },
+        {
+          "lhs": [
+            "\\\\}"
+          ],
+          "rhs": [
+            "}"
+          ]
+        },
+        {
+          "lhs": [
+            "\\\\{"
+          ],
+          "rhs": [
+            "{"
+          ]
+        },
+        {
+          "lhs": [
+            "\\\\threedots"
+          ],
+          "rhs": [
+            "'...'"
+          ],
+          "comment": "three dots"
+        },
+        {
+          "lhs": [
+            "\\\\`"
+          ],
+          "rhs": [
+            "0x0951"
+          ],
+          "comment": "udatta"
+        },
+        {
+          "lhs": [
+            "\\\\_"
+          ],
+          "rhs": [
+            "0x0952"
+          ],
+          "comment": "anudatta"
+        },
+        {
+          "lhs": [
+            "\\\\nukta"
+          ],
+          "rhs": [
+            "0x093C"
+          ],
+          "comment": "nukta"
+        }
+      ]
+    },
+    "vowels": {
+      "mappings": [
+        {
+          "lhs": [
+            "a"
+          ],
+          "rhs": [
+            "0x0905",
+            "0x0"
+          ]
+        },
+        {
+          "lhs": [
+            "aa",
+            "A"
+          ],
+          "rhs": [
+            "0x0906",
+            "0x093E"
+          ]
+        },
+        {
+          "lhs": [
+            "i"
+          ],
+          "rhs": [
+            "0x0907",
+            "0x093F"
+          ]
+        },
+        {
+          "lhs": [
+            "ii",
+            "I",
+            "ee"
+          ],
+          "rhs": [
+            "0x0908",
+            "0x0940"
+          ]
+        },
+        {
+          "lhs": [
+            "u"
+          ],
+          "rhs": [
+            "0x0909",
+            "0x0941"
+          ]
+        },
+        {
+          "lhs": [
+            "uu",
+            "U",
+            "oo"
+          ],
+          "rhs": [
+            "0x090A",
+            "0x0942"
+          ]
+        },
+        {
+          "lhs": [
+            "R^i",
+            "RRi"
+          ],
+          "rhs": [
+            "0x090B",
+            "0x0943"
+          ]
+        },
+        {
+          "lhs": [
+            "R^I",
+            "RRI"
+          ],
+          "rhs": [
+            "0x0960",
+            "0x0944"
+          ]
+        },
+        {
+          "lhs": [
+            "L^i",
+            "LLi"
+          ],
+          "rhs": [
+            "0x090C",
+            "0x0962"
+          ]
+        },
+        {
+          "lhs": [
+            "L^I",
+            "LLI"
+          ],
+          "rhs": [
+            "0x0961",
+            "0x0963"
+          ]
+        },
+        {
+          "lhs": [
+            "a.c",
+            ".c"
+          ],
+          "rhs": [
+            "0xFFFF",
+            "0x0945"
+          ]
+        },
+        {
+          "lhs": [
+            "e.c"
+          ],
+          "rhs": [
+            "0x090D"
+          ]
+        },
+        {
+          "lhs": [
+            "e"
+          ],
+          "rhs": [
+            "0x090F",
+            "0x0947"
+          ]
+        },
+        {
+          "lhs": [
+            "ai"
+          ],
+          "rhs": [
+            "0x0910",
+            "0x0948"
+          ]
+        },
+        {
+          "lhs": [
+            "aa.c"
+          ],
+          "rhs": [
+            "0x0911",
+            "0x0949"
+          ]
+        },
+        {
+          "lhs": [
+            "o"
+          ],
+          "rhs": [
+            "0x0913",
+            "0x094B"
+          ]
+        },
+        {
+          "lhs": [
+            "au"
+          ],
+          "rhs": [
+            "0x0914",
+            "0x094C"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -60,6 +60,22 @@ func validateMandatoryFields(scheme *types.TransliterationScheme) error {
 	return nil
 }
 
+func handleFormattedChars(value string) string {
+	// Handle left and right square brackets
+	value = strings.ReplaceAll(value, "[", "\\u005B")
+	value = strings.ReplaceAll(value, "]", "\\u005D")
+	value = strings.ReplaceAll(value, "\\[", "\\u005C\\u005B")
+	value = strings.ReplaceAll(value, "\\]", "\\u005C\\u005D")
+	// Handle left and right curly braces
+	value = strings.ReplaceAll(value, "{", "\\u007B")
+	value = strings.ReplaceAll(value, "}", "\\u007D")
+	value = strings.ReplaceAll(value, "\\{", "\\u005C\\u007B")
+	value = strings.ReplaceAll(value, "\\}", "\\u005C\\u007D")
+	// Handle escaped backslashes
+	value = strings.ReplaceAll(value, "\\\\", "\\u005C")
+	return value
+}
+
 // Parse mappings and handle multiple LHS
 func parseMapping(line string, lastMapping *types.CategoryEntry) *types.CategoryEntry {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
@@ -68,8 +84,8 @@ func parseMapping(line string, lastMapping *types.CategoryEntry) *types.Category
 	// Match full mappings
 	if match := mappingPattern.FindStringSubmatch(line); match != nil {
 		return &types.CategoryEntry{
-			LHS:     []string{match[1]},
-			RHS:     strings.Fields(match[2]),
+			LHS:     []string{handleFormattedChars(match[1])},
+			RHS:     strings.Fields(handleFormattedChars(match[2])),
 			Comment: match[3],
 		}
 	}
@@ -77,7 +93,7 @@ func parseMapping(line string, lastMapping *types.CategoryEntry) *types.Category
 	// Match LHS-only lines and attach to the last mapping
 	if match := lhsOnlyPattern.FindStringSubmatch(line); match != nil {
 		if lastMapping != nil {
-			lastMapping.LHS = append(lastMapping.LHS, match[1])
+			lastMapping.LHS = append(lastMapping.LHS, handleFormattedChars(match[1]))
 		}
 		return nil
 	}

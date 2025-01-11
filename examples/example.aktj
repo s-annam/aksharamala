@@ -1,13 +1,12 @@
 {
   "comments": [
-    " ==================================================================",
-    " Copyright (c) 2001-2002 Deshweb.com Pvt. Ltd.",
-    " ==================================================================",
-    " vowel signs"
+    "Keymap generated from example.akt. Manually reviewed and refined for accuracy.",
+    "Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."
   ],
   "version": "2025.1",
   "id": "rdeva",
   "name": "Devanagari Reversliteration",
+  "license": "AGPL-3.0-or-later",
   "language": "Devanagari",
   "scheme": "Unicode",
   "metadata": {
@@ -21,8 +20,8 @@
             "क"
           ],
           "rhs": [
-            "k[a]",
-            "[][a]ak[a]"
+            "k\\u005Ba\\u005D",
+            "\\u005B\\u005D\\u005Ba\\u005Dak\\u005Ba\\u005D"
           ]
         },
         {
@@ -30,8 +29,8 @@
             "ख"
           ],
           "rhs": [
-            "kh[a]",
-            "[][a]akh[a]"
+            "kh\\u005Ba\\u005D",
+            "\\u005B\\u005D\\u005Ba\\u005Dakh\\u005Ba\\u005D"
           ]
         },
         {
@@ -40,7 +39,7 @@
           ],
           "rhs": [
             "R",
-            "[][a]aR"
+            "\\u005B\\u005D\\u005Ba\\u005DaR"
           ],
           "comment": "marathi half-R (as in daRyaa)"
         },
@@ -49,8 +48,8 @@
             "क्ष"
           ],
           "rhs": [
-            "x[a]",
-            "[][a]ax[a]"
+            "x\\u005Ba\\u005D",
+            "\\u005B\\u005D\\u005Ba\\u005Dax\\u005Ba\\u005D"
           ],
           "comment": "x = ksh"
         },
@@ -59,8 +58,8 @@
             "ज्ञ"
           ],
           "rhs": [
-            "GY[a]",
-            "[][a]aGY[a]"
+            "GY\\u005Ba\\u005D",
+            "\\u005B\\u005D\\u005Ba\\u005DaGY\\u005Ba\\u005D"
           ],
           "comment": "GY = dny"
         },
@@ -77,7 +76,7 @@
             "ा"
           ],
           "rhs": [
-            "aa[v]"
+            "aa\\u005Bv\\u005D"
           ]
         },
         {
@@ -86,8 +85,8 @@
             "क़"
           ],
           "rhs": [
-            "q[a]",
-            "[][a]aq[a]"
+            "q\\u005Ba\\u005D",
+            "\\u005B\\u005D\\u005Ba\\u005Daq\\u005Ba\\u005D"
           ]
         },
         {
@@ -143,6 +142,85 @@
       "mappings": [
         {
           "lhs": [
+            "."
+          ],
+          "rhs": [
+            "0x0964"
+          ],
+          "comment": "danda"
+        },
+        {
+          "lhs": [
+            ".."
+          ],
+          "rhs": [
+            "0x0965"
+          ],
+          "comment": "double danda"
+        },
+        {
+          "lhs": [
+            "\\u005C\\u005C."
+          ],
+          "rhs": [
+            "'.'"
+          ],
+          "comment": "ASCII period"
+        },
+        {
+          "lhs": [
+            "\\u005C\\u005C\\u007D"
+          ],
+          "rhs": [
+            "\\u007D"
+          ]
+        },
+        {
+          "lhs": [
+            "\\u005C\\u005C\\u007B"
+          ],
+          "rhs": [
+            "\\u007B"
+          ]
+        },
+        {
+          "lhs": [
+            "\\u005C\\u005Cthreedots"
+          ],
+          "rhs": [
+            "'...'"
+          ],
+          "comment": "three dots"
+        },
+        {
+          "lhs": [
+            "\\u005C\\u005C`"
+          ],
+          "rhs": [
+            "0x0951"
+          ],
+          "comment": "udatta"
+        },
+        {
+          "lhs": [
+            "\\u005C\\u005C_"
+          ],
+          "rhs": [
+            "0x0952"
+          ],
+          "comment": "anudatta"
+        },
+        {
+          "lhs": [
+            "\\u005C\\u005Cnukta"
+          ],
+          "rhs": [
+            "0x093C"
+          ],
+          "comment": "nukta"
+        },
+        {
+          "lhs": [
             "ँ"
           ],
           "rhs": [
@@ -159,8 +237,8 @@
             "अ"
           ],
           "rhs": [
-            "a[v]",
-            "[][a]{a}[v]"
+            "a\\u005Bv\\u005D",
+            "\\u005B\\u005D\\u005Ba\\u005D\\u007Ba\\u007D\\u005Bv\\u005D"
           ]
         },
         {
@@ -168,8 +246,8 @@
             "आ"
           ],
           "rhs": [
-            "A[v]",
-            "[][a]{A}[v]"
+            "A\\u005Bv\\u005D",
+            "\\u005B\\u005D\\u005Ba\\u005D\\u007BA\\u007D\\u005Bv\\u005D"
           ]
         }
       ]

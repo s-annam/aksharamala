@@ -62,10 +62,15 @@ func validateMandatoryFields(scheme *types.TransliterationScheme) error {
 
 func handleFormattedChars(value string) string {
 	// Handle left and right square brackets
-	value = strings.ReplaceAll(value, "[", "\\u005B")
-	value = strings.ReplaceAll(value, "]", "\\u005D")
 	value = strings.ReplaceAll(value, "\\[", "\\u005C\\u005B")
 	value = strings.ReplaceAll(value, "\\]", "\\u005C\\u005D")
+
+	// Now, handled unescaped left and right square brackets. These are used to
+	// represent context in the AKT based keymaps. Going forward, we will use
+	// parentheses to represent context in the JSON based keymaps.
+	value = strings.ReplaceAll(value, "[", "(")
+	value = strings.ReplaceAll(value, "]", ")")
+
 	// Handle left and right curly braces
 	value = strings.ReplaceAll(value, "{", "\\u007B")
 	value = strings.ReplaceAll(value, "}", "\\u007D")

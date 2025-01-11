@@ -20,8 +20,8 @@
             "क"
           ],
           "rhs": [
-            "k\\u005Ba\\u005D",
-            "\\u005B\\u005D\\u005Ba\\u005Dak\\u005Ba\\u005D"
+            "k(a)",
+            "()(a)ak(a)"
           ]
         },
         {
@@ -29,8 +29,8 @@
             "ख"
           ],
           "rhs": [
-            "kh\\u005Ba\\u005D",
-            "\\u005B\\u005D\\u005Ba\\u005Dakh\\u005Ba\\u005D"
+            "kh(a)",
+            "()(a)akh(a)"
           ]
         },
         {
@@ -39,7 +39,7 @@
           ],
           "rhs": [
             "R",
-            "\\u005B\\u005D\\u005Ba\\u005DaR"
+            "()(a)aR"
           ],
           "comment": "marathi half-R (as in daRyaa)"
         },
@@ -48,8 +48,8 @@
             "क्ष"
           ],
           "rhs": [
-            "x\\u005Ba\\u005D",
-            "\\u005B\\u005D\\u005Ba\\u005Dax\\u005Ba\\u005D"
+            "x(a)",
+            "()(a)ax(a)"
           ],
           "comment": "x = ksh"
         },
@@ -58,8 +58,8 @@
             "ज्ञ"
           ],
           "rhs": [
-            "GY\\u005Ba\\u005D",
-            "\\u005B\\u005D\\u005Ba\\u005DaGY\\u005Ba\\u005D"
+            "GY(a)",
+            "()(a)aGY(a)"
           ],
           "comment": "GY = dny"
         },
@@ -76,7 +76,7 @@
             "ा"
           ],
           "rhs": [
-            "aa\\u005Bv\\u005D"
+            "aa(v)"
           ]
         },
         {
@@ -85,8 +85,8 @@
             "क़"
           ],
           "rhs": [
-            "q\\u005Ba\\u005D",
-            "\\u005B\\u005D\\u005Ba\\u005Daq\\u005Ba\\u005D"
+            "q(a)",
+            "()(a)aq(a)"
           ]
         },
         {
@@ -139,96 +139,7 @@
       ]
     },
     "others": {
-      "mappings": [
-        {
-          "lhs": [
-            "."
-          ],
-          "rhs": [
-            "0x0964"
-          ],
-          "comment": "danda"
-        },
-        {
-          "lhs": [
-            ".."
-          ],
-          "rhs": [
-            "0x0965"
-          ],
-          "comment": "double danda"
-        },
-        {
-          "lhs": [
-            "\\u005C\\u005C."
-          ],
-          "rhs": [
-            "'.'"
-          ],
-          "comment": "ASCII period"
-        },
-        {
-          "lhs": [
-            "\\u005C\\u005C\\u007D"
-          ],
-          "rhs": [
-            "\\u007D"
-          ]
-        },
-        {
-          "lhs": [
-            "\\u005C\\u005C\\u007B"
-          ],
-          "rhs": [
-            "\\u007B"
-          ]
-        },
-        {
-          "lhs": [
-            "\\u005C\\u005Cthreedots"
-          ],
-          "rhs": [
-            "'...'"
-          ],
-          "comment": "three dots"
-        },
-        {
-          "lhs": [
-            "\\u005C\\u005C`"
-          ],
-          "rhs": [
-            "0x0951"
-          ],
-          "comment": "udatta"
-        },
-        {
-          "lhs": [
-            "\\u005C\\u005C_"
-          ],
-          "rhs": [
-            "0x0952"
-          ],
-          "comment": "anudatta"
-        },
-        {
-          "lhs": [
-            "\\u005C\\u005Cnukta"
-          ],
-          "rhs": [
-            "0x093C"
-          ],
-          "comment": "nukta"
-        },
-        {
-          "lhs": [
-            "ँ"
-          ],
-          "rhs": [
-            ".N"
-          ],
-          "comment": "candrabindu"
-        }
-      ]
+      "mappings": null
     },
     "vowels": {
       "mappings": [
@@ -237,8 +148,8 @@
             "अ"
           ],
           "rhs": [
-            "a\\u005Bv\\u005D",
-            "\\u005B\\u005D\\u005Ba\\u005D\\u007Ba\\u007D\\u005Bv\\u005D"
+            "a(v)",
+            "()(a)\\u007Ba\\u007D(v)"
           ]
         },
         {
@@ -246,8 +157,8 @@
             "आ"
           ],
           "rhs": [
-            "A\\u005Bv\\u005D",
-            "\\u005B\\u005D\\u005Ba\\u005D\\u007BA\\u007D\\u005Bv\\u005D"
+            "A(v)",
+            "()(a)\\u007BA\\u007D(v)"
           ]
         }
       ]

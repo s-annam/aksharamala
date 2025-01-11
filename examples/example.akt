@@ -12,24 +12,6 @@
 
 #others#
 
-.       0x0964                                  // danda
-..      0x0965                                  // double danda
-\\.     '.'                                     // ASCII period
-\\}     }
-\\{     {
-\\threedots  '...'                              // three dots
-
-// =*= Vedic Accents =*=
-
-\\`     0x0951                                  // udatta
-\\_     0x0952                                  // anudatta
-
-// =*= Adding missing Unicode chars =*=
-
-\\nukta 0x093C                                  // nukta
-
-ँ		.N              // candrabindu
-
 // =*= vowels =*=
 
 अ		a[v]    [][a]{a}[v]

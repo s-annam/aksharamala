@@ -314,17 +314,26 @@ func main() {
 			"as with the rest of the Aksharamala project.",
 	}
 
+	// Convert to CompactScheme
+	compactScheme, err := types.ToCompactTransliterationScheme(scheme)
+	if err != nil {
+		fmt.Printf("Error converting to compact scheme: %v\n", err)
+		return
+	}
+
 	// Create the output JSON file
-	output, err := os.Create(outputFile)
+	output, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		fmt.Printf("Error creating output file '%s': %v\n", outputFile, err)
 		return
 	}
 	defer output.Close()
 
+	// Use encoder with indentation
 	encoder := json.NewEncoder(output)
 	encoder.SetIndent("", "  ")
-	if err := encoder.Encode(scheme); err != nil {
+	encoder.SetEscapeHTML(false)
+	if err := encoder.Encode(compactScheme); err != nil {
 		fmt.Printf("Error encoding JSON to output file: %v\n", err)
 		return
 	}

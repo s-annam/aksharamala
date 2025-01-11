@@ -1,318 +1,35 @@
 {
-  "comments": [
-    "Keymap generated from example.akt. Manually reviewed and refined for accuracy.",
-    "Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."
-  ],
+  "comments": ["Keymap generated from example.akt. Manually reviewed and refined for accuracy.","Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."],
   "version": "2025.1",
   "id": "rdeva",
   "name": "Devanagari Reversliteration",
   "license": "AGPL-3.0-or-later",
   "language": "Devanagari",
   "scheme": "Unicode",
-  "metadata": {
-    "virama": "0x0, smart"
-  },
+  "metadata": {"virama":"0x0, smart"},
   "categories": {
+    "others": [
+    ],
+    "vowels": [
+      {"lhs":["अ"],"rhs":["a(v)","()(a)\\u007Ba\\u007D(v)"]},
+      {"lhs":["आ"],"rhs":["A(v)","()(a)\\u007BA\\u007D(v)"]}
+    ],
     "consonants": [
-      {
-        "lhs": [
-          "क"
-        ],
-        "rhs": [
-          "k(a)",
-          "()(a)ak(a)"
-        ]
-      },
-      {
-        "lhs": [
-          "ख"
-        ],
-        "rhs": [
-          "kh(a)",
-          "()(a)akh(a)"
-        ]
-      },
-      {
-        "lhs": [
-          "र्‍"
-        ],
-        "rhs": [
-          "R",
-          "()(a)aR"
-        ],
-        "comment": "marathi half-R (as in daRyaa)"
-      },
-      {
-        "lhs": [
-          "क्ष"
-        ],
-        "rhs": [
-          "x(a)",
-          "()(a)ax(a)"
-        ],
-        "comment": "x = ksh"
-      },
-      {
-        "lhs": [
-          "ज्ञ"
-        ],
-        "rhs": [
-          "GY(a)",
-          "()(a)aGY(a)"
-        ],
-        "comment": "GY = dny"
-      },
-      {
-        "lhs": [
-          "ऽ"
-        ],
-        "rhs": [
-          ".a"
-        ]
-      },
-      {
-        "lhs": [
-          "ा"
-        ],
-        "rhs": [
-          "aa(v)"
-        ]
-      },
-      {
-        "lhs": [
-          "क़",
-          "क़"
-        ],
-        "rhs": [
-          "q(a)",
-          "()(a)aq(a)"
-        ]
-      },
-      {
-        "lhs": [
-          "।"
-        ],
-        "rhs": [
-          "."
-        ],
-        "comment": "danda"
-      }
+      {"lhs":["क"],"rhs":["k(a)","()(a)ak(a)"]},
+      {"lhs":["ख"],"rhs":["kh(a)","()(a)akh(a)"]},
+      {"comment":"marathi half-R (as in daRyaa)","lhs":["र्‍"],"rhs":["R","()(a)aR"]},
+      {"comment":"x = ksh","lhs":["क्ष"],"rhs":["x(a)","()(a)ax(a)"]},
+      {"comment":"GY = dny","lhs":["ज्ञ"],"rhs":["GY(a)","()(a)aGY(a)"]},
+      {"lhs":["ऽ"],"rhs":[".a"]},
+      {"lhs":["ा"],"rhs":["aa(v)"]},
+      {"lhs":["क़","क़"],"rhs":["q(a)","()(a)aq(a)"]},
+      {"comment":"danda","lhs":["।"],"rhs":["."]}
     ],
     "digits": [
-      {
-        "lhs": [
-          "०"
-        ],
-        "rhs": [
-          "0"
-        ]
-      },
-      {
-        "lhs": [
-          "१"
-        ],
-        "rhs": [
-          "1"
-        ]
-      },
-      {
-        "lhs": [
-          "॰"
-        ],
-        "rhs": [
-          "ABBR"
-        ],
-        "comment": "devanagari abbreviation sign"
-      },
-      {
-        "lhs": [
-          "."
-        ],
-        "rhs": [
-          "\\."
-        ],
-        "comment": "ASCII period"
-      }
-    ],
-    "others": [],
-    "vowels": [
-      {
-        "lhs": [
-          "अ"
-        ],
-        "rhs": [
-          "a(v)",
-          "()(a)\\u007Ba\\u007D(v)"
-        ]
-      },
-      {
-        "lhs": [
-          "आ"
-        ],
-        "rhs": [
-          "A(v)",
-          "()(a)\\u007BA\\u007D(v)"
-        ]
-      }
-    ]
-  }
-}
-{
-  "comments": [
-    "Keymap generated from example.akt. Manually reviewed and refined for accuracy.",
-    "Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."
-  ],
-  "version": "2025.1",
-  "id": "rdeva",
-  "name": "Devanagari Reversliteration",
-  "license": "AGPL-3.0-or-later",
-  "language": "Devanagari",
-  "scheme": "Unicode",
-  "metadata": {
-    "virama": "0x0, smart"
-  },
-  "categories": {
-    "consonants": [
-      {
-        "lhs": [
-          "क"
-        ],
-        "rhs": [
-          "k(a)",
-          "()(a)ak(a)"
-        ]
-      },
-      {
-        "lhs": [
-          "ख"
-        ],
-        "rhs": [
-          "kh(a)",
-          "()(a)akh(a)"
-        ]
-      },
-      {
-        "lhs": [
-          "र्‍"
-        ],
-        "rhs": [
-          "R",
-          "()(a)aR"
-        ],
-        "comment": "marathi half-R (as in daRyaa)"
-      },
-      {
-        "lhs": [
-          "क्ष"
-        ],
-        "rhs": [
-          "x(a)",
-          "()(a)ax(a)"
-        ],
-        "comment": "x = ksh"
-      },
-      {
-        "lhs": [
-          "ज्ञ"
-        ],
-        "rhs": [
-          "GY(a)",
-          "()(a)aGY(a)"
-        ],
-        "comment": "GY = dny"
-      },
-      {
-        "lhs": [
-          "ऽ"
-        ],
-        "rhs": [
-          ".a"
-        ]
-      },
-      {
-        "lhs": [
-          "ा"
-        ],
-        "rhs": [
-          "aa(v)"
-        ]
-      },
-      {
-        "lhs": [
-          "क़",
-          "क़"
-        ],
-        "rhs": [
-          "q(a)",
-          "()(a)aq(a)"
-        ]
-      },
-      {
-        "lhs": [
-          "।"
-        ],
-        "rhs": [
-          "."
-        ],
-        "comment": "danda"
-      }
-    ],
-    "digits": [
-      {
-        "lhs": [
-          "०"
-        ],
-        "rhs": [
-          "0"
-        ]
-      },
-      {
-        "lhs": [
-          "१"
-        ],
-        "rhs": [
-          "1"
-        ]
-      },
-      {
-        "lhs": [
-          "॰"
-        ],
-        "rhs": [
-          "ABBR"
-        ],
-        "comment": "devanagari abbreviation sign"
-      },
-      {
-        "lhs": [
-          "."
-        ],
-        "rhs": [
-          "\\."
-        ],
-        "comment": "ASCII period"
-      }
-    ],
-    "others": [],
-    "vowels": [
-      {
-        "lhs": [
-          "अ"
-        ],
-        "rhs": [
-          "a(v)",
-          "()(a)\\u007Ba\\u007D(v)"
-        ]
-      },
-      {
-        "lhs": [
-          "आ"
-        ],
-        "rhs": [
-          "A(v)",
-          "()(a)\\u007BA\\u007D(v)"
-        ]
-      }
+      {"lhs":["०"],"rhs":["0"]},
+      {"lhs":["१"],"rhs":["1"]},
+      {"comment":"devanagari abbreviation sign","lhs":["॰"],"rhs":["ABBR"]},
+      {"comment":"ASCII period","lhs":["."],"rhs":["\\."]}
     ]
   }
 }

@@ -321,20 +321,76 @@ func main() {
 		return
 	}
 
-	// Create the output JSON file
-	output, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
-	if err != nil {
-		fmt.Printf("Error creating output file '%s': %v\n", outputFile, err)
-		return
-	}
-	defer output.Close()
+	// Build the JSON string with exact formatting we want
+	var output strings.Builder
+	output.WriteString("{\n")
+	output.WriteString(`  "comments": `)
+	commentsJSON, _ := json.Marshal(compactScheme.Comments)
+	output.Write(commentsJSON)
+	output.WriteString(",\n")
 
-	// Use encoder with indentation
-	encoder := json.NewEncoder(output)
-	encoder.SetIndent("", "  ")
-	encoder.SetEscapeHTML(false)
-	if err := encoder.Encode(compactScheme); err != nil {
-		fmt.Printf("Error encoding JSON to output file: %v\n", err)
+	output.WriteString(`  "version": "`)
+	output.WriteString(compactScheme.Version)
+	output.WriteString("\",\n")
+
+	output.WriteString(`  "id": "`)
+	output.WriteString(compactScheme.ID)
+	output.WriteString("\",\n")
+
+	output.WriteString(`  "name": "`)
+	output.WriteString(compactScheme.Name)
+	output.WriteString("\",\n")
+
+	output.WriteString(`  "license": "`)
+	output.WriteString(compactScheme.License)
+	output.WriteString("\",\n")
+
+	output.WriteString(`  "language": "`)
+	output.WriteString(compactScheme.Language)
+	output.WriteString("\",\n")
+
+	output.WriteString(`  "scheme": "`)
+	output.WriteString(compactScheme.Scheme)
+	output.WriteString("\",\n")
+
+	output.WriteString(`  "metadata": `)
+	metadataJSON, _ := json.Marshal(compactScheme.Metadata)
+	output.Write(metadataJSON)
+	output.WriteString(",\n")
+
+	output.WriteString(`  "categories": {`)
+	first := true
+	for category, mappings := range compactScheme.Categories {
+		if !first {
+			output.WriteString(",")
+		}
+		first = false
+		output.WriteString("\n    \"")
+		output.WriteString(category)
+		output.WriteString("\": [\n")
+
+		// Parse existing mappings
+		var entries []map[string]interface{}
+		json.Unmarshal(mappings, &entries)
+
+		// Write each mapping on one line
+		for i, entry := range entries {
+			entryJSON, _ := json.Marshal(entry)
+			output.WriteString("      ")
+			output.Write(entryJSON)
+			if i < len(entries)-1 {
+				output.WriteString(",")
+			}
+			output.WriteString("\n")
+		}
+		output.WriteString("    ]")
+	}
+	output.WriteString("\n  }\n")
+	output.WriteString("}\n")
+
+	// Write the output
+	if err := os.WriteFile(outputFile, []byte(output.String()), 0o644); err != nil {
+		fmt.Printf("Error writing to output file: %v\n", err)
 		return
 	}
 

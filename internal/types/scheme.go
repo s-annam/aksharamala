@@ -16,7 +16,6 @@
 package types
 
 import (
-	"bytes"
 	"encoding/json"
 )
 
@@ -74,38 +73,11 @@ type CompactTransliterationScheme struct {
 func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransliterationScheme, error) {
 	compactCategories := make(map[string]json.RawMessage)
 	for key, section := range scheme.Categories {
-		var buf bytes.Buffer
-
-		// Start array
-		buf.WriteString("[")
-
-		if len(section.Mappings) > 0 {
-			buf.WriteString("\n")
-
-			// Write each mapping
-			for i, mapping := range section.Mappings {
-				mappingBytes, err := json.Marshal(mapping)
-				if err != nil {
-					return CompactTransliterationScheme{}, err
-				}
-
-				// Add indentation and mapping
-				buf.WriteString("      ")
-				buf.Write(mappingBytes)
-
-				// Add comma if not last
-				if i < len(section.Mappings)-1 {
-					buf.WriteString(",")
-				}
-				buf.WriteString("\n")
-			}
-
-			// Close array with proper indentation
-			buf.WriteString("    ")
+		bytes, err := json.Marshal(section.Mappings)
+		if err != nil {
+			return CompactTransliterationScheme{}, err
 		}
-		buf.WriteString("]")
-
-		compactCategories[key] = json.RawMessage(buf.Bytes())
+		compactCategories[key] = bytes
 	}
 
 	return CompactTransliterationScheme{

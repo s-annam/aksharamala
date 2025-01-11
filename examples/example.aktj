@@ -1,7 +1,7 @@
 {
   "comments": [
-    "Keymap generated from example.akt. Manually reviewed and refined for accuracy.",
-    "Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."
+    "Converted from example.akt.",
+    "Distributed under the GNU Affero General Public License (AGPL)."
   ],
   "version": "2025.1",
   "id": "rdeva",
@@ -14,25 +14,25 @@
     "consonants": [
       {"lhs":["क"],"rhs":["k(a)","()(a)ak(a)"]},
       {"lhs":["ख"],"rhs":["kh(a)","()(a)akh(a)"]},
-      {"lhs":["र्‍"],"rhs":["R","()(a)aR"],"comment":"marathi half-R (as in daRyaa)"},
       {"lhs":["क्ष"],"rhs":["x(a)","()(a)ax(a)"],"comment":"x = ksh"},
       {"lhs":["ज्ञ"],"rhs":["GY(a)","()(a)aGY(a)"],"comment":"GY = dny"},
-      {"lhs":["ऽ"],"rhs":[".a"]},
-      {"lhs":["ा"],"rhs":["aa(v)"]},
-      {"lhs":["क़","क़"],"rhs":["q(a)","()(a)aq(a)"]},
-      {"lhs":["।"],"rhs":["."],"comment":"danda"}
-    ],
-    "digits": [
-      {"lhs":["०"],"rhs":["0"]},
-      {"lhs":["१"],"rhs":["1"]},
-      {"lhs":["॰"],"rhs":["ABBR"],"comment":"devanagari abbreviation sign"},
-      {"lhs":["."],"rhs":["\\."],"comment":"ASCII period"}
-    ],
-    "others": [
+      {"lhs":["क़","क़"],"rhs":["q(a)","()(a)aq(a)"]}
     ],
     "vowels": [
       {"lhs":["अ"],"rhs":["a(v)","()(a)\\u007Ba\\u007D(v)"]},
       {"lhs":["आ"],"rhs":["A(v)","()(a)\\u007BA\\u007D(v)"]}
+    ],
+    "digits": [
+      {"lhs":["०"],"rhs":["0"]},
+      {"lhs":["१"],"rhs":["1"]}
+    ],
+    "others": [
+      {"lhs":["र्‍"],"rhs":["R","()(a)aR"],"comment":"marathi half-R (as in daRyaa)"},
+      {"lhs":["ऽ"],"rhs":[".a"]},
+      {"lhs":["ा"],"rhs":["aa(v)"]},
+      {"lhs":["।"],"rhs":["."],"comment":"danda"},
+      {"lhs":["॰"],"rhs":["ABBR"],"comment":"devanagari abbreviation sign"},
+      {"lhs":["."],"rhs":["\\."],"comment":"ASCII period"}
     ]
   }
 }

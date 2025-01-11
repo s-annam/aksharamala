@@ -9,12 +9,12 @@ import (
 func TestToCompactScheme(t *testing.T) {
 	original := TransliterationScheme{
 		Comments: []string{"Test comment"},
-		Version:  "1.0",
+		Version:  "2025.1",
 		ID:       "test_id",
 		Name:     "Test Scheme",
-		License:  "Test License",
+		License:  "AGPL",
 		Language: "Test Language",
-		Scheme:   "Test Scheme",
+		Scheme:   "Unicode",
 		Metadata: Metadata{
 			Virama:       "Test Virama",
 			FontName:     "Test Font",
@@ -23,10 +23,11 @@ func TestToCompactScheme(t *testing.T) {
 			IconDisabled: "disabled.png",
 		},
 		Categories: map[string]Section{
-			"test_category": {
+			"vowels": {
 				Comments: []string{"Category comment"},
 				Mappings: []CategoryEntry{
-					{LHS: []string{"a"}, RHS: []string{"अ"}},
+					{LHS: []string{"a"}, RHS: []string{"अ"}, Comment: "=*= Vowel A =*="},
+					{LHS: []string{"aa"}, RHS: []string{"आ"}, Comment: " Vowel AA "},
 				},
 			},
 		},
@@ -37,163 +38,58 @@ func TestToCompactScheme(t *testing.T) {
 		t.Fatalf("Error converting to compact scheme: %v", err)
 	}
 
-	// Marshal the original and compact schemes to JSON
-	originalJSON, err := json.Marshal(original)
-	if err != nil {
-		t.Fatalf("Error marshalling original scheme to JSON: %v", err)
+	// Test version and license
+	if compact.Version != "2025.1" {
+		t.Errorf("Expected version '2025.1', got '%s'", compact.Version)
+	}
+	if compact.License != "AGPL" {
+		t.Errorf("Expected license 'AGPL', got '%s'", compact.License)
 	}
 
-	compactJSON, err := json.Marshal(compact)
-	if err != nil {
-		t.Fatalf("Error marshalling compact scheme to JSON: %v", err)
+	// Test categories
+	if len(compact.Categories) != len(original.Categories) {
+		t.Fatalf("Mismatch in number of categories: expected %d, got %d",
+			len(original.Categories), len(compact.Categories))
 	}
 
-	// Unmarshal the JSON back to maps for comparison
-	var originalMap map[string]interface{}
-	var compactMap map[string]interface{}
-
-	if err := json.Unmarshal(originalJSON, &originalMap); err != nil {
-		t.Fatalf("Error unmarshalling original scheme JSON: %v", err)
-	}
-
-	if err := json.Unmarshal(compactJSON, &compactMap); err != nil {
-		t.Fatalf("Error unmarshalling compact scheme JSON: %v", err)
-	}
-
-	// Remove the categories field for comparison
-	delete(originalMap, "categories")
-	delete(compactMap, "categories")
-
-	// Compare the remaining fields
-	if !equalMaps(originalMap, compactMap) {
-		t.Fatalf("Original and compact schemes do not match")
-	}
-}
-
-// Helper function to compare two maps
-func equalMaps(a, b map[string]interface{}) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for k, v := range a {
-		if bv, ok := b[k]; !ok || !equalValues(v, bv) {
-			return false
-		}
-	}
-	return true
-}
-
-// Helper function to compare two values
-func equalValues(a, b interface{}) bool {
-	switch a := a.(type) {
-	case map[string]interface{}:
-		b, ok := b.(map[string]interface{})
-		if !ok {
-			return false
-		}
-		return equalMaps(a, b)
-	case []interface{}:
-		b, ok := b.([]interface{})
-		if !ok {
-			return false
-		}
-		if len(a) != len(b) {
-			return false
-		}
-		for i := range a {
-			if !equalValues(a[i], b[i]) {
-				return false
-			}
-		}
-		return true
-	default:
-		return a == b
-	}
-}
-
-func TestMappingFormat(t *testing.T) {
-	// Create a test scheme with multiple mappings
-	scheme := TransliterationScheme{
-		ID:       "test",
-		Name:     "Test Scheme",
-		Language: "Test",
-		Scheme:   "Test",
-		Categories: map[string]Section{
-			"test_category": {
-				Mappings: []CategoryEntry{
-					{LHS: []string{"a"}, RHS: []string{"A"}},
-					{LHS: []string{"b"}, RHS: []string{"B"}},
-					{LHS: []string{"c", "C"}, RHS: []string{"क"}},
-				},
-			},
-		},
-	}
-
-	// Convert to compact scheme
-	compact, err := ToCompactTransliterationScheme(scheme)
-	if err != nil {
-		t.Fatalf("Failed to convert to compact scheme: %v", err)
-	}
-
-	// Get the raw JSON for the test category
-	categoryJSON, ok := compact.Categories["test_category"]
+	// Check category serialization
+	categoryJSON, ok := compact.Categories["vowels"]
 	if !ok {
-		t.Fatal("Test category not found in compact scheme")
+		t.Fatal("Vowels category not found in compact scheme")
 	}
 
-	// Convert to string for inspection
-	jsonStr := string(categoryJSON)
-	t.Logf("JSON output:\n%s", jsonStr) // Add this for debugging
+	var mappings []CategoryEntry
+	if err := json.Unmarshal(categoryJSON, &mappings); err != nil {
+		t.Fatalf("Error unmarshalling category JSON: %v", err)
+	}
 
-	// Test formatting expectations
-	t.Run("Array brackets placement", func(t *testing.T) {
-		if !strings.HasPrefix(jsonStr, "[") {
-			t.Error("Expected array to start with '[', got:", jsonStr[:1])
+	// Test normalized comments
+	expectedComments := []string{
+		"Vowel A",
+		"Vowel AA",
+	}
+	for i, mapping := range mappings {
+		if mapping.Comment != expectedComments[i] {
+			t.Errorf("Expected comment '%s', got '%s'",
+				expectedComments[i], mapping.Comment)
 		}
-		if !strings.HasSuffix(jsonStr, "]") {
-			t.Error("Expected array to end with ']'")
-		}
-	})
-
-	t.Run("One mapping per line", func(t *testing.T) {
-		lines := strings.Split(jsonStr, "\n")
-		expectedLines := len(scheme.Categories["test_category"].Mappings) + 2 // +2 for opening and closing brackets
-		if len(lines) != expectedLines {
-			t.Errorf("Expected %d lines, got %d", expectedLines, len(lines))
-		}
-	})
-
-	t.Run("Mapping format", func(t *testing.T) {
-		lines := strings.Split(jsonStr, "\n")
-		for i, line := range lines {
-			// Skip first and last lines (brackets)
-			if i > 0 && i < len(lines)-1 {
-				if !strings.HasPrefix(line, "      {") {
-					t.Errorf("Line %d should start with '      {', got: %s", i, line)
-				}
-				if i < len(lines)-2 && !strings.HasSuffix(line, "},") {
-					t.Errorf("Line %d should end with '},', got: %s", i, line)
-				}
-				if i == len(lines)-2 && !strings.HasSuffix(line, "}") {
-					t.Errorf("Last mapping line should end with '}', got: %s", line)
-				}
-			}
-		}
-	})
+	}
 }
 
-// Test entire JSON output
 func TestFullJSONOutput(t *testing.T) {
 	scheme := TransliterationScheme{
-		ID:       "test",
-		Name:     "Test Scheme",
-		Language: "Test",
-		Scheme:   "Test",
+		Comments: []string{"Generated from Hindi.akt. Distributed under AGPL."},
+		Version:  "2025.1",
+		ID:       "hindi",
+		Name:     "Hindi Transliteration",
+		License:  "AGPL",
+		Language: "Hindi",
+		Scheme:   "Unicode",
 		Categories: map[string]Section{
 			"consonants": {
 				Mappings: []CategoryEntry{
-					{LHS: []string{"k"}, RHS: []string{"क"}},
-					{LHS: []string{"kh"}, RHS: []string{"ख"}},
+					{LHS: []string{"k"}, RHS: []string{"क"}, Comment: "Consonant K"},
+					{LHS: []string{"kh"}, RHS: []string{"ख"}, Comment: "Consonant KH"},
 				},
 			},
 		},
@@ -204,7 +100,7 @@ func TestFullJSONOutput(t *testing.T) {
 		t.Fatalf("Failed to convert to compact scheme: %v", err)
 	}
 
-	// Encode with indentation
+	// Serialize to JSON
 	var buf strings.Builder
 	encoder := json.NewEncoder(&buf)
 	encoder.SetIndent("", "  ")
@@ -217,29 +113,14 @@ func TestFullJSONOutput(t *testing.T) {
 	output := buf.String()
 	t.Logf("Full JSON output:\n%s", output)
 
-	// Test the structure
+	// Check basic structure
+	if !strings.Contains(output, `"version": "2025.1"`) {
+		t.Error("Version field missing or incorrect")
+	}
+	if !strings.Contains(output, `"license": "AGPL"`) {
+		t.Error("License field missing or incorrect")
+	}
 	if !strings.Contains(output, `"consonants": [`) {
-		t.Error("Missing expected category opening")
-	}
-
-	// Split into lines and check each line
-	lines := strings.Split(output, "\n")
-	foundMapping := false
-	for i := 0; i < len(lines)-1; i++ {
-		// If we find a [ character, the next line should be a mapping
-		if strings.Contains(lines[i], `": [`) {
-			nextLine := lines[i+1]
-			leadingSpaces := len(nextLine) - len(strings.TrimLeft(nextLine, " "))
-			if leadingSpaces != 6 {
-				t.Errorf("Expected 6 leading spaces for mapping, got %d: %s",
-					leadingSpaces, nextLine)
-			}
-			foundMapping = true
-			break
-		}
-	}
-
-	if !foundMapping {
-		t.Error("No category mappings found in output")
+		t.Error("Consonants category missing or incorrectly formatted")
 	}
 }

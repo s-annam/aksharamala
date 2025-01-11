@@ -190,8 +190,8 @@ func convertToCompactScheme(scheme types.TransliterationScheme, inputFile string
 	// Override comments
 	sourceFile := filepath.Base(inputFile)
 	scheme.Comments = []string{
-		fmt.Sprintf("Keymap generated from %s. Manually reviewed and refined for accuracy.", sourceFile),
-		"Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project.",
+		fmt.Sprintf("Converted from %s.", sourceFile),
+		"Distributed under the GNU Affero General Public License (AGPL).",
 	}
 
 	return types.ToCompactTransliterationScheme(scheme)

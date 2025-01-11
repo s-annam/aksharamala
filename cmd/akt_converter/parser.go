@@ -19,8 +19,8 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 	}
 
 	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
-	sectionPattern := regexp.MustCompile(`^#(\w+)#`)                                   // Regular sections
-	pseudoSectionPattern := regexp.MustCompile(`^\/\/\s*=\*=\s*(\w+)(?:\s*=\*=\s*)?$`) // Pseudo-sections
+	sectionPattern := regexp.MustCompile(`^#(\w+)#`)                                  // Regular sections
+	pseudoSectionPattern := regexp.MustCompile(`^\/\/\s*=*\*=*\s*(.+?)\s*=*\*=*\s*$`) // Pseudo-sections
 
 	var currentCategory string
 	var section types.Section
@@ -62,9 +62,16 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 				scheme.Categories[currentCategory] = section
 			}
 
-			// Start a new (pseudo) section
-			currentCategory = strings.ToLower(match[1])
-			section = types.Section{}
+			// Start a new (pseudo) section, consider only the first word
+			currentCategory = strings.ToLower(strings.Fields(match[1])[0])
+
+			// Check if the section already exists
+			if existingSection, exists := scheme.Categories[currentCategory]; exists {
+				section = existingSection // Use the existing section
+			} else {
+				section = types.Section{} // Create a new section if it doesn't exist
+			}
+
 			lastMapping = nil // Reset last mapping for the new section
 			continue
 		}
@@ -123,6 +130,19 @@ func parseMetadata(line string, scheme *types.TransliterationScheme) {
 	}
 }
 
+func normalizeComment(comment string) string {
+	// Trim spaces
+	comment = strings.TrimSpace(comment)
+
+	// Remove surrounding `=*=` if present
+	if strings.HasPrefix(comment, "=*=") && strings.HasSuffix(comment, "=*=") {
+		comment = strings.TrimPrefix(comment, "=*=")
+		comment = strings.TrimSuffix(comment, "=*=")
+	}
+
+	return comment
+}
+
 // Parse mappings and handle multiple LHS
 func parseMapping(line string, lastMapping *types.CategoryEntry) *types.CategoryEntry {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
@@ -133,7 +153,7 @@ func parseMapping(line string, lastMapping *types.CategoryEntry) *types.Category
 		return &types.CategoryEntry{
 			LHS:     handleMappingMatch(match[1]),
 			RHS:     handleMappingMatch(match[2]),
-			Comment: match[3],
+			Comment: normalizeComment(match[3]),
 		}
 	}
 

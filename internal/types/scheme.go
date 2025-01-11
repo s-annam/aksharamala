@@ -17,6 +17,7 @@ package types
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 // TransliterationScheme represents a keymap for transliteration.
@@ -69,15 +70,30 @@ type CompactTransliterationScheme struct {
 	Categories map[string]json.RawMessage `json:"categories"`
 }
 
+func normalizeComment(comment string) string {
+	comment = strings.TrimSpace(comment)
+	comment = strings.TrimPrefix(comment, "=*=")
+	comment = strings.TrimSuffix(comment, "=*=")
+	comment = strings.TrimSpace(comment)
+	return comment
+}
+
 // ToCompactTransliterationScheme converts a TransliterationScheme to a CompactTransliterationScheme
 func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransliterationScheme, error) {
 	compactCategories := make(map[string]json.RawMessage)
-	for key, section := range scheme.Categories {
-		bytes, err := json.Marshal(section.Mappings)
+
+	for category, section := range scheme.Categories {
+		// Normalize comments in mappings
+		for i := range section.Mappings {
+			section.Mappings[i].Comment = normalizeComment(section.Mappings[i].Comment)
+		}
+
+		// Convert section to JSON
+		sectionJSON, err := json.Marshal(section.Mappings)
 		if err != nil {
 			return CompactTransliterationScheme{}, err
 		}
-		compactCategories[key] = bytes
+		compactCategories[category] = sectionJSON
 	}
 
 	return CompactTransliterationScheme{

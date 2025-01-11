@@ -1,7 +1,7 @@
 {
   "comments": [
-    "Keymap generated from Hindi.akt. Manually reviewed and refined for accuracy.",
-    "Distributed under GNU Affero General Public License (AGPL) as with the rest of the Aksharamala project."
+    "Converted from Hindi.akt.",
+    "Distributed under the GNU Affero General Public License (AGPL)."
   ],
   "version": "2025.1",
   "id": "hindi",
@@ -53,33 +53,10 @@
       {"lhs":[".D"],"rhs":["ड़"]},
       {"lhs":[".Dh"],"rhs":["ढ़"]},
       {"lhs":["f"],"rhs":["फ़"]},
-      {"lhs":["Y"],"rhs":["य़"]},
+      {"lhs":["Y"],"rhs":["य़"]}
       {"lhs":["x","ksh"],"rhs":["क्ष"]},
       {"lhs":["GY","dny"],"rhs":["ज्ञ"]},
       {"lhs":[".r","^r"],"rhs":["￿","(r)र्"]}
-    ],
-    "others": [
-      {"lhs":["_"],"rhs":["\u0000"],"comment":"=*= SPECIAL HANDLING =*="},
-      {"lhs":["\\##"],"rhs":["￾"],"comment":"=*= ENGLISH \u003c-\u003e ITRANS HINDI"},
-      {"lhs":["0"],"rhs":["०"],"comment":"zero"},
-      {"lhs":["1"],"rhs":["१"],"comment":"one"},
-      {"lhs":["2"],"rhs":["२"],"comment":"two"},
-      {"lhs":["3"],"rhs":["३"],"comment":"three"},
-      {"lhs":["4"],"rhs":["४"],"comment":"four"},
-      {"lhs":["5"],"rhs":["५"],"comment":"five"},
-      {"lhs":["6"],"rhs":["६"],"comment":"six"},
-      {"lhs":["7"],"rhs":["७"],"comment":"seven"},
-      {"lhs":["8"],"rhs":["८"],"comment":"eight"},
-      {"lhs":["9"],"rhs":["९"],"comment":"nine"},
-      {"lhs":["."],"rhs":["।"],"comment":"danda"},
-      {"lhs":[".."],"rhs":["॥"],"comment":"double danda"},
-      {"lhs":["\\u005C."],"rhs":["'.'"],"comment":"ASCII period"},
-      {"lhs":["\\u005C\\u007D"],"rhs":["\\u007D"]},
-      {"lhs":["\\u005C\\u007B"],"rhs":["\\u007B"]},
-      {"lhs":["\\u005Cthreedots"],"rhs":["'...'"],"comment":"three dots"},
-      {"lhs":["\\u005C`"],"rhs":["॑"],"comment":"udatta"},
-      {"lhs":["\\u005C_"],"rhs":["॒"],"comment":"anudatta"},
-      {"lhs":["\\u005Cnukta"],"rhs":["़"],"comment":"nukta"}
     ],
     "vowels": [
       {"lhs":["a"],"rhs":["अ","\u0000"]},
@@ -99,6 +76,33 @@
       {"lhs":["aa.c"],"rhs":["ऑ","ॉ"]},
       {"lhs":["o"],"rhs":["ओ","ो"]},
       {"lhs":["au"],"rhs":["औ","ौ"]}
+    ],
+    "digits": [
+      {"lhs":["0"],"rhs":["०"],"comment":"zero"},
+      {"lhs":["1"],"rhs":["१"],"comment":"one"},
+      {"lhs":["2"],"rhs":["२"],"comment":"two"},
+      {"lhs":["3"],"rhs":["३"],"comment":"three"},
+      {"lhs":["4"],"rhs":["४"],"comment":"four"},
+      {"lhs":["5"],"rhs":["५"],"comment":"five"},
+      {"lhs":["6"],"rhs":["६"],"comment":"six"},
+      {"lhs":["7"],"rhs":["७"],"comment":"seven"},
+      {"lhs":["8"],"rhs":["८"],"comment":"eight"},
+      {"lhs":["9"],"rhs":["९"],"comment":"nine"},
+      {"lhs":["."],"rhs":["।"],"comment":"danda"},
+      {"lhs":[".."],"rhs":["॥"],"comment":"double danda"},
+      {"lhs":["\\u005C."],"rhs":["'.'"],"comment":"ASCII period"},
+      {"lhs":["\\u005C\\u007D"],"rhs":["\\u007D"]},
+      {"lhs":["\\u005C\\u007B"],"rhs":["\\u007B"]},
+      {"lhs":["\\u005Cthreedots"],"rhs":["'...'"],"comment":"three dots"}
+    ],
+    "others": [
+      {"lhs":["_"],"rhs":["\u0000"],"comment":"SPECIAL HANDLING"},
+      {"lhs":["\\##"],"rhs":["￾"],"comment":"ENGLISH \u003c-\u003e ITRANS HINDI"}
+      {"lhs":["\\u005Cnukta"],"rhs":["़"],"comment":"nukta"}
+    ],
+    "vedic": [
+      {"lhs":["\\u005C`"],"rhs":["॑"],"comment":"udatta"},
+      {"lhs":["\\u005C_"],"rhs":["॒"],"comment":"anudatta"}
     ]
   }
 }

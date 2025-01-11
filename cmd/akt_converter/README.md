@@ -10,8 +10,9 @@ The `aks_converter` tool provides powerful capabilities for converting `.akt` fi
 ## Future Enhancements
 1. **Update-Only Mode**:
    - Update existing entries in-place, keeping their sections intact.
-   - Add new entries to appropriate sections.
+   - Add new mapping entries to appropriate sections.
    - Enable verbose output by default to log significant actions.
+   - All the other sections and the metadata to be fully replaced.
 
 2. **Verbose Mode**:
    - Log detailed information about sections, entries, and significant events.
@@ -32,3 +33,6 @@ The `aks_converter` tool provides powerful capabilities for converting `.akt` fi
    - Extract historical information from AKT file comments (one line per update).
    - Append this history to the end of the `.aksj` file under a dedicated "history" section.
    - Clearly indicate that this history is sourced from the original AKT file.
+
+8. **Skip Empty Section**:
+   - Ignore any empty sections and skip to create them.

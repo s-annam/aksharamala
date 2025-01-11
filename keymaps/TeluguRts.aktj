@@ -1,0 +1,83 @@
+{
+  "comments": [
+    "Converted from TelRts.akt.",
+    "Distributed under the GNU Affero General Public License (AGPL)."
+  ],
+  "version": "2025.1",
+  "id": "teluguRts",
+  "name": "Telugu RTS Transliteration Scheme",
+  "license": "AGPL-3.0-or-later",
+  "language": "Telugu",
+  "scheme": "RTS",
+  "metadata": {"virama":"0x0C4D, normal"},
+  "categories": {
+    "consonants": [
+      {"lhs":["k"],"rhs":["క","(c)(M)ం(x)"]},
+      {"lhs":["kh","kH","K","Kh","KH"],"rhs":["ఖ","(c)(M)ం(x)"]},
+      {"lhs":["g"],"rhs":["గ","(c)(M)ం(x)"]},
+      {"lhs":["gh","gH","G","Gh","GH"],"rhs":["ఘ","(c)(M)ం(x)"]},
+      {"lhs":["~m"],"rhs":["ఙ"]},
+      {"lhs":["c","ch","cH"],"rhs":["చ","(c)(M)ం(x)"]},
+      {"lhs":["C","Ch","CH","c'"],"rhs":["ఛ","(c)(M)ం(x)"]},
+      {"lhs":["j"],"rhs":["జ","(c)(M)ం(x)"]},
+      {"lhs":["jh","jH","J","Jh","JH"],"rhs":["ఝ","(c)(M)ం(x)"]},
+      {"lhs":["~n"],"rhs":["ఞ"]},
+      {"lhs":["T","t'"],"rhs":["ట","(c)(M)ం(x)"]},
+      {"lhs":["Th","TH","th'","tH'"],"rhs":["ఠ","(c)(M)ం(x)"]},
+      {"lhs":["D","d'"],"rhs":["డ","(c)(M)ం(x)"]},
+      {"lhs":["Dh","DH","dh'","dH'"],"rhs":["ఢ","(c)(M)ం(x)"]},
+      {"lhs":["N","nh","nH","n'"],"rhs":["ణ"]},
+      {"lhs":["t"],"rhs":["త","(c)(M)ం(x)"]},
+      {"lhs":["th","tH"],"rhs":["థ","(c)(M)ం(x)"]},
+      {"lhs":["d"],"rhs":["ద","(c)(M)ం(x)"]},
+      {"lhs":["dh","dH"],"rhs":["ధ","(c)(M)ం(x)"]},
+      {"lhs":["n"],"rhs":["న(M)","(W)ం"]},
+      {"lhs":["n^"],"rhs":["న"]},
+      {"lhs":["p"],"rhs":["ప","(c)(M)ం(x)"]},
+      {"lhs":["ph","pH","f","P","Ph","PH"],"rhs":["ఫ","(c)(M)ం(x)"]},
+      {"lhs":["b"],"rhs":["బ","(c)(M)ం(x)"]},
+      {"lhs":["bh","bH","B","Bh","BH"],"rhs":["భ","(c)(M)ం(x)"]},
+      {"lhs":["m"],"rhs":["మ(M)","(W)ం"]},
+      {"lhs":["m^"],"rhs":["మ"]},
+      {"lhs":["y"],"rhs":["య"]},
+      {"lhs":["r"],"rhs":["ర"]},
+      {"lhs":["l"],"rhs":["ల"]},
+      {"lhs":["v","w"],"rhs":["వ"]},
+      {"lhs":["S"],"rhs":["శ","(c)(M)ం(x)"]},
+      {"lhs":["sh","sH"],"rhs":["ష","(c)(M)ం(x)"]},
+      {"lhs":["s"],"rhs":["స","(c)(M)ం(x)"]},
+      {"lhs":["h"],"rhs":["హ","(c)(M)ం(x)"]},
+      {"lhs":["L","lh","lH","Lh","LH","l'"],"rhs":["ళ"]},
+      {"lhs":["~r","r\""],"rhs":["ఱ"]},
+      {"lhs":["x"],"rhs":["క్ష"]}
+    ],
+    "others": [
+      {"lhs":["@M"],"rhs":["ఁ"],"comment":"ara sunna"},
+      {"lhs":["M"],"rhs":["ం"],"comment":"sunna"},
+      {"lhs":["@h","@H"],"rhs":["ః"],"comment":"visarga"}
+    ],
+    "special": [
+      {"lhs":["^"],"rhs":["\u0000"],"comment":"syllable break"},
+      {"lhs":["\u0026"],"rhs":["\u0000"]},
+      {"lhs":["\\#"],"rhs":["￾"],"comment":"switch between english and telugu"}
+    ],
+    "vowels": [
+      {"lhs":["a"],"rhs":["అ","\u0000"]},
+      {"lhs":["aa","a'","A"],"rhs":["ఆ","ా"]},
+      {"lhs":["i"],"rhs":["ఇ","ి"]},
+      {"lhs":["ii","ee","ia","i'","I"],"rhs":["ఈ","ీ"]},
+      {"lhs":["u"],"rhs":["ఉ","ు"]},
+      {"lhs":["uu","oo","U","ua","u'"],"rhs":["ఊ","ూ"]},
+      {"lhs":["R","r'"],"rhs":["ఋ","ృ"]},
+      {"lhs":["RU","r'u"],"rhs":["ౠ","ౄ"]},
+      {"lhs":["~l"],"rhs":["ఌ","ౢ"]},
+      {"lhs":["~L"],"rhs":["ౡ","ౣ"]},
+      {"lhs":["e"],"rhs":["ఎ","ె"]},
+      {"lhs":["E","ea","ae","e'"],"rhs":["ఏ","ే"]},
+      {"lhs":["ai"],"rhs":["ఐ","ై"]},
+      {"lhs":["o"],"rhs":["ఒ","ొ"]},
+      {"lhs":["O","oa","oe","o'"],"rhs":["ఓ","ో"]},
+      {"lhs":["au"],"rhs":["ఔ","ౌ"]}
+    ]
+  }
+}

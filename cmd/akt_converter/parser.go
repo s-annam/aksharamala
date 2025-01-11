@@ -48,9 +48,9 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 				scheme.Categories[currentCategory] = section
 			}
 
-			// Start a new section
+			// Get or create the section
 			currentCategory = match[1]
-			section = types.Section{}
+			section = getOrCreateSection(scheme, currentCategory)
 			lastMapping = nil // Reset last mapping for the new section
 			continue
 		}
@@ -62,16 +62,9 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 				scheme.Categories[currentCategory] = section
 			}
 
-			// Start a new (pseudo) section, consider only the first word
+			// Get or create the (pseudo) section, consider only the first word
 			currentCategory = strings.ToLower(strings.Fields(match[1])[0])
-
-			// Check if the section already exists
-			if existingSection, exists := scheme.Categories[currentCategory]; exists {
-				section = existingSection // Use the existing section
-			} else {
-				section = types.Section{} // Create a new section if it doesn't exist
-			}
-
+			section = getOrCreateSection(scheme, currentCategory)
 			lastMapping = nil // Reset last mapping for the new section
 			continue
 		}
@@ -103,6 +96,14 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 	}
 
 	return scheme, scanner.Err()
+}
+
+// Get an existing section or create a new one if it doesn't exist
+func getOrCreateSection(scheme types.TransliterationScheme, currentCategory string) types.Section {
+	if existingSection, exists := scheme.Categories[currentCategory]; exists {
+		return existingSection // Use the existing section
+	}
+	return types.Section{} // Create a new section if it doesn't exist
 }
 
 // Parse metadata fields from the AKT file

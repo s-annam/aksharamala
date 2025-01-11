@@ -14,19 +14,19 @@
     "consonants": [
       {"lhs":["क"],"rhs":["k(a)","()(a)ak(a)"]},
       {"lhs":["ख"],"rhs":["kh(a)","()(a)akh(a)"]},
-      {"comment":"marathi half-R (as in daRyaa)","lhs":["र्‍"],"rhs":["R","()(a)aR"]},
-      {"comment":"x = ksh","lhs":["क्ष"],"rhs":["x(a)","()(a)ax(a)"]},
-      {"comment":"GY = dny","lhs":["ज्ञ"],"rhs":["GY(a)","()(a)aGY(a)"]},
+      {"lhs":["र्‍"],"rhs":["R","()(a)aR"],"comment":"marathi half-R (as in daRyaa)"},
+      {"lhs":["क्ष"],"rhs":["x(a)","()(a)ax(a)"],"comment":"x = ksh"},
+      {"lhs":["ज्ञ"],"rhs":["GY(a)","()(a)aGY(a)"],"comment":"GY = dny"},
       {"lhs":["ऽ"],"rhs":[".a"]},
       {"lhs":["ा"],"rhs":["aa(v)"]},
       {"lhs":["क़","क़"],"rhs":["q(a)","()(a)aq(a)"]},
-      {"comment":"danda","lhs":["।"],"rhs":["."]}
+      {"lhs":["।"],"rhs":["."],"comment":"danda"}
     ],
     "digits": [
       {"lhs":["०"],"rhs":["0"]},
       {"lhs":["१"],"rhs":["1"]},
-      {"comment":"devanagari abbreviation sign","lhs":["॰"],"rhs":["ABBR"]},
-      {"comment":"ASCII period","lhs":["."],"rhs":["\\."]}
+      {"lhs":["॰"],"rhs":["ABBR"],"comment":"devanagari abbreviation sign"},
+      {"lhs":["."],"rhs":["\\."],"comment":"ASCII period"}
     ],
     "others": [
     ],

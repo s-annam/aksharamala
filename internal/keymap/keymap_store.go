@@ -47,7 +47,7 @@ func (store *KeymapStore) LoadKeymaps(directory string) error {
 	}
 
 	for _, file := range files {
-		if file.IsDir() || !strings.HasSuffix(file.Name(), ".json") {
+		if file.IsDir() || !strings.HasSuffix(file.Name(), ".aksj") {
 			continue
 		}
 

@@ -1,39 +1,39 @@
-// This file is part of Aksharamala (aks.go).
-//
-// Aksharamala is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// Aksharamala is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with Aksharamala. If not, see <https://www.gnu.org/licenses/>.
-
 package main
 
 import (
 	"fmt"
+	"log"
 
 	"aks.go/internal/keymap"
+	"aks.go/internal/translit"
 )
 
 func main() {
+	// Initialize keymap store
 	store := keymap.NewKeymapStore()
+	if err := store.LoadKeymaps("./keymaps"); err != nil {
+		log.Fatalf("Failed to load keymaps: %v", err)
+	}
 
-	// Load keymaps from the "keymaps" directory
-	err := store.LoadKeymaps("./keymaps")
+	// Get Hindi scheme
+	scheme, exists := store.GetKeymap("hindi")
+	if !exists {
+		log.Fatal("Hindi keymap not found")
+	}
+
+	// Create Aksharamala instance
+	aks, err := translit.NewAksharamala(&scheme)
 	if err != nil {
-		fmt.Printf("Error loading keymaps: %v\n", err)
-		return
+		log.Fatalf("Failed to create Aksharamala: %v", err)
 	}
 
-	// List all loaded keymaps
-	fmt.Println("Loaded Keymaps:")
-	for _, id := range store.ListKeymapIDs() {
-		fmt.Println("- ", id)
+	// Example transliteration
+	input := "namaste"
+	output, err := aks.Transliterate(input)
+	if err != nil {
+		log.Fatalf("Transliteration failed: %v", err)
 	}
+
+	fmt.Printf("Input text: %s\n", input)
+	fmt.Printf("Transliterated text: %s\n", output)
 }

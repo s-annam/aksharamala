@@ -108,3 +108,37 @@ func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransl
 		Categories: compactCategories,
 	}, nil
 }
+
+// UnmarshalJSON customizes JSON unmarshaling for TransliterationScheme
+func (s *TransliterationScheme) UnmarshalJSON(data []byte) error {
+	var compact CompactTransliterationScheme
+	if err := json.Unmarshal(data, &compact); err != nil {
+		return err
+	}
+
+	// Copy the simple fields
+	s.Comments = compact.Comments
+	s.Version = compact.Version
+	s.ID = compact.ID
+	s.Name = compact.Name
+	s.License = compact.License
+	s.Language = compact.Language
+	s.Scheme = compact.Scheme
+	s.Metadata = compact.Metadata
+
+	// Initialize the Categories map
+	s.Categories = make(map[string]Section)
+
+	// Process each category
+	for name, rawEntries := range compact.Categories {
+		var mappings []CategoryEntry
+		if err := json.Unmarshal(rawEntries, &mappings); err != nil {
+			return err
+		}
+		s.Categories[name] = Section{
+			Mappings: mappings,
+		}
+	}
+
+	return nil
+}

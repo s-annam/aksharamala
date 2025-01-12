@@ -3,37 +3,46 @@ package translit
 import (
 	"fmt"
 	"strings"
-	"unicode/utf8"
 
 	"aks.go/internal/types"
 )
 
-// Aksharamala handles Indic script transliteration using configurable schemes
+// Add viramaHandler to Aksharamala struct
 type Aksharamala struct {
-	scheme       *types.TransliterationScheme
-	buffer       *Buffer
-	context      *Context
-	categoryMaps map[string]map[string][]string
+	scheme        *types.TransliterationScheme
+	buffer        *Buffer
+	context       *Context
+	categoryMaps  map[string]map[string][]string
+	viramaHandler *ViramaHandler
 }
 
-// NewAksharamala creates a new transliterator for the given scheme
+// Update NewAksharamala to initialize viramaHandler
 func NewAksharamala(scheme *types.TransliterationScheme) (*Aksharamala, error) {
 	if scheme == nil {
 		return nil, fmt.Errorf("scheme cannot be nil")
 	}
 
+	context := NewContext()
 	t := &Aksharamala{
 		scheme:       scheme,
 		buffer:       NewBuffer(),
-		context:      NewContext(),
+		context:      context,
 		categoryMaps: make(map[string]map[string][]string),
 	}
+
+	// Initialize virama handler
+	t.viramaHandler = NewViramaHandler(scheme.Metadata.Virama, context)
 
 	if err := t.buildMaps(); err != nil {
 		return nil, fmt.Errorf("failed to build category maps: %w", err)
 	}
 
 	return t, nil
+}
+
+// Update handleVirama to use viramaHandler
+func (a *Aksharamala) handleVirama(output string) string {
+	return a.viramaHandler.ApplyVirama(output)
 }
 
 // buildMaps preprocesses the scheme mappings for efficient lookup
@@ -103,8 +112,8 @@ func (a *Aksharamala) transliterateRune(r rune) Result {
 
 	// Add to buffer and try to match
 	a.buffer.Append(r)
+	match, outputs := a.findLongestMatch()
 
-	match, output := a.findLongestMatch()
 	if match == "" {
 		// No match found, return first character if buffer has multiple chars
 		if a.buffer.Len() > 1 {
@@ -116,21 +125,28 @@ func (a *Aksharamala) transliterateRune(r rune) Result {
 	}
 
 	// Process the match
-	matchLen := utf8.RuneCountInString(match)
+	matchLen := len(match)
 	backspaces := matchLen - 1
 	a.buffer.Remove(matchLen)
 
-	// Apply any context-specific rules
-	output = a.applyContextRules(output)
+	// Handle dependent vowel forms
+	if len(outputs) > 1 && a.context.LastChar != 0 {
+		// Use dependent form (matra) if available
+		return Result{
+			Output:         a.applyContextRules(outputs[1]),
+			BackspaceCount: backspaces,
+		}
+	}
 
+	// Use independent form
 	return Result{
-		Output:         output,
+		Output:         a.applyContextRules(outputs[0]),
 		BackspaceCount: backspaces,
 	}
 }
 
 // findLongestMatch finds the longest matching sequence in the current buffer
-func (a *Aksharamala) findLongestMatch() (string, string) {
+func (a *Aksharamala) findLongestMatch() (string, []string) {
 	bufStr := a.buffer.String()
 
 	// Try each category in priority order
@@ -144,32 +160,26 @@ func (a *Aksharamala) findLongestMatch() (string, string) {
 		// Try progressively shorter substrings
 		for i := len(bufStr); i > 0; i-- {
 			if outputs, ok := mappings[bufStr[:i]]; ok {
-				return bufStr[:i], outputs[0]
+				return bufStr[:i], outputs
 			}
 		}
 	}
 
-	return "", ""
+	return "", nil
 }
 
 // applyContextRules handles context-specific modifications
 func (a *Aksharamala) applyContextRules(output string) string {
-	// Check for virama handling based on scheme metadata
-	if vrm := a.scheme.Metadata.Virama; vrm != "" {
-		output = a.handleVirama(output, vrm)
+	if output == "" {
+		return output
 	}
+
+	// Apply virama rules
+	output = a.handleVirama(output)
 
 	// Update context based on output
-	if output != "" {
-		a.context.UpdateWithOutput(output)
-	}
+	a.context.UpdateWithOutput(output)
 
-	return output
-}
-
-// handleVirama applies virama rules based on scheme configuration
-func (a *Aksharamala) handleVirama(output, virama string) string {
-	// TODO: Implement virama handling logic based on scheme settings
 	return output
 }
 

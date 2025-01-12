@@ -53,7 +53,7 @@
       {"lhs":[".D"],"rhs":["ड़"]},
       {"lhs":[".Dh"],"rhs":["ढ़"]},
       {"lhs":["f"],"rhs":["फ़"]},
-      {"lhs":["Y"],"rhs":["य़"]}
+      {"lhs":["Y"],"rhs":["य़"]},
       {"lhs":["x","ksh"],"rhs":["क्ष"]},
       {"lhs":["GY","dny"],"rhs":["ज्ञ"]},
       {"lhs":[".r","^r"],"rhs":["￿","(r)र्"]}
@@ -96,8 +96,8 @@
       {"lhs":["\\u005Cthreedots"],"rhs":["'...'"],"comment":"three dots"}
     ],
     "others": [
-      {"lhs":["_"],"rhs":["\u0000"],"comment":"SPECIAL HANDLING"},
-      {"lhs":["\\##"],"rhs":["￾"],"comment":"ENGLISH \u003c-\u003e ITRANS HINDI"}
+      {"lhs":["_"],"rhs":["\u0000"],"comment":"special handling"},
+      {"lhs":["\\##"],"rhs":["￾"],"comment":"switch between english and hindi"},
       {"lhs":["\\u005Cnukta"],"rhs":["़"],"comment":"nukta"}
     ],
     "vedic": [

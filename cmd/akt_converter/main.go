@@ -158,7 +158,7 @@ func main() {
 
 func parseArgs() (string, string) {
 	defaultInput := "../../examples/example.akt"
-	defaultOutput := "../../examples/example.aktj"
+	defaultOutput := "../../examples/example.aksj"
 
 	// Command-line arguments
 	flag.Parse()

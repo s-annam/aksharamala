@@ -83,38 +83,41 @@ func (vh *ViramaHandler) ApplyVirama(output string) string {
 		return output
 	}
 
+	// Don't add virama for first character
+	if vh.context.LastChar == 0 {
+		return output
+	}
+
 	// Check if the current character is a consonant
 	if !isConsonant(lastRune) {
 		return output
 	}
 
-	// Get previous character from context
 	prevChar := vh.context.LastChar
 
 	switch vh.mode {
 	case ViramaModeSmart:
-		// Only insert virama between consonants when needed
-		if isConsonant(prevChar) && !isVowelMark(lastRune) {
-			// Don't add the previous consonant again, just add virama + current
-			return string([]rune{vh.char, lastRune})
+		// Insert virama between consecutive consonants
+		if isConsonant(prevChar) {
+			return string(vh.char) + string(lastRune)
 		}
 
 	case ViramaModeNormal:
 		// Always insert virama after consonant
 		if isConsonant(prevChar) {
-			return string([]rune{vh.char, lastRune})
+			return string(vh.char) + string(lastRune)
 		}
 
 	case ViramaModeDouble:
 		// Insert virama for doubled consonants
 		if prevChar == lastRune {
-			return string([]rune{vh.char, lastRune})
+			return string(vh.char) + string(lastRune)
 		}
 
 	case ViramaModeRepeat:
 		// Check if current consonant matches the previous one
 		if isConsonant(prevChar) && prevChar == lastRune {
-			return string([]rune{vh.char, lastRune})
+			return string(vh.char) + string(lastRune)
 		}
 	}
 

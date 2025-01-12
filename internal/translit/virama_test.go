@@ -9,11 +9,10 @@ import (
 // TestViramaBasic focuses on core virama behavior between consonants
 // without handling special cases like .r
 func TestViramaBasic(t *testing.T) {
-	// Define test scheme with virama handling
+	// Define test scheme with necessary mappings
 	scheme := &types.TransliterationScheme{
 		Metadata: types.Metadata{
-			// Use the same virama character as in Hindi.aksj
-			Virama: "0x094D, smart", // DEVANAGARI SIGN VIRAMA with smart mode
+			Virama: "0x094D, smart", // DEVANAGARI SIGN VIRAMA
 		},
 		Categories: map[string]types.Section{
 			"consonants": {
@@ -25,15 +24,16 @@ func TestViramaBasic(t *testing.T) {
 					{LHS: []string{"n"}, RHS: []string{"न"}},
 					{LHS: []string{"s"}, RHS: []string{"स"}},
 					{LHS: []string{"t"}, RHS: []string{"त"}},
+					{LHS: []string{"y"}, RHS: []string{"य"}}, // Added y mapping
 				},
 			},
 			"vowels": {
 				Mappings: []types.CategoryEntry{
-					{LHS: []string{"a"}, RHS: []string{"अ", ""}},    // Base vowel with empty matra
-					{LHS: []string{"aa"}, RHS: []string{"आ", "ा"}},  // Long A with matra
-					{LHS: []string{"e"}, RHS: []string{"ए", "े"}},   // E with matra
-					{LHS: []string{"i"}, RHS: []string{"इ", "ि"}},   // I with matra
-					{LHS: []string{"R^i"}, RHS: []string{"ऋ", "ृ"}}, // Vocalic R with matra
+					{LHS: []string{"a"}, RHS: []string{"अ", ""}},           // Base vowel with empty matra
+					{LHS: []string{"aa"}, RHS: []string{"आ", "ा"}},         // Long A with matra
+					{LHS: []string{"e"}, RHS: []string{"ए", "े"}},          // E with matra
+					{LHS: []string{"i"}, RHS: []string{"इ", "ि"}},          // I with matra
+					{LHS: []string{"R^i", "RRi"}, RHS: []string{"ऋ", "ृ"}}, // Vocalic R with matra
 				},
 			},
 		},
@@ -56,8 +56,13 @@ func TestViramaBasic(t *testing.T) {
 			want:  "कर्म",
 		},
 		{
-			name:  "consonant + r + vowel combination (kripa)",
+			name:  "consonant combination (kripa)",
 			input: "kripa",
+			want:  "क्रिप",
+		},
+		{
+			name:  "vocalic r combination (kR^ipa)",
+			input: "kR^ipa",
 			want:  "कृप",
 		},
 		{
@@ -78,12 +83,12 @@ func TestViramaBasic(t *testing.T) {
 		{
 			name:  "consonant cluster with different vowel (kri)",
 			input: "kri",
-			want:  "कृ",
+			want:  "क्रि",
 		},
 		{
 			name:  "three consonant cluster (stri)",
 			input: "stri",
-			want:  "स्त्री",
+			want:  "स्त्रि",
 		},
 	}
 

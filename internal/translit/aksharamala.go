@@ -40,11 +40,6 @@ func NewAksharamala(scheme *types.TransliterationScheme) (*Aksharamala, error) {
 	return t, nil
 }
 
-// Update handleVirama to use viramaHandler
-func (a *Aksharamala) handleVirama(output string) string {
-	return a.viramaHandler.ApplyVirama(output)
-}
-
 // buildMaps preprocesses the scheme mappings for efficient lookup
 func (a *Aksharamala) buildMaps() error {
 	for category, section := range a.scheme.Categories {
@@ -66,83 +61,96 @@ func (a *Aksharamala) buildMaps() error {
 func (a *Aksharamala) Transliterate(input string) (string, error) {
 	var result strings.Builder
 
+	// Clear buffer and reset state
+	a.buffer = NewBuffer()
+
+	// Add all characters to buffer first
 	for _, r := range input {
-		tr := a.transliterateRune(r)
-		if tr.Error != nil {
-			return "", tr.Error
-		}
-
-		// Handle backspaces if needed
-		if tr.BackspaceCount > 0 {
-			current := result.String()
-			if len(current) < tr.BackspaceCount {
-				return "", fmt.Errorf("invalid backspace count")
-			}
-			result.Reset()
-			result.WriteString(current[:len(current)-tr.BackspaceCount])
-		}
-
-		result.WriteString(tr.Output)
+		a.buffer.Append(r)
 	}
 
-	// Process any remaining buffer content
-	if a.buffer.Len() > 0 {
-		tr := a.flushBuffer()
-		if tr.Error != nil {
-			return "", tr.Error
+	// Process until buffer is empty
+	for a.buffer.Len() > 0 {
+		// Get longest match from current position
+		match, outputs := a.findLongestMatch()
+
+		if match == "" {
+			// No match found, consume one character and continue
+			result.WriteRune(a.buffer.First())
+			a.buffer.RemoveFirst()
+			continue
 		}
-		result.WriteString(tr.Output)
+
+		matchLen := len(match)
+
+		// Handle vowel after consonant
+		if len(outputs) > 1 && isConsonant(a.context.LastChar) {
+			if outputs[1] == "" {
+				// Skip implicit 'a'
+				a.buffer.Remove(matchLen)
+				continue
+			}
+			// Add matra
+			result.WriteString(outputs[1])
+			a.buffer.Remove(matchLen)
+			continue
+		}
+
+		// Handle consonants
+		if len(outputs[0]) > 0 && isConsonant([]rune(outputs[0])[0]) {
+			output := outputs[0]
+			currentChar := []rune(output)[0]
+
+			// In the consonant handling section of Transliterate:
+			// Remove current match from buffer to look ahead
+			remainingBuffer := a.buffer.String()[matchLen:]
+			a.buffer.Remove(matchLen)
+
+			needsVirama := false
+
+			// Look ahead - we need virama if next character is a consonant
+			if len(remainingBuffer) > 0 {
+				// Get next match
+				nextMatch, nextOutputs := a.findLongestMatch()
+
+				if nextMatch != "" {
+					// Check if next is a consonant (no vowel form) or is followed by a consonant
+					isNextConsonant := len(nextOutputs) == 1 ||
+						(len(nextOutputs) > 1 && nextOutputs[1] == "")
+
+					// Don't add virama if next char is a vowel
+					if isNextConsonant && !strings.ContainsAny(nextMatch, "aeiou") {
+						needsVirama = true
+					}
+				}
+
+				// Restore buffer
+				a.buffer = NewBuffer()
+				for _, ch := range remainingBuffer {
+					a.buffer.Append(ch)
+				}
+			}
+
+			// Update context
+			a.context.LastChar = currentChar
+
+			// Write output
+			result.WriteString(output)
+			if needsVirama {
+				result.WriteString("्")
+			}
+			continue
+		}
+
+		// Default case
+		result.WriteString(outputs[0])
+		if len(outputs[0]) > 0 {
+			a.context.LastChar = []rune(outputs[0])[0]
+		}
+		a.buffer.Remove(matchLen)
 	}
 
 	return result.String(), nil
-}
-
-// transliterateRune handles single character transliteration
-func (a *Aksharamala) transliterateRune(r rune) Result {
-	// Handle English mode toggle
-	if r == '#' {
-		a.context.ToggleEnglishMode()
-		return Result{Output: ""}
-	}
-
-	// In English mode, pass through unchanged
-	if a.context.InEnglishMode {
-		return Result{Output: string(r)}
-	}
-
-	// Add to buffer and try to match
-	a.buffer.Append(r)
-	match, outputs := a.findLongestMatch()
-
-	if match == "" {
-		// No match found, return first character if buffer has multiple chars
-		if a.buffer.Len() > 1 {
-			first := a.buffer.First()
-			a.buffer.RemoveFirst()
-			return Result{Output: string(first)}
-		}
-		return Result{Output: ""}
-	}
-
-	// Process the match
-	matchLen := len(match)
-	backspaces := matchLen - 1
-	a.buffer.Remove(matchLen)
-
-	// Handle dependent vowel forms
-	if len(outputs) > 1 && a.context.LastChar != 0 {
-		// Use dependent form (matra) if available
-		return Result{
-			Output:         a.applyContextRules(outputs[1]),
-			BackspaceCount: backspaces,
-		}
-	}
-
-	// Use independent form
-	return Result{
-		Output:         a.applyContextRules(outputs[0]),
-		BackspaceCount: backspaces,
-	}
 }
 
 // findLongestMatch finds the longest matching sequence in the current buffer
@@ -166,31 +174,4 @@ func (a *Aksharamala) findLongestMatch() (string, []string) {
 	}
 
 	return "", nil
-}
-
-// applyContextRules handles context-specific modifications
-func (a *Aksharamala) applyContextRules(output string) string {
-	if output == "" {
-		return output
-	}
-
-	// Apply virama rules
-	output = a.handleVirama(output)
-
-	// Update context based on output
-	a.context.UpdateWithOutput(output)
-
-	return output
-}
-
-// flushBuffer processes any remaining content in the buffer
-func (a *Aksharamala) flushBuffer() Result {
-	if a.buffer.Len() == 0 {
-		return Result{}
-	}
-
-	// Return remaining content as-is
-	content := a.buffer.String()
-	a.buffer.Clear()
-	return Result{Output: content}
 }

@@ -1,14 +1,16 @@
-package translit
+package types
+
+import "aks.go/internal/core"
 
 // Context maintains the state during transliteration.
 type Context struct {
-	LatestLookup LookupResult // Tracks the result of the last lookup
+	LatestLookup core.LookupResult // Tracks the result of the last lookup
 }
 
 // NewContext initializes a new Context instance.
 func NewContext() *Context {
 	return &Context{
-		LatestLookup: LookupResult{
+		LatestLookup: core.LookupResult{
 			Output:   "",
 			Category: "",
 		},
@@ -17,7 +19,7 @@ func NewContext() *Context {
 
 // Reset clears the context state.
 func (ctx *Context) Reset() {
-	ctx.LatestLookup = LookupResult{
+	ctx.LatestLookup = core.LookupResult{
 		Output:   "",
 		Category: "",
 	}

@@ -19,6 +19,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"aks.go/internal/core"
 )
 
 // TransliterationScheme represents a keymap for transliteration.
@@ -47,8 +49,8 @@ type Metadata struct {
 
 // Section represents a category of mappings within a transliteration scheme.
 type Section struct {
-	Comments []string `json:"comments,omitempty"`
-	Mappings Mappings `json:"mappings"`
+	Comments []string      `json:"comments,omitempty"`
+	Mappings core.Mappings `json:"mappings"`
 }
 
 // CompactTransliterationScheme is a temporary struct to hold the compact JSON
@@ -62,45 +64,6 @@ type CompactTransliterationScheme struct {
 	Scheme     string                     `json:"scheme"`
 	Metadata   Metadata                   `json:"metadata"`
 	Categories map[string]json.RawMessage `json:"categories"`
-}
-
-func normalizeComment(comment string) string {
-	comment = strings.TrimSpace(comment)
-	comment = strings.TrimPrefix(comment, "=*=")
-	comment = strings.TrimSuffix(comment, "=*=")
-	comment = strings.TrimSpace(comment)
-	return comment
-}
-
-// ToCompactTransliterationScheme converts a TransliterationScheme to a CompactTransliterationScheme
-func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransliterationScheme, error) {
-	compactCategories := make(map[string]json.RawMessage)
-
-	for category, section := range scheme.Categories {
-		// Normalize comments in mappings
-		for i := range section.Mappings.Entries() {
-			section.Mappings.Entries()[i].Comment = normalizeComment(section.Mappings.Entries()[i].Comment)
-		}
-
-		// Convert section to JSON
-		sectionJSON, err := json.Marshal(section.Mappings.Entries())
-		if err != nil {
-			return CompactTransliterationScheme{}, err
-		}
-		compactCategories[category] = sectionJSON
-	}
-
-	return CompactTransliterationScheme{
-		Comments:   scheme.Comments,
-		Version:    scheme.Version,
-		ID:         scheme.ID,
-		Name:       scheme.Name,
-		License:    scheme.License,
-		Language:   scheme.Language,
-		Scheme:     scheme.Scheme,
-		Metadata:   scheme.Metadata,
-		Categories: compactCategories,
-	}, nil
 }
 
 // UnmarshalJSON customizes JSON unmarshaling for TransliterationScheme
@@ -125,12 +88,12 @@ func (s *TransliterationScheme) UnmarshalJSON(data []byte) error {
 
 	// Process each category
 	for name, rawEntries := range compact.Categories {
-		var mappings []Mapping
+		var mappings []core.Mapping
 		if err := json.Unmarshal(rawEntries, &mappings); err != nil {
 			return err
 		}
 		s.Categories[name] = Section{
-			Mappings: NewMappings(mappings),
+			Mappings: core.NewMappings(mappings),
 		}
 	}
 
@@ -139,21 +102,94 @@ func (s *TransliterationScheme) UnmarshalJSON(data []byte) error {
 
 // Validate checks the integrity of the transliteration scheme.
 func (s *TransliterationScheme) Validate() error {
+	missingFields := []string{}
+
+	// Validate mandatory fields
 	if s.ID == "" {
-		return fmt.Errorf("keymap is missing 'id'")
+		missingFields = append(missingFields, "id")
+		s.ID = "unknown_id" // Assign default if required
 	}
+	if s.Name == "" {
+		missingFields = append(missingFields, "name")
+		s.Name = "Unnamed Transliteration"
+	}
+	if s.Language == "" {
+		missingFields = append(missingFields, "language")
+		s.Language = "unknown_language"
+	}
+	if s.Scheme == "" {
+		missingFields = append(missingFields, "scheme")
+		s.Scheme = "unknown_scheme"
+	}
+
+	// Check categories and mappings
 	if len(s.Categories) == 0 {
 		return fmt.Errorf("keymap '%s' has no categories", s.ID)
 	}
 	for category, section := range s.Categories {
-		for _, mapping := range section.Mappings.Entries() {
-			if len(mapping.LHS) == 0 {
-				return fmt.Errorf("category '%s' in keymap '%s' has an empty 'LHS'", category, s.ID)
-			}
-			if len(mapping.RHS) == 0 {
-				return fmt.Errorf("category '%s' in keymap '%s' has an empty 'RHS'", category, s.ID)
+		if err := section.Mappings.ValidateAll(category, s.ID); err != nil {
+			return err
+		}
+	}
+
+	if len(missingFields) > 0 {
+		return fmt.Errorf("mandatory fields missing: %s", strings.Join(missingFields, ", "))
+	}
+
+	return nil
+}
+
+// BuildLookupTable constructs a precomputed lookup table from a transliteration scheme.
+func BuildLookupTable(scheme *TransliterationScheme) core.LookupTable {
+	table := make(core.LookupTable)
+	for category, section := range scheme.Categories {
+		for _, mapping := range section.Mappings.All() {
+			for _, lhs := range mapping.LHS {
+				table[lhs] = core.LookupResult{
+					Output:   mapping.RHS[0],
+					Category: category,
+				}
 			}
 		}
 	}
-	return nil
+	return table
+}
+
+// ToCompactTransliterationScheme converts a TransliterationScheme to a CompactTransliterationScheme
+func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransliterationScheme, error) {
+	compactCategories := make(map[string]json.RawMessage)
+	var errList []error
+
+	scheme.IterateCategories(func(category string, section Section) {
+		section.Mappings.NormalizeComments(core.NormalizeComment)
+		sectionJSON, err := json.Marshal(section.Mappings.Entries())
+		if err != nil {
+			errList = append(errList, fmt.Errorf("failed to marshal category '%s': %w", category, err))
+			return
+		}
+		compactCategories[category] = sectionJSON
+	})
+
+	if len(errList) > 0 {
+		return CompactTransliterationScheme{}, fmt.Errorf("errors encountered: %v", errList)
+	}
+
+	return CompactTransliterationScheme{
+		Comments:   scheme.Comments,
+		Version:    scheme.Version,
+		ID:         scheme.ID,
+		Name:       scheme.Name,
+		License:    scheme.License,
+		Language:   scheme.Language,
+		Scheme:     scheme.Scheme,
+		Metadata:   scheme.Metadata,
+		Categories: compactCategories,
+	}, nil
+}
+
+// IterateCategories performs an action on each category and section.
+func (s *TransliterationScheme) IterateCategories(action func(string, Section)) {
+	for category, section := range s.Categories {
+		action(category, section)
+	}
 }

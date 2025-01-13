@@ -8,12 +8,13 @@ import (
 	"strconv"
 	"strings"
 
+	"aks.go/internal/core"
 	"aks.go/internal/types"
 )
 
 type Aksharamala struct {
 	scheme     *types.TransliterationScheme
-	context    *Context
+	context    *types.Context
 	virama     string
 	viramaMode string
 }
@@ -74,7 +75,7 @@ func NewAksharamala(schemePath string) (*Aksharamala, error) {
 
 	return &Aksharamala{
 		scheme:     scheme,
-		context:    NewContext(),
+		context:    types.NewContext(),
 		virama:     viramaRune,
 		viramaMode: viramaMode,
 	}, nil
@@ -83,7 +84,7 @@ func NewAksharamala(schemePath string) (*Aksharamala, error) {
 // Transliterate performs transliteration for consonants, vowels, and mixed input.
 func (a *Aksharamala) Transliterate(input string) string {
 	// Reset context for a clean state
-	a.context = NewContext()
+	a.context = types.NewContext()
 
 	var result strings.Builder
 	for _, char := range input {
@@ -105,7 +106,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 		} else {
 			// For unmatched characters, treat as "other"
 			result.WriteString(string(char))
-			a.context.LatestLookup = LookupResult{Output: string(char), Category: "other"}
+			a.context.LatestLookup = core.LookupResult{Output: string(char), Category: "other"}
 		}
 	}
 	return result.String()
@@ -132,21 +133,21 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 }
 
 // lookup finds the transliteration for a single character.
-func (a *Aksharamala) lookup(char string) LookupResult {
+func (a *Aksharamala) lookup(char string) core.LookupResult {
 	for category, section := range a.scheme.Categories {
 		for _, mapping := range section.Mappings.Entries() {
 			for _, lhs := range mapping.LHS {
 				if lhs == char {
 					// Use matra (RHS[1]) if the previous character is a consonant
 					if category == "vowels" && a.context.LatestLookup.Category == "consonants" && len(mapping.RHS) > 1 {
-						return LookupResult{Output: mapping.RHS[1], Category: category}
+						return core.LookupResult{Output: mapping.RHS[1], Category: category}
 					}
-					return LookupResult{Output: mapping.RHS[0], Category: category} // Use full form otherwise
+					return core.LookupResult{Output: mapping.RHS[0], Category: category} // Use full form otherwise
 				}
 			}
 		}
 	}
-	return LookupResult{Output: "", Category: "other"} // No match found
+	return core.LookupResult{Output: "", Category: "other"} // No match found
 }
 
 // getCategory determines the category of the output character.

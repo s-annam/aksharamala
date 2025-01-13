@@ -1,4 +1,4 @@
-package types
+package core
 
 import "testing"
 
@@ -25,13 +25,15 @@ func TestMappings_Validate(t *testing.T) {
 	mappings.Add([]string{"i"}, []string{"इ"}, "Vowel I")
 
 	// Test valid mappings
-	if err := mappings.Validate(); err != nil {
+	err := mappings.Validate("test_category", "test_schemeID")
+	if err != nil {
 		t.Errorf("Validation failed for valid mappings: %v", err)
 	}
 
 	// Test invalid mapping (empty LHS)
 	mappings.Add([]string{}, []string{"उ"}, "Invalid Mapping")
-	if err := mappings.Validate(); err == nil {
+	err = mappings.Validate("test_category", "test_schemeID")
+	if err == nil {
 		t.Errorf("Expected validation error for empty LHS, but got none")
 	}
 }

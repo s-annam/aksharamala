@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+
+	"aks.go/internal/core"
 )
 
 func TestToCompactScheme(t *testing.T) {
@@ -25,7 +27,7 @@ func TestToCompactScheme(t *testing.T) {
 		Categories: map[string]Section{
 			"vowels": {
 				Comments: []string{"Category comment"},
-				Mappings: NewMappings([]Mapping{
+				Mappings: core.NewMappings([]core.Mapping{
 					{LHS: []string{"a"}, RHS: []string{"अ"}, Comment: "=*= Vowel A =*="},
 					{LHS: []string{"aa"}, RHS: []string{"आ"}, Comment: " Vowel AA "},
 				}),
@@ -58,7 +60,7 @@ func TestToCompactScheme(t *testing.T) {
 		t.Fatal("Vowels category not found in compact scheme")
 	}
 
-	var mappings []Mapping
+	var mappings []core.Mapping
 	if err := json.Unmarshal(categoryJSON, &mappings); err != nil {
 		t.Fatalf("Error unmarshalling category JSON: %v", err)
 	}
@@ -87,7 +89,7 @@ func TestFullJSONOutput(t *testing.T) {
 		Scheme:   "Unicode",
 		Categories: map[string]Section{
 			"consonants": {
-				Mappings: NewMappings([]Mapping{
+				Mappings: core.NewMappings([]core.Mapping{
 					{LHS: []string{"k"}, RHS: []string{"क"}, Comment: "Consonant K"},
 					{LHS: []string{"kh"}, RHS: []string{"ख"}, Comment: "Consonant KH"},
 				}),
@@ -122,5 +124,49 @@ func TestFullJSONOutput(t *testing.T) {
 	}
 	if !strings.Contains(output, `"consonants": [`) {
 		t.Error("Consonants category missing or incorrectly formatted")
+	}
+}
+
+func TestBuildLookupTable(t *testing.T) {
+	scheme := &TransliterationScheme{
+		Categories: map[string]Section{
+			"consonants": {
+				Mappings: core.NewMappings([]core.Mapping{
+					{LHS: []string{"k"}, RHS: []string{"क"}},
+					{LHS: []string{"kh"}, RHS: []string{"ख"}},
+				}),
+			},
+			"vowels": {
+				Mappings: core.NewMappings([]core.Mapping{
+					{LHS: []string{"a"}, RHS: []string{"अ"}},
+				}),
+			},
+		},
+	}
+
+	table := BuildLookupTable(scheme)
+
+	// Test valid lookups
+	tests := []struct {
+		input    string
+		expected core.LookupResult
+	}{
+		{"k", core.LookupResult{Output: "क", Category: "consonants"}},
+		{"a", core.LookupResult{Output: "अ", Category: "vowels"}},
+	}
+
+	for _, test := range tests {
+		result := table.Lookup(test.input)
+		if result != test.expected {
+			t.Errorf("For input '%s': expected %+v, got %+v", test.input, test.expected, result)
+		} else {
+			t.Logf("For input '%s': got expected result %+v", test.input, result)
+		}
+	}
+
+	// Test invalid lookup
+	result := table.Lookup("z")
+	if result.Output != "" || result.Category != "other" {
+		t.Errorf("For input 'z': expected empty output and 'other' category, got %+v", result)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"aks.go/internal/core"
 	"aks.go/internal/types"
 )
 
@@ -25,7 +26,7 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 	var currentCategory string
 	var section types.Section
 	var fileComments []string
-	var lastMapping *types.Mapping
+	var lastMapping *core.Mapping
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -78,8 +79,8 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 		// Match mappings within the current section
 		entry := parseMapping(line, lastMapping)
 		if entry != nil {
-			section.Mappings = append(section.Mappings, *entry)
-			lastMapping = &section.Mappings[len(section.Mappings)-1] // Track last mapping
+			section.Mappings.Add(entry.LHS, entry.RHS, entry.Comment)
+			lastMapping = entry
 		}
 	}
 
@@ -91,7 +92,7 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 	// Save file-level comments
 	scheme.Comments = fileComments
 
-	if err := validateMandatoryFields(&scheme); err != nil {
+	if err := scheme.Validate(); err != nil {
 		return scheme, err
 	}
 
@@ -131,27 +132,24 @@ func parseMetadata(line string, scheme *types.TransliterationScheme) {
 	}
 }
 
+// Normalize comments
 func normalizeComment(comment string) string {
-	// Trim spaces
 	comment = strings.TrimSpace(comment)
-
-	// Remove surrounding `=*=` if present
 	if strings.HasPrefix(comment, "=*=") && strings.HasSuffix(comment, "=*=") {
 		comment = strings.TrimPrefix(comment, "=*=")
 		comment = strings.TrimSuffix(comment, "=*=")
 	}
-
 	return comment
 }
 
 // Parse mappings and handle multiple LHS
-func parseMapping(line string, lastMapping *types.Mapping) *types.Mapping {
+func parseMapping(line string, lastMapping *core.Mapping) *core.Mapping {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
 	lhsOnlyPattern := regexp.MustCompile(`^(\S+)$`)
 
 	// Match full mappings
 	if match := mappingPattern.FindStringSubmatch(line); match != nil {
-		return &types.Mapping{
+		return &core.Mapping{
 			LHS:     handleMappingMatch(match[1]),
 			RHS:     handleMappingMatch(match[2]),
 			Comment: normalizeComment(match[3]),
@@ -161,9 +159,7 @@ func parseMapping(line string, lastMapping *types.Mapping) *types.Mapping {
 	// Match LHS-only lines and attach to the last mapping
 	if match := lhsOnlyPattern.FindStringSubmatch(line); match != nil {
 		if lastMapping != nil {
-			// Append the new LHS to the last mapping's LHS
-			x := handleMappingMatch(match[1])[0]
-			lastMapping.LHS = append(lastMapping.LHS, x)
+			lastMapping.LHS = append(lastMapping.LHS, match[1])
 		}
 		return nil
 	}

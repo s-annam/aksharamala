@@ -1,14 +1,16 @@
-package translit
+package types
 
 import (
 	"testing"
+
+	"aks.go/internal/core"
 )
 
 func TestContext_Reset(t *testing.T) {
 	ctx := NewContext()
 
 	// Update the context
-	ctx.LatestLookup = LookupResult{
+	ctx.LatestLookup = core.LookupResult{
 		Output:   "क",
 		Category: "consonants",
 	}

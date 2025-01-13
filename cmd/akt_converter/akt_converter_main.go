@@ -32,33 +32,6 @@ const (
 	defaultLicense = "AGPL-3.0-or-later" // License for the generated file
 )
 
-// Validate mandatory fields
-func validateMandatoryFields(scheme *types.TransliterationScheme) error {
-	missingFields := []string{}
-
-	if scheme.ID == "" {
-		missingFields = append(missingFields, "id")
-		scheme.ID = "unknown_id" // Assign default if required
-	}
-	if scheme.Name == "" {
-		missingFields = append(missingFields, "name")
-		scheme.Name = "Unnamed Transliteration"
-	}
-	if scheme.Language == "" {
-		missingFields = append(missingFields, "language")
-		scheme.Language = "unknown_language"
-	}
-	if scheme.Scheme == "" {
-		missingFields = append(missingFields, "scheme")
-		scheme.Scheme = "unknown_scheme"
-	}
-
-	if len(missingFields) > 0 {
-		return fmt.Errorf("mandatory fields missing: %s", strings.Join(missingFields, ", "))
-	}
-	return nil
-}
-
 // Convert 0x-prefixed hexadecimal Unicode values to their corresponding characters
 func convertUnicode(value string) string {
 	// Recognize optional context markers around the Unicode values

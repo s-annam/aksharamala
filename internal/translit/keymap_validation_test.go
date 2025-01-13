@@ -4,15 +4,19 @@ import (
 	"encoding/json"
 	"testing"
 
+	"aks.go/internal/core"
 	"aks.go/internal/types"
 )
 
 func TestValidateKeymap(t *testing.T) {
 	validKeymap := types.TransliterationScheme{
-		ID: "hindi",
+		ID:       "hindi",
+		Name:     "Hindi Keymap",
+		Language: "Hindi",
+		Scheme:   "ITRANS",
 		Categories: map[string]types.Section{
 			"vowels": {
-				Mappings: types.NewMappings([]types.Mapping{
+				Mappings: core.NewMappings([]core.Mapping{
 					{LHS: []string{"a"}, RHS: []string{"अ"}},
 				}),
 			},
@@ -55,8 +59,8 @@ func TestValidateKeymap(t *testing.T) {
 				ID: "hindi",
 				Categories: map[string]types.Section{
 					"vowels": {
-						Mappings: types.NewMappings(
-							[]types.Mapping{
+						Mappings: core.NewMappings(
+							[]core.Mapping{
 								{LHS: []string{}, RHS: []string{"अ"}},
 							}),
 					},
@@ -71,7 +75,7 @@ func TestValidateKeymap(t *testing.T) {
 				ID: "hindi",
 				Categories: map[string]types.Section{
 					"vowels": {
-						Mappings: types.NewMappings([]types.Mapping{
+						Mappings: core.NewMappings([]core.Mapping{
 							{LHS: []string{"a"}, RHS: []string{}},
 						}),
 					},

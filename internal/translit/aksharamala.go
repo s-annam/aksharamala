@@ -80,6 +80,13 @@ func (a *Aksharamala) Transliterate(input string) string {
 	var result strings.Builder
 	for _, char := range input {
 		output := a.lookup(string(char))
+		if output == "\x00" && a.context.LastCharCategory == "consonants" {
+			category := a.getCategory(output)
+			a.context.LastCharCategory = category
+			a.context.LastOutput = output
+			continue
+		}
+
 		if output != "" {
 			// Handle virama based on mode and context
 			if a.shouldApplyVirama(output) {

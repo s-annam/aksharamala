@@ -24,12 +24,12 @@ type Mapping struct {
 }
 
 type Context struct {
-	Result LookupResult // Tracks the result of the last lookup
+	LatestLookup LookupResult // Tracks the result of the last lookup
 }
 
 func NewContext() *Context {
 	return &Context{
-		Result: LookupResult{
+		LatestLookup: LookupResult{
 			Output:   "",
 			Category: "",
 		},
@@ -81,8 +81,8 @@ func (a *Aksharamala) Transliterate(input string) string {
 	var result strings.Builder
 	for _, char := range input {
 		lookupResult := a.lookup(string(char))
-		if lookupResult.Output == "\x00" && a.context.Result.Category == "consonants" {
-			a.context.Result = lookupResult
+		if lookupResult.Output == "\x00" && a.context.LatestLookup.Category == "consonants" {
+			a.context.LatestLookup = lookupResult
 			continue
 		}
 
@@ -93,12 +93,12 @@ func (a *Aksharamala) Transliterate(input string) string {
 			}
 
 			// Update context and write output
-			a.context.Result = lookupResult
+			a.context.LatestLookup = lookupResult
 			result.WriteString(lookupResult.Output)
 		} else {
 			// For unmatched characters, treat as "other"
 			result.WriteString(string(char))
-			a.context.Result = LookupResult{Output: string(char), Category: "other"}
+			a.context.LatestLookup = LookupResult{Output: string(char), Category: "other"}
 		}
 	}
 	return result.String()
@@ -106,7 +106,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 
 // shouldApplyVirama determines if a virama should be inserted before the current character.
 func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
-	if a.context.Result.Category != "consonants" || a.getCategory(nextOutput) != "consonants" {
+	if a.context.LatestLookup.Category != "consonants" || a.getCategory(nextOutput) != "consonants" {
 		return false
 	}
 
@@ -116,9 +116,9 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 	case "normal":
 		return true
 	case "double":
-		return a.context.Result.Output == nextOutput
+		return a.context.LatestLookup.Output == nextOutput
 	case "repeat":
-		return a.context.Result.Output == nextOutput
+		return a.context.LatestLookup.Output == nextOutput
 	}
 
 	return false
@@ -136,7 +136,7 @@ func (a *Aksharamala) lookup(char string) LookupResult {
 			for _, lhs := range mapping.LHS {
 				if lhs == char {
 					// Use matra (RHS[1]) if the previous character is a consonant
-					if category == "vowels" && a.context.Result.Category == "consonants" && len(mapping.RHS) > 1 {
+					if category == "vowels" && a.context.LatestLookup.Category == "consonants" && len(mapping.RHS) > 1 {
 						return LookupResult{Output: mapping.RHS[1], Category: category}
 					}
 					return LookupResult{Output: mapping.RHS[0], Category: category} // Use full form otherwise

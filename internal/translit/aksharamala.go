@@ -24,19 +24,6 @@ type Mapping struct {
 	RHS []string `json:"rhs"`
 }
 
-type Context struct {
-	LatestLookup LookupResult // Tracks the result of the last lookup
-}
-
-func NewContext() *Context {
-	return &Context{
-		LatestLookup: LookupResult{
-			Output:   "",
-			Category: "",
-		},
-	}
-}
-
 type Aksharamala struct {
 	scheme     *TransliterationScheme
 	context    *Context
@@ -155,11 +142,6 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 	}
 
 	return false
-}
-
-type LookupResult struct {
-	Output   string
-	Category string
 }
 
 // lookup finds the transliteration for a single character.

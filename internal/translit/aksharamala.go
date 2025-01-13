@@ -38,10 +38,10 @@ func NewContext() *Context {
 }
 
 type Aksharamala struct {
-	scheme  *TransliterationScheme
-	context *Context
-	virama  rune
-	mode    string
+	scheme     *TransliterationScheme
+	context    *Context
+	virama     string
+	viramaMode string
 }
 
 func splitAndTrim(s string) []string {
@@ -58,29 +58,27 @@ func splitAndTrim(s string) []string {
 	return parts
 }
 
-func parseVirama(metadata string) (rune, string, error) {
+func parseVirama(metadata string) (string, string, error) {
 	// Split virama metadata entry into two parts
 	parts := splitAndTrim(metadata)
 	if len(parts) != 2 {
-		return 0, "", fmt.Errorf("invalid or missing virama metadata: %s", metadata)
+		return "", "", fmt.Errorf("invalid or missing virama metadata: %s", metadata)
 	}
 	viramaString := parts[0]
 	viramaMode := parts[1]
 
+	// Handle hexadecimal Unicode value, if present
 	if strings.HasPrefix(viramaString, "0x") {
-		viramaString = strings.TrimPrefix(viramaString, "0x")
-		codePoint, err := strconv.ParseUint(viramaString, 16, 32)
+		codePoint, err := strconv.ParseUint(viramaString[2:], 16, 32)
 		if err != nil {
-			return 0, "", fmt.Errorf("invalid Unicode code point: %v", err)
+			return "", "", fmt.Errorf("invalid Unicode code point: %v", err)
 		}
-		return rune(codePoint), viramaMode, nil
-	} else {
-		runes := []rune(viramaString)
-		if len(runes) != 1 {
-			return 0, "", fmt.Errorf("invalid virama: %s", viramaString)
-		}
-		return runes[0], viramaMode, nil
+		return string(rune(codePoint)), viramaMode, nil
+	} else if viramaString == "" {
+		return "", "", fmt.Errorf("empty virama: %s", metadata)
 	}
+
+	return viramaString, viramaMode, nil
 }
 
 // NewAksharamala initializes a new Aksharamala instance.
@@ -101,10 +99,10 @@ func NewAksharamala(schemePath string) (*Aksharamala, error) {
 	}
 
 	return &Aksharamala{
-		scheme:  scheme,
-		context: NewContext(),
-		virama:  viramaRune,
-		mode:    viramaMode,
+		scheme:     scheme,
+		context:    NewContext(),
+		virama:     viramaRune,
+		viramaMode: viramaMode,
 	}, nil
 }
 
@@ -124,7 +122,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 		if lookupResult.Output != "" {
 			// Handle virama based on mode and context
 			if a.shouldApplyVirama(lookupResult.Output) {
-				result.WriteRune(a.virama)
+				result.WriteString(a.virama)
 			}
 
 			// Update context and write output
@@ -145,7 +143,7 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 		return false
 	}
 
-	switch a.mode {
+	switch a.viramaMode {
 	case "smart":
 		return true
 	case "normal":

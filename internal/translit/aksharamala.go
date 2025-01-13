@@ -1,4 +1,4 @@
-// Updated aksharamala.go for Stage 2 with context management
+// Updated aksharamala.go for Stage 3 with smart virama handling
 package translit
 
 import (
@@ -10,6 +10,11 @@ import (
 
 type TransliterationScheme struct {
 	Categories map[string][]Mapping `json:"categories"`
+	Metadata   Metadata             `json:"metadata"`
+}
+
+type Metadata struct {
+	Virama string `json:"virama"`
 }
 
 type Mapping struct {
@@ -32,6 +37,7 @@ func NewContext() *Context {
 type Aksharamala struct {
 	scheme  *TransliterationScheme
 	context *Context
+	virama  rune
 }
 
 // NewAksharamala initializes a new Aksharamala instance.
@@ -46,9 +52,15 @@ func NewAksharamala(schemePath string) (*Aksharamala, error) {
 		return nil, fmt.Errorf("failed to parse scheme: %w", err)
 	}
 
+	viramaRune := '्' // Default Devanagari virama
+	if scheme.Metadata.Virama != "" {
+		viramaRune = []rune(scheme.Metadata.Virama)[0]
+	}
+
 	return &Aksharamala{
 		scheme:  scheme,
 		context: NewContext(),
+		virama:  viramaRune,
 	}, nil
 }
 
@@ -58,7 +70,12 @@ func (a *Aksharamala) Transliterate(input string) string {
 	for _, char := range input {
 		output := a.lookup(string(char))
 		if output != "" {
-			// Update context based on the output
+			// Handle virama for consecutive consonants
+			if a.context.LastCharCategory == "consonants" && a.getCategory(output) == "consonants" {
+				result.WriteRune(a.virama)
+			}
+
+			// Update context and write output
 			category := a.getCategory(output)
 			a.context.LastCharCategory = category
 			a.context.LastOutput = output
@@ -66,7 +83,6 @@ func (a *Aksharamala) Transliterate(input string) string {
 		} else {
 			// For unmatched characters, treat as "other"
 			result.WriteString(string(char))
-			// Reset context
 			a.context.LastCharCategory = "other"
 			a.context.LastOutput = string(char)
 		}

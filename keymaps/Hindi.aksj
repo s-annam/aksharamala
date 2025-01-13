@@ -9,7 +9,7 @@
   "license": "AGPL-3.0-or-later",
   "language": "Devanagari",
   "scheme": "ITRANS",
-  "metadata": {"virama":"0x094D, smart"},
+  "metadata": {"virama":"्, smart"},
   "categories": {
     "consonants": [
       {"lhs":["k"],"rhs":["क"]},

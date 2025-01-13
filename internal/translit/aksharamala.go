@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -43,6 +44,45 @@ type Aksharamala struct {
 	mode    string
 }
 
+func splitAndTrim(s string) []string {
+	// Split the string by commas and trim white spaces
+	parts := strings.FieldsFunc(s, func(r rune) bool {
+		return r == ','
+	})
+
+	// Trim white spaces from each part
+	for i, part := range parts {
+		parts[i] = strings.TrimSpace(part)
+	}
+
+	return parts
+}
+
+func parseVirama(metadata string) (rune, string, error) {
+	// Split virama metadata entry into two parts
+	parts := splitAndTrim(metadata)
+	if len(parts) != 2 {
+		return 0, "", fmt.Errorf("invalid or missing virama metadata: %s", metadata)
+	}
+	viramaString := parts[0]
+	viramaMode := parts[1]
+
+	if strings.HasPrefix(viramaString, "0x") {
+		viramaString = strings.TrimPrefix(viramaString, "0x")
+		codePoint, err := strconv.ParseUint(viramaString, 16, 32)
+		if err != nil {
+			return 0, "", fmt.Errorf("invalid Unicode code point: %v", err)
+		}
+		return rune(codePoint), viramaMode, nil
+	} else {
+		runes := []rune(viramaString)
+		if len(runes) != 1 {
+			return 0, "", fmt.Errorf("invalid virama: %s", viramaString)
+		}
+		return runes[0], viramaMode, nil
+	}
+}
+
 // NewAksharamala initializes a new Aksharamala instance.
 func NewAksharamala(schemePath string) (*Aksharamala, error) {
 	data, err := os.ReadFile(schemePath)
@@ -55,21 +95,16 @@ func NewAksharamala(schemePath string) (*Aksharamala, error) {
 		return nil, fmt.Errorf("failed to parse scheme: %w", err)
 	}
 
-	viramaRune := '्' // Default Devanagari virama
-	if scheme.Metadata.Virama != "" {
-		viramaRune = []rune(scheme.Metadata.Virama)[0]
-	}
-
-	mode := scheme.Metadata.Mode
-	if mode == "" {
-		mode = "smart" // Default to smart mode
+	viramaRune, viramaMode, err := parseVirama(scheme.Metadata.Virama)
+	if err != nil {
+		return nil, fmt.Errorf("invalid virama: %w", err)
 	}
 
 	return &Aksharamala{
 		scheme:  scheme,
 		context: NewContext(),
 		virama:  viramaRune,
-		mode:    mode,
+		mode:    viramaMode,
 	}, nil
 }
 

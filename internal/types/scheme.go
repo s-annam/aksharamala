@@ -17,6 +17,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 )
 
@@ -140,5 +141,26 @@ func (s *TransliterationScheme) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	return nil
+}
+
+// Validate checks the integrity of the transliteration scheme.
+func (s *TransliterationScheme) Validate() error {
+	if s.ID == "" {
+		return fmt.Errorf("keymap is missing 'id'")
+	}
+	if len(s.Categories) == 0 {
+		return fmt.Errorf("keymap '%s' has no categories", s.ID)
+	}
+	for category, section := range s.Categories {
+		for _, mapping := range section.Mappings {
+			if len(mapping.LHS) == 0 {
+				return fmt.Errorf("category '%s' in keymap '%s' has an empty 'LHS'", category, s.ID)
+			}
+			if len(mapping.RHS) == 0 {
+				return fmt.Errorf("category '%s' in keymap '%s' has an empty 'RHS'", category, s.ID)
+			}
+		}
+	}
 	return nil
 }

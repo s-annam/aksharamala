@@ -74,15 +74,14 @@ func (store *KeymapStore) loadKeymapFromFile(filePath string) error {
 		return fmt.Errorf("failed to decode JSON: %w", err)
 	}
 
-	if scheme.ID == "" {
-		return fmt.Errorf("missing id in keymap file: %s", filePath)
+	// Validate the scheme
+	if err := scheme.Validate(); err != nil {
+		return fmt.Errorf("keymap validation failed for '%s': %w", filePath, err)
 	}
 
-	// Safely add the keymap to the store
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	store.Keymaps[scheme.ID] = scheme
-
 	return nil
 }
 

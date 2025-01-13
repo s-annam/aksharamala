@@ -2,17 +2,23 @@ package translit
 
 import (
 	"testing"
+
+	"aks.go/internal/types"
 )
 
 func TestBuildLookupTable(t *testing.T) {
-	scheme := &TransliterationScheme{
-		Categories: map[string][]Mapping{
+	scheme := &types.TransliterationScheme{
+		Categories: map[string]types.Section{
 			"consonants": {
-				{LHS: []string{"k"}, RHS: []string{"क"}},
-				{LHS: []string{"kh"}, RHS: []string{"ख"}},
+				Mappings: []types.CategoryEntry{
+					{LHS: []string{"k"}, RHS: []string{"क"}},
+					{LHS: []string{"kh"}, RHS: []string{"ख"}},
+				},
 			},
 			"vowels": {
-				{LHS: []string{"a"}, RHS: []string{"अ"}},
+				Mappings: []types.CategoryEntry{
+					{LHS: []string{"a"}, RHS: []string{"अ"}},
+				},
 			},
 		},
 	}

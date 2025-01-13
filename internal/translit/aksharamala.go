@@ -7,25 +7,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"aks.go/internal/types"
 )
 
-type TransliterationScheme struct {
-	Categories map[string][]Mapping `json:"categories"`
-	Metadata   Metadata             `json:"metadata"`
-}
-
-type Metadata struct {
-	Virama string `json:"virama"`
-	Mode   string `json:"mode"` // Added mode to metadata (smart, normal, double, repeat)
-}
-
-type Mapping struct {
-	LHS []string `json:"lhs"`
-	RHS []string `json:"rhs"`
-}
-
 type Aksharamala struct {
-	scheme     *TransliterationScheme
+	scheme     *types.TransliterationScheme
 	context    *Context
 	virama     string
 	viramaMode string
@@ -75,7 +62,7 @@ func NewAksharamala(schemePath string) (*Aksharamala, error) {
 		return nil, fmt.Errorf("failed to read scheme: %w", err)
 	}
 
-	scheme := &TransliterationScheme{}
+	scheme := &types.TransliterationScheme{}
 	if err := json.Unmarshal(data, scheme); err != nil {
 		return nil, fmt.Errorf("failed to parse scheme: %w", err)
 	}
@@ -146,8 +133,8 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 
 // lookup finds the transliteration for a single character.
 func (a *Aksharamala) lookup(char string) LookupResult {
-	for category, mappings := range a.scheme.Categories {
-		for _, mapping := range mappings {
+	for category, section := range a.scheme.Categories {
+		for _, mapping := range section.Mappings {
 			for _, lhs := range mapping.LHS {
 				if lhs == char {
 					// Use matra (RHS[1]) if the previous character is a consonant
@@ -164,8 +151,8 @@ func (a *Aksharamala) lookup(char string) LookupResult {
 
 // getCategory determines the category of the output character.
 func (a *Aksharamala) getCategory(output string) string {
-	for category, mappings := range a.scheme.Categories {
-		for _, mapping := range mappings {
+	for category, section := range a.scheme.Categories {
+		for _, mapping := range section.Mappings {
 			for _, rhs := range mapping.RHS {
 				if rhs == output {
 					return category

@@ -1,5 +1,7 @@
 package translit
 
+import "aks.go/internal/types"
+
 // LookupResult represents the result of a lookup operation.
 type LookupResult struct {
 	Output   string
@@ -10,10 +12,10 @@ type LookupResult struct {
 type LookupTable map[string]LookupResult
 
 // BuildLookupTable constructs a precomputed lookup table from a transliteration scheme.
-func BuildLookupTable(scheme *TransliterationScheme) LookupTable {
+func BuildLookupTable(scheme *types.TransliterationScheme) LookupTable {
 	table := make(LookupTable)
-	for category, mappings := range scheme.Categories {
-		for _, mapping := range mappings {
+	for category, section := range scheme.Categories {
+		for _, mapping := range section.Mappings {
 			for _, lhs := range mapping.LHS {
 				table[lhs] = LookupResult{
 					Output:   mapping.RHS[0],

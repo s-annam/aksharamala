@@ -1,4 +1,4 @@
-// Updated aksharamala.go for Stage 3 with smart virama handling
+// Final fixes for vowel handling in Stage 4
 package translit
 
 import (
@@ -15,6 +15,7 @@ type TransliterationScheme struct {
 
 type Metadata struct {
 	Virama string `json:"virama"`
+	Mode   string `json:"mode"` // Added mode to metadata (smart, normal, double, repeat)
 }
 
 type Mapping struct {
@@ -38,6 +39,7 @@ type Aksharamala struct {
 	scheme  *TransliterationScheme
 	context *Context
 	virama  rune
+	mode    string
 }
 
 // NewAksharamala initializes a new Aksharamala instance.
@@ -57,21 +59,30 @@ func NewAksharamala(schemePath string) (*Aksharamala, error) {
 		viramaRune = []rune(scheme.Metadata.Virama)[0]
 	}
 
+	mode := scheme.Metadata.Mode
+	if mode == "" {
+		mode = "smart" // Default to smart mode
+	}
+
 	return &Aksharamala{
 		scheme:  scheme,
 		context: NewContext(),
 		virama:  viramaRune,
+		mode:    mode,
 	}, nil
 }
 
 // Transliterate performs transliteration for consonants, vowels, and mixed input.
 func (a *Aksharamala) Transliterate(input string) string {
+	// Reset context for a clean state
+	a.context = NewContext()
+
 	var result strings.Builder
 	for _, char := range input {
 		output := a.lookup(string(char))
 		if output != "" {
-			// Handle virama for consecutive consonants
-			if a.context.LastCharCategory == "consonants" && a.getCategory(output) == "consonants" {
+			// Handle virama based on mode and context
+			if a.shouldApplyVirama(output) {
 				result.WriteRune(a.virama)
 			}
 
@@ -88,6 +99,26 @@ func (a *Aksharamala) Transliterate(input string) string {
 		}
 	}
 	return result.String()
+}
+
+// shouldApplyVirama determines if a virama should be inserted before the current character.
+func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
+	if a.context.LastCharCategory != "consonants" || a.getCategory(nextOutput) != "consonants" {
+		return false
+	}
+
+	switch a.mode {
+	case "smart":
+		return true
+	case "normal":
+		return true
+	case "double":
+		return a.context.LastOutput == nextOutput
+	case "repeat":
+		return a.context.LastOutput == nextOutput
+	}
+
+	return false
 }
 
 // lookup finds the transliteration for a single character.

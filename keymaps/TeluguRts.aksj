@@ -9,7 +9,7 @@
   "license": "AGPL-3.0-or-later",
   "language": "Telugu",
   "scheme": "RTS",
-  "metadata": {"virama":"0x0C4D, normal"},
+  "metadata": {"virama":"్, normal"},
   "categories": {
     "consonants": [
       {"lhs":["k"],"rhs":["క","(c)(M)ం(x)"]},

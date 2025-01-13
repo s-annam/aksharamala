@@ -1,22 +1,21 @@
-// Final fixes for vowel handling in Stage 4
 package translit
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
 	"aks.go/internal/core"
+	"aks.go/internal/keymap"
 	"aks.go/internal/types"
 )
 
 type Aksharamala struct {
-	scheme     *types.TransliterationScheme
-	context    *types.Context
-	virama     string
-	viramaMode string
+	keymapStore  *keymap.KeymapStore
+	activeScheme *types.TransliterationScheme
+	context      *types.Context
+	virama       string
+	viramaMode   string
 }
 
 func splitAndTrim(s string) []string {
@@ -57,31 +56,31 @@ func parseVirama(metadata string) (string, string, error) {
 }
 
 // NewAksharamala initializes a new Aksharamala instance.
-func NewAksharamala(schemePath string) (*Aksharamala, error) {
-	data, err := os.ReadFile(schemePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read scheme: %w", err)
-	}
-
-	scheme := &types.TransliterationScheme{}
-	if err := json.Unmarshal(data, scheme); err != nil {
-		return nil, fmt.Errorf("failed to parse scheme: %w", err)
-	}
-
-	viramaRune, viramaMode, err := parseVirama(scheme.Metadata.Virama)
-	if err != nil {
-		return nil, fmt.Errorf("invalid virama: %w", err)
-	}
-
+func NewAksharamala(store *keymap.KeymapStore) *Aksharamala {
 	return &Aksharamala{
-		scheme:     scheme,
-		context:    types.NewContext(),
-		virama:     viramaRune,
-		viramaMode: viramaMode,
-	}, nil
+		keymapStore: store,
+		context:     types.NewContext(),
+	}
+}
+
+func (a *Aksharamala) SetActiveKeymap(id string) error {
+	scheme, exists := a.keymapStore.GetKeymap(id)
+	if !exists {
+		return fmt.Errorf("keymap with ID '%s' not found", id)
+	}
+	a.activeScheme = &scheme
+	a.virama, a.viramaMode, _ = parseVirama(scheme.Metadata.Virama) // Assuming validation is done earlier
+	return nil
 }
 
 // Transliterate performs transliteration for consonants, vowels, and mixed input.
+func (a *Aksharamala) TransliterateWithKeymap(id, input string) (string, error) {
+	if err := a.SetActiveKeymap(id); err != nil {
+		return "", err
+	}
+	return a.Transliterate(input), nil
+}
+
 func (a *Aksharamala) Transliterate(input string) string {
 	// Reset context for a clean state
 	a.context = types.NewContext()
@@ -134,7 +133,7 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 
 // lookup finds the transliteration for a single character.
 func (a *Aksharamala) lookup(char string) core.LookupResult {
-	for category, section := range a.scheme.Categories {
+	for category, section := range a.activeScheme.Categories {
 		for _, mapping := range section.Mappings.Entries() {
 			for _, lhs := range mapping.LHS {
 				if lhs == char {
@@ -152,7 +151,7 @@ func (a *Aksharamala) lookup(char string) core.LookupResult {
 
 // getCategory determines the category of the output character.
 func (a *Aksharamala) getCategory(output string) string {
-	for category, section := range a.scheme.Categories {
+	for category, section := range a.activeScheme.Categories {
 		for _, mapping := range section.Mappings.Entries() {
 			for _, rhs := range mapping.RHS {
 				if rhs == output {

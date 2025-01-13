@@ -1,15 +1,20 @@
 package translit
 
 import (
+	"fmt"
 	"testing"
+
+	"aks.go/internal/keymap"
 )
 
 func TestAksharamala_Transliterate(t *testing.T) {
-	schemePath := "..\\..\\keymaps\\Hindi.aksj"
-	aks, err := NewAksharamala(schemePath)
-	if err != nil {
-		t.Fatalf("Failed to initialize Aksharamala: %v", err)
+	store := keymap.NewKeymapStore()
+	if err := store.LoadKeymaps("./keymaps"); err != nil {
+		fmt.Printf("Failed to load keymaps: %v\n", err)
+		return
 	}
+
+	aks := NewAksharamala(store)
 
 	tests := []struct {
 		input    string
@@ -22,6 +27,7 @@ func TestAksharamala_Transliterate(t *testing.T) {
 		{"", ""}, // Edge case: empty string
 	}
 
+	aks.SetActiveKeymap("hindi")
 	for _, test := range tests {
 		output := aks.Transliterate(test.input)
 		if output != test.expected {

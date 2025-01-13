@@ -25,7 +25,7 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 	var currentCategory string
 	var section types.Section
 	var fileComments []string
-	var lastMapping *types.CategoryEntry
+	var lastMapping *types.Mapping
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -145,13 +145,13 @@ func normalizeComment(comment string) string {
 }
 
 // Parse mappings and handle multiple LHS
-func parseMapping(line string, lastMapping *types.CategoryEntry) *types.CategoryEntry {
+func parseMapping(line string, lastMapping *types.Mapping) *types.Mapping {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
 	lhsOnlyPattern := regexp.MustCompile(`^(\S+)$`)
 
 	// Match full mappings
 	if match := mappingPattern.FindStringSubmatch(line); match != nil {
-		return &types.CategoryEntry{
+		return &types.Mapping{
 			LHS:     handleMappingMatch(match[1]),
 			RHS:     handleMappingMatch(match[2]),
 			Comment: normalizeComment(match[3]),

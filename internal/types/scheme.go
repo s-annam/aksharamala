@@ -47,15 +47,8 @@ type Metadata struct {
 
 // Section represents a category of mappings within a transliteration scheme.
 type Section struct {
-	Comments []string        `json:"comments,omitempty"`
-	Mappings []CategoryEntry `json:"mappings"`
-}
-
-// CategoryEntry represents a mapping of LHS (input characters) to RHS (output characters).
-type CategoryEntry struct {
-	LHS     []string `json:"lhs"`
-	RHS     []string `json:"rhs"`
-	Comment string   `json:"comment,omitempty"`
+	Comments []string `json:"comments,omitempty"`
+	Mappings Mappings `json:"mappings"`
 }
 
 // CompactTransliterationScheme is a temporary struct to hold the compact JSON
@@ -85,12 +78,12 @@ func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransl
 
 	for category, section := range scheme.Categories {
 		// Normalize comments in mappings
-		for i := range section.Mappings {
-			section.Mappings[i].Comment = normalizeComment(section.Mappings[i].Comment)
+		for i := range section.Mappings.Entries() {
+			section.Mappings.Entries()[i].Comment = normalizeComment(section.Mappings.Entries()[i].Comment)
 		}
 
 		// Convert section to JSON
-		sectionJSON, err := json.Marshal(section.Mappings)
+		sectionJSON, err := json.Marshal(section.Mappings.Entries())
 		if err != nil {
 			return CompactTransliterationScheme{}, err
 		}
@@ -132,12 +125,12 @@ func (s *TransliterationScheme) UnmarshalJSON(data []byte) error {
 
 	// Process each category
 	for name, rawEntries := range compact.Categories {
-		var mappings []CategoryEntry
+		var mappings []Mapping
 		if err := json.Unmarshal(rawEntries, &mappings); err != nil {
 			return err
 		}
 		s.Categories[name] = Section{
-			Mappings: mappings,
+			Mappings: NewMappings(mappings),
 		}
 	}
 
@@ -153,7 +146,7 @@ func (s *TransliterationScheme) Validate() error {
 		return fmt.Errorf("keymap '%s' has no categories", s.ID)
 	}
 	for category, section := range s.Categories {
-		for _, mapping := range section.Mappings {
+		for _, mapping := range section.Mappings.Entries() {
 			if len(mapping.LHS) == 0 {
 				return fmt.Errorf("category '%s' in keymap '%s' has an empty 'LHS'", category, s.ID)
 			}

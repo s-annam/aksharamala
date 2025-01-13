@@ -25,10 +25,10 @@ func TestToCompactScheme(t *testing.T) {
 		Categories: map[string]Section{
 			"vowels": {
 				Comments: []string{"Category comment"},
-				Mappings: []CategoryEntry{
+				Mappings: NewMappings([]Mapping{
 					{LHS: []string{"a"}, RHS: []string{"अ"}, Comment: "=*= Vowel A =*="},
 					{LHS: []string{"aa"}, RHS: []string{"आ"}, Comment: " Vowel AA "},
-				},
+				}),
 			},
 		},
 	}
@@ -58,7 +58,7 @@ func TestToCompactScheme(t *testing.T) {
 		t.Fatal("Vowels category not found in compact scheme")
 	}
 
-	var mappings []CategoryEntry
+	var mappings []Mapping
 	if err := json.Unmarshal(categoryJSON, &mappings); err != nil {
 		t.Fatalf("Error unmarshalling category JSON: %v", err)
 	}
@@ -87,10 +87,10 @@ func TestFullJSONOutput(t *testing.T) {
 		Scheme:   "Unicode",
 		Categories: map[string]Section{
 			"consonants": {
-				Mappings: []CategoryEntry{
+				Mappings: NewMappings([]Mapping{
 					{LHS: []string{"k"}, RHS: []string{"क"}, Comment: "Consonant K"},
 					{LHS: []string{"kh"}, RHS: []string{"ख"}, Comment: "Consonant KH"},
-				},
+				}),
 			},
 		},
 	}

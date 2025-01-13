@@ -15,7 +15,7 @@ type LookupTable map[string]LookupResult
 func BuildLookupTable(scheme *types.TransliterationScheme) LookupTable {
 	table := make(LookupTable)
 	for category, section := range scheme.Categories {
-		for _, mapping := range section.Mappings {
+		for _, mapping := range section.Mappings.All() {
 			for _, lhs := range mapping.LHS {
 				table[lhs] = LookupResult{
 					Output:   mapping.RHS[0],

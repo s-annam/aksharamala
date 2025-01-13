@@ -12,9 +12,9 @@ func TestValidateKeymap(t *testing.T) {
 		ID: "hindi",
 		Categories: map[string]types.Section{
 			"vowels": {
-				Mappings: []types.CategoryEntry{
+				Mappings: types.NewMappings([]types.Mapping{
 					{LHS: []string{"a"}, RHS: []string{"अ"}},
-				},
+				}),
 			},
 		},
 		Metadata: types.Metadata{
@@ -55,9 +55,10 @@ func TestValidateKeymap(t *testing.T) {
 				ID: "hindi",
 				Categories: map[string]types.Section{
 					"vowels": {
-						Mappings: []types.CategoryEntry{
-							{LHS: []string{}, RHS: []string{"अ"}},
-						},
+						Mappings: types.NewMappings(
+							[]types.Mapping{
+								{LHS: []string{}, RHS: []string{"अ"}},
+							}),
 					},
 				},
 				Metadata: validKeymap.Metadata,
@@ -70,9 +71,9 @@ func TestValidateKeymap(t *testing.T) {
 				ID: "hindi",
 				Categories: map[string]types.Section{
 					"vowels": {
-						Mappings: []types.CategoryEntry{
+						Mappings: types.NewMappings([]types.Mapping{
 							{LHS: []string{"a"}, RHS: []string{}},
-						},
+						}),
 					},
 				},
 				Metadata: validKeymap.Metadata,

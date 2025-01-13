@@ -10,15 +10,15 @@ func TestBuildLookupTable(t *testing.T) {
 	scheme := &types.TransliterationScheme{
 		Categories: map[string]types.Section{
 			"consonants": {
-				Mappings: []types.CategoryEntry{
+				Mappings: types.NewMappings([]types.Mapping{
 					{LHS: []string{"k"}, RHS: []string{"क"}},
 					{LHS: []string{"kh"}, RHS: []string{"ख"}},
-				},
+				}),
 			},
 			"vowels": {
-				Mappings: []types.CategoryEntry{
+				Mappings: types.NewMappings([]types.Mapping{
 					{LHS: []string{"a"}, RHS: []string{"अ"}},
-				},
+				}),
 			},
 		},
 	}

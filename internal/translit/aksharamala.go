@@ -134,7 +134,7 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 // lookup finds the transliteration for a single character.
 func (a *Aksharamala) lookup(char string) LookupResult {
 	for category, section := range a.scheme.Categories {
-		for _, mapping := range section.Mappings {
+		for _, mapping := range section.Mappings.Entries() {
 			for _, lhs := range mapping.LHS {
 				if lhs == char {
 					// Use matra (RHS[1]) if the previous character is a consonant
@@ -152,7 +152,7 @@ func (a *Aksharamala) lookup(char string) LookupResult {
 // getCategory determines the category of the output character.
 func (a *Aksharamala) getCategory(output string) string {
 	for category, section := range a.scheme.Categories {
-		for _, mapping := range section.Mappings {
+		for _, mapping := range section.Mappings.Entries() {
 			for _, rhs := range mapping.RHS {
 				if rhs == output {
 					return category

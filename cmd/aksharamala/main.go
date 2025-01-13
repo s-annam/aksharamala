@@ -15,7 +15,9 @@ func main() {
 		return
 	}
 
-	input := "namaste"
-	output := aks.Transliterate(input)
-	fmt.Printf("Input: %s\nOutput: %s\n", input, output)
+	inputs := []string{"namaste", "a1k"}
+	for _, input := range inputs {
+		output := aks.Transliterate(input)
+		fmt.Printf("Input: %s\nOutput: %s\n", input, output)
+	}
 }

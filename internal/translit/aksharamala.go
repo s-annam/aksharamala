@@ -24,14 +24,15 @@ type Mapping struct {
 }
 
 type Context struct {
-	LastCharCategory string // Tracks the category of the last processed character (e.g., consonant, vowel, other)
-	LastOutput       string // Tracks the last output character
+	Result LookupResult // Tracks the result of the last lookup
 }
 
 func NewContext() *Context {
 	return &Context{
-		LastCharCategory: "",
-		LastOutput:       "",
+		Result: LookupResult{
+			Output:   "",
+			Category: "",
+		},
 	}
 }
 
@@ -79,30 +80,25 @@ func (a *Aksharamala) Transliterate(input string) string {
 
 	var result strings.Builder
 	for _, char := range input {
-		output := a.lookup(string(char))
-		if output == "\x00" && a.context.LastCharCategory == "consonants" {
-			category := a.getCategory(output)
-			a.context.LastCharCategory = category
-			a.context.LastOutput = output
+		lookupResult := a.lookup(string(char))
+		if lookupResult.Output == "\x00" && a.context.Result.Category == "consonants" {
+			a.context.Result = lookupResult
 			continue
 		}
 
-		if output != "" {
+		if lookupResult.Output != "" {
 			// Handle virama based on mode and context
-			if a.shouldApplyVirama(output) {
+			if a.shouldApplyVirama(lookupResult.Output) {
 				result.WriteRune(a.virama)
 			}
 
 			// Update context and write output
-			category := a.getCategory(output)
-			a.context.LastCharCategory = category
-			a.context.LastOutput = output
-			result.WriteString(output)
+			a.context.Result = lookupResult
+			result.WriteString(lookupResult.Output)
 		} else {
 			// For unmatched characters, treat as "other"
 			result.WriteString(string(char))
-			a.context.LastCharCategory = "other"
-			a.context.LastOutput = string(char)
+			a.context.Result = LookupResult{Output: string(char), Category: "other"}
 		}
 	}
 	return result.String()
@@ -110,7 +106,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 
 // shouldApplyVirama determines if a virama should be inserted before the current character.
 func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
-	if a.context.LastCharCategory != "consonants" || a.getCategory(nextOutput) != "consonants" {
+	if a.context.Result.Category != "consonants" || a.getCategory(nextOutput) != "consonants" {
 		return false
 	}
 
@@ -120,30 +116,35 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 	case "normal":
 		return true
 	case "double":
-		return a.context.LastOutput == nextOutput
+		return a.context.Result.Output == nextOutput
 	case "repeat":
-		return a.context.LastOutput == nextOutput
+		return a.context.Result.Output == nextOutput
 	}
 
 	return false
 }
 
+type LookupResult struct {
+	Output   string
+	Category string
+}
+
 // lookup finds the transliteration for a single character.
-func (a *Aksharamala) lookup(char string) string {
+func (a *Aksharamala) lookup(char string) LookupResult {
 	for category, mappings := range a.scheme.Categories {
 		for _, mapping := range mappings {
 			for _, lhs := range mapping.LHS {
 				if lhs == char {
 					// Use matra (RHS[1]) if the previous character is a consonant
-					if category == "vowels" && a.context.LastCharCategory == "consonants" && len(mapping.RHS) > 1 {
-						return mapping.RHS[1]
+					if category == "vowels" && a.context.Result.Category == "consonants" && len(mapping.RHS) > 1 {
+						return LookupResult{Output: mapping.RHS[1], Category: category}
 					}
-					return mapping.RHS[0] // Use full form otherwise
+					return LookupResult{Output: mapping.RHS[0], Category: category} // Use full form otherwise
 				}
 			}
 		}
 	}
-	return "" // No match found
+	return LookupResult{Output: "", Category: "other"} // No match found
 }
 
 // getCategory determines the category of the output character.

@@ -25,7 +25,6 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 
 	var currentCategory string
 	var section types.Section
-	var fileComments []string
 	var lastMapping *core.Mapping
 
 	for scanner.Scan() {
@@ -49,10 +48,10 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 				scheme.Categories[currentCategory] = section
 			}
 
-			// Get or create the section
+			// Start a new section or reuse an existing one
 			currentCategory = match[1]
-			section = getOrCreateSection(scheme, currentCategory)
-			lastMapping = nil // Reset last mapping for the new section
+			section = *types.GetOrCreate(scheme, currentCategory)
+			lastMapping = nil
 			continue
 		}
 
@@ -63,23 +62,16 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 				scheme.Categories[currentCategory] = section
 			}
 
-			// Get or create the (pseudo) section, consider only the first word
+			// Start a new pseudo-section or reuse an existing one
 			currentCategory = strings.ToLower(strings.Fields(match[1])[0])
-			section = getOrCreateSection(scheme, currentCategory)
-			lastMapping = nil // Reset last mapping for the new section
+			section = *types.GetOrCreate(scheme, currentCategory)
+			lastMapping = nil
 			continue
 		}
 
-		// Match file-level comments
-		if strings.HasPrefix(line, "//") {
-			fileComments = append(fileComments, strings.TrimPrefix(line, "//"))
-			continue
-		}
-
-		// Match mappings within the current section
-		entry := parseMapping(line, lastMapping)
+		// Match mappings
+		entry := parseAndAddMapping(line, &section, lastMapping)
 		if entry != nil {
-			section.Mappings.Add(entry.LHS, entry.RHS, entry.Comment)
 			lastMapping = entry
 		}
 	}
@@ -89,22 +81,7 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 		scheme.Categories[currentCategory] = section
 	}
 
-	// Save file-level comments
-	scheme.Comments = fileComments
-
-	if err := scheme.Validate(); err != nil {
-		return scheme, err
-	}
-
 	return scheme, scanner.Err()
-}
-
-// Get an existing section or create a new one if it doesn't exist
-func getOrCreateSection(scheme types.TransliterationScheme, currentCategory string) types.Section {
-	if existingSection, exists := scheme.Categories[currentCategory]; exists {
-		return existingSection // Use the existing section
-	}
-	return types.Section{} // Create a new section if it doesn't exist
 }
 
 // Parse metadata fields from the AKT file
@@ -142,26 +119,36 @@ func normalizeComment(comment string) string {
 	return comment
 }
 
-// Parse mappings and handle multiple LHS
-func parseMapping(line string, lastMapping *core.Mapping) *core.Mapping {
+// parseAndAddMapping parses a single line from the AKT file and updates the given section.
+//
+// Parameters:
+// - line: The line to parse.
+// - section: The section to which the parsed mapping should be added or updated.
+// - lastMapping: The most recent mapping added, used to update LHS-only patterns.
+//
+// Returns:
+// - The new mapping if a full mapping is found.
+func parseAndAddMapping(line string, section *types.Section, lastMapping *core.Mapping) *core.Mapping {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
 	lhsOnlyPattern := regexp.MustCompile(`^(\S+)$`)
 
 	// Match full mappings
 	if match := mappingPattern.FindStringSubmatch(line); match != nil {
-		return &core.Mapping{
+		entry := &core.Mapping{
 			LHS:     handleMappingMatch(match[1]),
 			RHS:     handleMappingMatch(match[2]),
 			Comment: normalizeComment(match[3]),
 		}
+		section.AddMapping(entry.LHS, entry.RHS, entry.Comment)
+		return entry
 	}
 
-	// Match LHS-only lines and attach to the last mapping
+	// Match LHS-only lines
 	if match := lhsOnlyPattern.FindStringSubmatch(line); match != nil {
 		if lastMapping != nil {
-			lastMapping.LHS = append(lastMapping.LHS, match[1])
+			section.AppendLHSToMapping(lastMapping, match[1])
+			return nil
 		}
-		return nil
 	}
 
 	return nil

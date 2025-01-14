@@ -25,6 +25,8 @@ import (
 	"strings"
 
 	"aks.go/internal/types"
+	"aks.go/logger"
+	"go.uber.org/zap"
 )
 
 const (
@@ -103,30 +105,40 @@ func handleSingleMapping(value string) string {
 }
 
 func main() {
-	// Parse command-line arguments
+	// Parse flags
+	debug := flag.Bool("debug", false, "Enable debug logging")
+	flag.Parse()
+
+	// Initialize the logger
+	logger.InitLogger(*debug)
+	defer logger.Sync()
+
+	// Parse input and output
 	inputFile, outputFile := parseArgs()
 
-	// Read and parse input file
+	logger.Info("Starting AKT conversion", zap.String("inputFile", inputFile), zap.String("outputFile", outputFile))
+
+	// Process the input file
 	scheme, err := readAndParseInput(inputFile)
 	if err != nil {
-		fmt.Printf("Error processing input file: %v\n", err)
+		logger.Error("Error reading input file", zap.String("inputFile", inputFile), zap.Error(err))
 		return
 	}
 
 	// Convert to compact scheme
 	compactScheme, err := convertToCompactScheme(scheme, inputFile)
 	if err != nil {
-		fmt.Printf("Error converting to compact scheme: %v\n", err)
+		logger.Error("Error converting to compact scheme: %v\n", zap.Error(err))
 		return
 	}
 
 	// Format and write output
 	if err := writeOutput(compactScheme, outputFile); err != nil {
-		fmt.Printf("Error writing output: %v\n", err)
+		logger.Error("Error writing output file", zap.String("outputFile", outputFile), zap.Error(err))
 		return
 	}
 
-	fmt.Printf("AKT file '%s' converted to JSON successfully: %s\n", inputFile, outputFile)
+	logger.Info("AKT conversion completed successfully", zap.String("outputFile", outputFile))
 }
 
 func parseArgs() (string, string) {

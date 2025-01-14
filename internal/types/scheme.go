@@ -48,12 +48,6 @@ type Metadata struct {
 	IconDisabled string     `json:"icon_disabled,omitempty"`
 }
 
-// Section represents a category of mappings within a transliteration scheme.
-type Section struct {
-	Comments []string      `json:"comments,omitempty"`
-	Mappings core.Mappings `json:"mappings"`
-}
-
 // CompactTransliterationScheme is a temporary struct to hold the compact JSON
 type CompactTransliterationScheme struct {
 	Comments   []string                   `json:"comments,omitempty"`

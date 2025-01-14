@@ -6,6 +6,8 @@ import (
 	"aks.go/internal/core"
 )
 
+// TestAppendLHSToMapping tests the AppendLHSToMapping method of the Section struct.
+// It verifies that new LHS values can be appended to existing mappings correctly.
 func TestAppendLHSToMapping(t *testing.T) {
 	section := NewSection()
 
@@ -31,6 +33,8 @@ func TestAppendLHSToMapping(t *testing.T) {
 	}
 }
 
+// TestAddMappingAndGetMappings tests the retrieval of mappings from a Section.
+// It verifies that mappings can be added and retrieved correctly.
 func TestAddMappingAndGetMappings(t *testing.T) {
 	section := NewSection()
 
@@ -48,6 +52,8 @@ func TestAddMappingAndGetMappings(t *testing.T) {
 	}
 }
 
+// TestGetOrCreate tests the GetOrCreate method of the Section struct.
+// It verifies that a section can be retrieved or created as needed.
 func TestGetOrCreate(t *testing.T) {
 	scheme := TransliterationScheme{
 		Categories: make(map[string]Section),
@@ -67,6 +73,8 @@ func TestGetOrCreate(t *testing.T) {
 	}
 }
 
+// TestValidateEmptyMappings tests the validation of empty mappings in a Section.
+// It verifies that appropriate errors are raised for empty mappings.
 func TestValidateEmptyMappings(t *testing.T) {
 	section := NewSection()
 	section.AddMapping([]string{}, []string{}, "empty mapping")

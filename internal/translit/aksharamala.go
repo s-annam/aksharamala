@@ -2,7 +2,6 @@ package translit
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"aks.go/internal/core"
@@ -10,52 +9,15 @@ import (
 	"aks.go/internal/types"
 )
 
+// Aksharamala represents a transliteration engine that uses a keymap store
+// to perform transliteration operations. It maintains the active transliteration
+// scheme and manages the context for transliteration processes.
 type Aksharamala struct {
 	keymapStore  *keymap.KeymapStore
 	activeScheme *types.TransliterationScheme
 	context      *types.Context
 	virama       string
 	viramaMode   types.ViramaMode
-}
-
-func splitAndTrim(s string) []string {
-	// Split the string by commas and trim white spaces
-	parts := strings.FieldsFunc(s, func(r rune) bool {
-		return r == ','
-	})
-
-	// Trim white spaces from each part
-	for i, part := range parts {
-		parts[i] = strings.TrimSpace(part)
-	}
-
-	return parts
-}
-
-func parseVirama(metadata string) (string, types.ViramaMode, error) {
-	parts := splitAndTrim(metadata)
-	if len(parts) != 2 {
-		return "", types.UnknownMode, fmt.Errorf("invalid or missing virama metadata: %s", metadata)
-	}
-
-	viramaString := parts[0]
-	mode := types.ParseViramaMode(parts[1])
-	if mode == types.UnknownMode {
-		return "", types.UnknownMode, fmt.Errorf("invalid virama mode: %s", parts[1])
-	}
-
-	// Handle hexadecimal Unicode value, if present
-	if strings.HasPrefix(viramaString, "0x") {
-		codePoint, err := strconv.ParseUint(viramaString[2:], 16, 32)
-		if err != nil {
-			return "", types.UnknownMode, fmt.Errorf("invalid Unicode code point: %v", err)
-		}
-		return string(rune(codePoint)), mode, nil
-	} else if viramaString == "" {
-		return "", types.UnknownMode, fmt.Errorf("empty virama: %s", metadata)
-	}
-
-	return viramaString, mode, nil
 }
 
 // NewAksharamala initializes a new Aksharamala instance.
@@ -66,17 +28,20 @@ func NewAksharamala(store *keymap.KeymapStore) *Aksharamala {
 	}
 }
 
+// SetActiveKeymap sets the active keymap by ID for transliteration.
+// Returns an error if the keymap ID is not found.
 func (a *Aksharamala) SetActiveKeymap(id string) error {
 	scheme, exists := a.keymapStore.GetKeymap(id)
 	if !exists {
 		return fmt.Errorf("keymap with ID '%s' not found", id)
 	}
 	a.activeScheme = &scheme
-	a.virama, a.viramaMode, _ = parseVirama(scheme.Metadata.Virama) // Assuming validation is done earlier
+	a.virama, a.viramaMode, _ = types.ParseVirama(scheme.Metadata.Virama) // Assuming validation is done earlier
 	return nil
 }
 
-// Transliterate performs transliteration for consonants, vowels, and mixed input.
+// TransliterateWithKeymap performs transliteration for consonants, vowels, and mixed input
+// using the active keymap. Returns the transliterated string and an error if any occurs.
 func (a *Aksharamala) TransliterateWithKeymap(id, input string) (string, error) {
 	if err := a.SetActiveKeymap(id); err != nil {
 		return "", err
@@ -84,6 +49,8 @@ func (a *Aksharamala) TransliterateWithKeymap(id, input string) (string, error) 
 	return a.Transliterate(input), nil
 }
 
+// Transliterate performs transliteration for the input string using the active scheme.
+// Returns the transliterated string.
 func (a *Aksharamala) Transliterate(input string) string {
 	// Reset context for a clean state
 	a.context = types.NewContext()
@@ -115,6 +82,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 }
 
 // shouldApplyVirama determines if a virama should be inserted before the current character.
+// Returns true if a virama should be applied, false otherwise.
 func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 	if a.context.LatestLookup.Category != "consonants" || a.getCategory(nextOutput) != "consonants" {
 		return false
@@ -133,6 +101,7 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 }
 
 // lookup finds the transliteration for a single character.
+// Returns the LookupResult for the character.
 func (a *Aksharamala) lookup(char string) core.LookupResult {
 	for category, section := range a.activeScheme.Categories {
 		for _, mapping := range section.Mappings.Entries() {
@@ -151,6 +120,7 @@ func (a *Aksharamala) lookup(char string) core.LookupResult {
 }
 
 // getCategory determines the category of the output character.
+// Returns the category as a string.
 func (a *Aksharamala) getCategory(output string) string {
 	for category, section := range a.activeScheme.Categories {
 		for _, mapping := range section.Mappings.Entries() {

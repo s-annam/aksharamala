@@ -34,7 +34,8 @@ const (
 	defaultLicense = "AGPL-3.0-or-later" // License for the generated file
 )
 
-// Convert 0x-prefixed hexadecimal Unicode values to their corresponding characters
+// convertUnicode converts 0x-prefixed hexadecimal Unicode values to their corresponding characters.
+// It takes a string value and returns the converted character as a string.
 func convertUnicode(value string) string {
 	// Recognize optional context markers around the Unicode values
 	match := regexp.MustCompile(`^((?:\([^)]*\))*)([^()]+)((?:\([^)]*\))*)?$`).FindStringSubmatch(value)
@@ -72,6 +73,8 @@ func convertUnicode(value string) string {
 	return before + result.String() + after
 }
 
+// handleMappingMatch processes a part of the input and returns the corresponding mappings.
+// It takes a string part and returns a slice of strings.
 func handleMappingMatch(part string) []string {
 	splits := strings.Fields(part)
 	for i, split := range splits {
@@ -80,6 +83,8 @@ func handleMappingMatch(part string) []string {
 	return splits
 }
 
+// handleSingleMapping processes a single mapping value and returns the corresponding character.
+// It takes a string value and returns the mapped character as a string.
 func handleSingleMapping(value string) string {
 	// Handle left and right square brackets
 	value = strings.ReplaceAll(value, "\\[", "\\u005C\\u005B")
@@ -104,6 +109,9 @@ func handleSingleMapping(value string) string {
 	return convertUnicode(value)
 }
 
+// main is the entry point of the application. It processes command-line flags,
+// reads input files, and performs transliteration based on the provided keymaps.
+// It returns an error if any step of the process fails.
 func main() {
 	// Parse flags
 	debug := flag.Bool("debug", false, "Enable debug logging")
@@ -141,6 +149,8 @@ func main() {
 	logger.Info("AKT conversion completed successfully", zap.String("outputFile", outputFile))
 }
 
+// parseArgs parses command-line arguments and returns the input and output file paths.
+// It returns the default input and output file paths if no arguments are provided.
 func parseArgs() (string, string) {
 	defaultInput := "../../examples/example.akt"
 	defaultOutput := "../../examples/example.aksj"
@@ -161,6 +171,8 @@ func parseArgs() (string, string) {
 	return inputFile, outputFile
 }
 
+// readAndParseInput reads and parses the input file, returning a TransliterationScheme.
+// It returns an error if the file cannot be opened or parsed.
 func readAndParseInput(inputFile string) (types.TransliterationScheme, error) {
 	file, err := os.Open(inputFile)
 	if err != nil {
@@ -171,6 +183,9 @@ func readAndParseInput(inputFile string) (types.TransliterationScheme, error) {
 	return ParseAKTFile(file)
 }
 
+// convertToCompactScheme converts a TransliterationScheme to a CompactTransliterationScheme.
+// It takes the scheme and input file path, returning the compact scheme and any error encountered.
+// The function also overrides the comments in the scheme with information about the conversion.
 func convertToCompactScheme(scheme types.TransliterationScheme, inputFile string) (types.CompactTransliterationScheme, error) {
 	// Override comments
 	sourceFile := filepath.Base(inputFile)
@@ -182,6 +197,9 @@ func convertToCompactScheme(scheme types.TransliterationScheme, inputFile string
 	return types.ToCompactTransliterationScheme(scheme)
 }
 
+// writeOutput writes the CompactTransliterationScheme to the specified output file.
+// It takes the scheme and output file path, returning any error encountered.
+// The function formats the scheme as JSON before writing it to the file.
 func writeOutput(scheme types.CompactTransliterationScheme, outputFile string) error {
 	// Format the JSON
 	formattedJSON, err := FormatSchemeJSON(scheme)

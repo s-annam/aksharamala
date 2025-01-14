@@ -8,8 +8,10 @@ import (
 	"aks.go/internal/types"
 )
 
-// FormatSchemeJSON converts a CompactTransliterationScheme to formatted JSON string
+// FormatSchemeJSON converts a CompactTransliterationScheme to a formatted JSON string.
+// It takes a CompactTransliterationScheme and returns the JSON representation as a string.
 func FormatSchemeJSON(scheme types.CompactTransliterationScheme) (string, error) {
+	// FormatSchemeJSON takes a CompactTransliterationScheme and returns its JSON representation as a string.
 	var output strings.Builder
 	output.WriteString("{\n")
 
@@ -27,6 +29,9 @@ func FormatSchemeJSON(scheme types.CompactTransliterationScheme) (string, error)
 	return output.String(), nil
 }
 
+// writeMetadataFields writes the metadata fields of the scheme to the provided string builder.
+// It takes a pointer to strings.Builder and a CompactTransliterationScheme.
+// The function writes the metadata fields in the following order: comments, version, id, name, license, language, scheme, and metadata.
 func writeMetadataFields(w *strings.Builder, scheme types.CompactTransliterationScheme) error {
 	// Comments with default formatting (one per line)
 	w.WriteString(`  "comments": [`)
@@ -63,6 +68,9 @@ func writeMetadataFields(w *strings.Builder, scheme types.CompactTransliteration
 	return nil
 }
 
+// writeStringField writes a string field to the provided string builder.
+// It takes a pointer to strings.Builder, a field name, and a field value.
+// The function writes the field in the format "field": "value".
 func writeStringField(w *strings.Builder, field, value string) {
 	w.WriteString(`  "`)
 	w.WriteString(field)
@@ -72,6 +80,9 @@ func writeStringField(w *strings.Builder, field, value string) {
 	w.WriteString("\n")
 }
 
+// writeCategories writes the categories of the scheme to the provided string builder.
+// It takes a pointer to strings.Builder and a map of categories.
+// The function writes the categories in sorted order, with each category containing a list of mappings.
 func writeCategories(w *strings.Builder, categories map[string]json.RawMessage) error {
 	w.WriteString(`  "categories": {`)
 

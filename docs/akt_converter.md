@@ -73,13 +73,20 @@ i   0x0907 0x093F
 ```
 
 #### **End Marker**
-The `#end` marker signifies the end of the file:
+   - Parsing stops when the `#end` marker is encountered.
 
 ```
 #end
 ```
 
+#### **Robust JSON Output**:
+- Optional metadata fields are omitted if empty.
+
 ---
+
+### **Common Pitfalls**
+- Ensure that metadata lines are correctly formatted.
+- Be cautious with section markers.
 
 ### **Output Format**
 #### **Top-Level Fields**

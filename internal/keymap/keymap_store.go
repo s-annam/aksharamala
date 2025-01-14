@@ -27,12 +27,17 @@ import (
 )
 
 // KeymapStore is an in-memory storage for all loaded keymaps.
+// It provides methods to load keymaps from JSON files, retrieve keymaps by ID,
+// and list all loaded keymap IDs. The store is thread-safe due to the use
+// of a read-write mutex.
 type KeymapStore struct {
+	// Maps keymap IDs to TransliterationScheme
 	Keymaps map[string]types.TransliterationScheme
-	mu      sync.RWMutex
+	// Mutex for concurrent access
+	mu sync.RWMutex
 }
 
-// NewKeymapStore initializes a new KeymapStore.
+// NewKeymapStore initializes a new KeymapStore with an empty map of keymaps.
 func NewKeymapStore() *KeymapStore {
 	return &KeymapStore{
 		Keymaps: make(map[string]types.TransliterationScheme),
@@ -40,6 +45,8 @@ func NewKeymapStore() *KeymapStore {
 }
 
 // LoadKeymaps loads JSON keymaps from a specified directory into the store.
+// It reads all JSON files in the directory and adds them to the Keymaps map.
+// Returns an error if loading any keymap fails.
 func (store *KeymapStore) LoadKeymaps(directory string) error {
 	files, err := os.ReadDir(directory)
 	if err != nil {
@@ -61,6 +68,8 @@ func (store *KeymapStore) LoadKeymaps(directory string) error {
 }
 
 // loadKeymapFromFile loads a single JSON keymap file into the store.
+// It reads the specified file and updates the Keymaps map with its contents.
+// Returns an error if the file cannot be read or if the JSON is invalid.
 func (store *KeymapStore) loadKeymapFromFile(filePath string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -86,6 +95,7 @@ func (store *KeymapStore) loadKeymapFromFile(filePath string) error {
 }
 
 // GetKeymap retrieves a TransliterationScheme by ID.
+// Returns the TransliterationScheme and a boolean indicating whether it was found.
 func (store *KeymapStore) GetKeymap(id string) (types.TransliterationScheme, bool) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
@@ -94,6 +104,7 @@ func (store *KeymapStore) GetKeymap(id string) (types.TransliterationScheme, boo
 }
 
 // ListKeymapIDs returns a list of all loaded keymap IDs.
+// This is useful for iterating over available keymaps.
 func (store *KeymapStore) ListKeymapIDs() []string {
 	store.mu.RLock()
 	defer store.mu.RUnlock()

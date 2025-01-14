@@ -2,6 +2,9 @@ package core
 
 import "testing"
 
+// TestMappings_AddAndLookup tests the Add and Lookup methods of the Mappings struct.
+// It verifies that mappings can be added and subsequently looked up correctly.
+// The test checks both an existing mapping and a non-existing mapping.
 func TestMappings_AddAndLookup(t *testing.T) {
 	mappings := &Mappings{}
 	mappings.Add([]string{"a"}, []string{"अ"}, "Vowel A")

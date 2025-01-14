@@ -10,7 +10,8 @@ import (
 	"aks.go/internal/types"
 )
 
-// ParseAKTFile parses an AKT file into a TransliterationScheme
+// ParseAKTFile parses an AKT file into a TransliterationScheme.
+// It takes a file pointer and returns the corresponding TransliterationScheme and any error encountered.
 func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 	scanner := bufio.NewScanner(file)
 	scheme := types.TransliterationScheme{
@@ -84,7 +85,8 @@ func ParseAKTFile(file *os.File) (types.TransliterationScheme, error) {
 	return scheme, scanner.Err()
 }
 
-// Parse metadata fields from the AKT file
+// parseMetadata parses metadata fields from the AKT file.
+// It takes a line string and a pointer to a TransliterationScheme.
 func parseMetadata(line string, scheme *types.TransliterationScheme) {
 	metadataPattern := regexp.MustCompile(`#(\w+)\s*=\s*(.+)#?$`)
 	match := metadataPattern.FindStringSubmatch(line)
@@ -109,7 +111,8 @@ func parseMetadata(line string, scheme *types.TransliterationScheme) {
 	}
 }
 
-// Normalize comments
+// normalizeComment normalizes comments by applying a specific transformation.
+// It takes a comment string and returns the normalized string.
 func normalizeComment(comment string) string {
 	comment = strings.TrimSpace(comment)
 	if strings.HasPrefix(comment, "=*=") && strings.HasSuffix(comment, "=*=") {
@@ -120,14 +123,8 @@ func normalizeComment(comment string) string {
 }
 
 // parseAndAddMapping parses a single line from the AKT file and updates the given section.
-//
-// Parameters:
-// - line: The line to parse.
-// - section: The section to which the parsed mapping should be added or updated.
-// - lastMapping: The most recent mapping added, used to update LHS-only patterns.
-//
-// Returns:
-// - The new mapping if a full mapping is found.
+// It takes a line string, a pointer to a Section, and a pointer to the last Mapping.
+// It returns the new mapping if a full mapping is found.
 func parseAndAddMapping(line string, section *types.Section, lastMapping *core.Mapping) *core.Mapping {
 	mappingPattern := regexp.MustCompile(`^(\S+)\s+(\S.*?)(?:\s+//\s*(.*))?$`)
 	lhsOnlyPattern := regexp.MustCompile(`^(\S+)$`)

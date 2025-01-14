@@ -1,3 +1,5 @@
+// Package main implements the Aksharamala application, which provides functionalities
+// for transliteration based on keymaps. It serves as the entry point for the application.
 package main
 
 import (
@@ -9,7 +11,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// Example test setup
+// main is the entry point of the Aksharamala application.
+// It parses command-line flags for configuration, initializes logging, and starts the application.
 func main() {
 	// Parse flags
 	keymapsPath := flag.String("keymaps", "./keymaps", "Path to the keymaps directory")

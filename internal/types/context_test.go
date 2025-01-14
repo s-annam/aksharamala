@@ -6,6 +6,8 @@ import (
 	"aks.go/internal/core"
 )
 
+// TestContext_Reset tests the Reset method of the Context struct.
+// It verifies that the context state is cleared after calling Reset.
 func TestContext_Reset(t *testing.T) {
 	ctx := NewContext()
 
@@ -20,8 +22,6 @@ func TestContext_Reset(t *testing.T) {
 
 	// Validate that the context is cleared
 	if ctx.LatestLookup.Output != "" || ctx.LatestLookup.Category != "" {
-		t.Errorf("Context reset failed: got %+v", ctx.LatestLookup)
-	} else {
-		t.Log("Context reset successfully")
+		t.Errorf("Expected cleared context, got %+v", ctx.LatestLookup)
 	}
 }

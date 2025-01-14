@@ -8,6 +8,8 @@ import (
 	"aks.go/internal/core"
 )
 
+// TestToCompactScheme tests the conversion of a TransliterationScheme to a compact scheme.
+// It verifies that the conversion retains the necessary information and structure.
 func TestToCompactScheme(t *testing.T) {
 	original := TransliterationScheme{
 		Comments: []string{"Test comment"},
@@ -78,6 +80,8 @@ func TestToCompactScheme(t *testing.T) {
 	}
 }
 
+// TestFullJSONOutput tests the JSON serialization of a TransliterationScheme.
+// It verifies that the output matches the expected JSON structure.
 func TestFullJSONOutput(t *testing.T) {
 	scheme := TransliterationScheme{
 		Comments: []string{"Generated from Hindi.akt. Distributed under AGPL."},
@@ -127,6 +131,8 @@ func TestFullJSONOutput(t *testing.T) {
 	}
 }
 
+// TestBuildLookupTable tests the building of a lookup table from a TransliterationScheme.
+// It verifies that the lookup table is constructed correctly based on the scheme.
 func TestBuildLookupTable(t *testing.T) {
 	scheme := &TransliterationScheme{
 		Categories: map[string]Section{

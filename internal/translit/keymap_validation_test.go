@@ -8,6 +8,8 @@ import (
 	"aks.go/internal/types"
 )
 
+// TestValidateKeymap tests the validation of a keymap.
+// It verifies that a valid keymap is accepted and invalid keymaps are rejected.
 func TestValidateKeymap(t *testing.T) {
 	validKeymap := types.TransliterationScheme{
 		ID:       "hindi",
@@ -98,6 +100,8 @@ func TestValidateKeymap(t *testing.T) {
 	}
 }
 
+// TestInvalidKeymapJSON tests the handling of invalid JSON for keymaps.
+// It verifies that the system correctly identifies and rejects invalid keymap JSON.
 func TestInvalidKeymapJSON(t *testing.T) {
 	invalidJSON := `{
 		"id": "hindi",

@@ -5,9 +5,11 @@ import (
 	"testing"
 
 	"aks.go/internal/keymap"
-	"aks.go/internal/types"
 )
 
+// TestAksharamala_Transliterate tests the Transliterate method of the Aksharamala struct.
+// It verifies that the transliteration works correctly for various input cases.
+// The test loads keymaps and checks the output against expected results.
 func TestAksharamala_Transliterate(t *testing.T) {
 	store := keymap.NewKeymapStore()
 	if err := store.LoadKeymaps("../../keymaps"); err != nil {
@@ -35,42 +37,6 @@ func TestAksharamala_Transliterate(t *testing.T) {
 			t.Errorf("For input '%s': expected '%s', got '%s'", test.input, test.expected, output)
 		} else {
 			t.Logf("For input '%s': output matches expected '%s'", test.input, test.expected)
-		}
-	}
-}
-
-// Test cases for parseVirama
-func TestAksharamala_ParseVirama(t *testing.T) {
-	tests := []struct {
-		metadata       string
-		expectedVirama string
-		expectedMode   types.ViramaMode
-		shouldError    bool
-	}{
-		{"0x094D,smart", "्", types.SmartMode, false},
-		{"्,normal", "्", types.NormalMode, false},
-		{"abcd,smart", "abcd", types.SmartMode, false},
-		{"0xZZZZ,smart", "", types.UnknownMode, true},
-		{"no_comma", "", types.UnknownMode, true},
-	}
-
-	for _, test := range tests {
-		r, mode, err := parseVirama(test.metadata)
-		if test.shouldError {
-			if err == nil {
-				t.Errorf("Expected error for input '%s', but got none", test.metadata)
-			}
-			continue
-		}
-
-		if err != nil {
-			t.Errorf("Unexpected error for input '%s': %v", test.metadata, err)
-			continue
-		}
-
-		if r != test.expectedVirama || mode != test.expectedMode {
-			t.Errorf("For input '%s', expected '%s' and mode '%s', but got '%s' and mode '%s'",
-				test.metadata, test.expectedVirama, test.expectedMode, r, mode)
 		}
 	}
 }

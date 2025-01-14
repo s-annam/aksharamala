@@ -24,8 +24,8 @@ import (
 )
 
 // TransliterationScheme represents a keymap for transliteration.
-// Note: If you make changes to this struct, ensure that the corresponding
-// fields in CompactScheme are updated accordingly.
+// It contains various fields that define the transliteration scheme,
+// including comments, version, ID, name, license, language, and categories.
 type TransliterationScheme struct {
 	Comments   []string           `json:"comments,omitempty"`
 	Version    string             `json:"version"`
@@ -48,7 +48,8 @@ type Metadata struct {
 	IconDisabled string     `json:"icon_disabled,omitempty"`
 }
 
-// CompactTransliterationScheme is a temporary struct to hold the compact JSON
+// CompactTransliterationScheme is a temporary struct to hold the compact JSON representation
+// of a transliteration scheme. It is used for efficient storage and transmission.
 type CompactTransliterationScheme struct {
 	Comments   []string                   `json:"comments,omitempty"`
 	Version    string                     `json:"version"`
@@ -61,7 +62,8 @@ type CompactTransliterationScheme struct {
 	Categories map[string]json.RawMessage `json:"categories"`
 }
 
-// UnmarshalJSON customizes JSON unmarshaling for TransliterationScheme
+// UnmarshalJSON customizes JSON unmarshaling for TransliterationScheme.
+// It ensures that the scheme is properly initialized from JSON data.
 func (s *TransliterationScheme) UnmarshalJSON(data []byte) error {
 	var compact CompactTransliterationScheme
 	if err := json.Unmarshal(data, &compact); err != nil {
@@ -96,6 +98,7 @@ func (s *TransliterationScheme) UnmarshalJSON(data []byte) error {
 }
 
 // Validate checks the integrity of the transliteration scheme.
+// It returns an error if the scheme is invalid.
 func (s *TransliterationScheme) Validate() error {
 	missingFields := []string{}
 
@@ -135,6 +138,7 @@ func (s *TransliterationScheme) Validate() error {
 }
 
 // BuildLookupTable constructs a precomputed lookup table from a transliteration scheme.
+// It returns the constructed lookup table.
 func BuildLookupTable(scheme *TransliterationScheme) core.LookupTable {
 	table := make(core.LookupTable)
 	for category, section := range scheme.Categories {
@@ -150,7 +154,8 @@ func BuildLookupTable(scheme *TransliterationScheme) core.LookupTable {
 	return table
 }
 
-// ToCompactTransliterationScheme converts a TransliterationScheme to a CompactTransliterationScheme
+// ToCompactTransliterationScheme converts a TransliterationScheme to a CompactTransliterationScheme.
+// It returns the compact representation of the scheme.
 func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransliterationScheme, error) {
 	compactCategories := make(map[string]json.RawMessage)
 	var errList []error
@@ -182,7 +187,8 @@ func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransl
 	}, nil
 }
 
-// IterateCategories performs an action on each category and section.
+// IterateCategories performs an action on each category and section in the scheme.
+// It takes a function as an argument to apply to each category.
 func (s *TransliterationScheme) IterateCategories(action func(string, Section)) {
 	for category, section := range s.Categories {
 		action(category, section)

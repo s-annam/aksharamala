@@ -1,132 +1,85 @@
-# Aksharamala (aks.go)
+# aks.go - Transliteration for Indian Languages
 
-Aksharamala is a versatile transliteration framework designed to convert text 
-across multiple languages and scripts using customizable keymaps. This project 
-builds upon the legacy of the original Aksharamala, introduced in 1989 as an 
-undergraduate project and later expanded in 2000 with a C++ implementation.
+## Overview
+`aks.go` is a modern, extensible transliteration system for Indian languages, reimagining the original Aksharamala project (2000-2005) in Go. It provides developers with a robust, portable, and cloud-compatible toolkit to handle transliteration across languages and scripts efficiently.
 
-This Go-based implementation modernizes the transliteration process with:
-- JSON-based keymaps for flexibility and compatibility.
-- Command-line tools for managing and applying transliteration schemes.
+## Purpose
+Indian language data often exists in legacy formats or custom encodings, making it inaccessible to modern applications. `aks.go` bridges this gap by providing tools to convert and transliterate such data into standardized Unicode representations. This empowers developers to preserve and modernize historical content while supporting future innovations.
 
-## License
+## Features
+- **Transliteration Engine**:
+  - Support for customizable mappings.
+  - Handles multiple languages and scripts.
+- **Legacy Compatibility**:
+  - Converts old Aksharamala (`.akt`) files into JSON (`.aksj`) while preserving comments and structure.
+- **Extensibility**:
+  - JSON-driven configuration for easy customization.
+  - Modular design enables new languages and scripts to be added seamlessly.
+- **Smart Processing**:
+  - Intelligent virama handling (with support for various modes that are helpful for Indic).
+  - Optional logging and verbose modes for debugging.
 
-This project is licensed under the GNU Affero General Public License (AGPL),
-version 3 or later. See the [LICENSE](./LICENSE) file for details.
+## Quick Start
+### Prerequisites
+- Go 1.20+
+- A working environment for Go projects.
 
-## History
+### Installation
+```bash
+# Clone the repository
+$ git clone https://github.com/s-annam/aks.go.git
 
-- **1989**: Original Aksharamala developed as an undergraduate project. This
-  was written in Turbo Pascal, to generate characters on a CRT and dot-matrix
-  printers to type in Telugu. The solution was certainly matching that era.
-- **2000-2003**: Built a brand new C++ version for Windows as a keyboard hook
-  (or colloquially referred to as IME, Input Method Editor) and sold under the
-  banner Deshweb.com Pvt. Ltd.
-- **2025**: Reimagined as an open-source Go project with a focus on modularity
-  and modern workflows. Largely reusing the concepts of transliteration while
-  taking support from ChatGPT, Claude and Gemini to develop code using LLMs.
-  The architecture otherwise has been evolved (for example, taking AKT text
-  files into a JSON based format etc.) to fit today's needs.
+# Navigate to the directory
+$ cd aks.go
 
-### Contributors
-Special acknowledgment to collaborators and contractors who contributed to the
-development of the two original Aksharamala projects.
-
-## Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/s-annam/aks.go.git
-   cd aks.go
-   ```
-
-2. Build the tools:
-
-   ```bash
-    go build ./cmd/aksharamala
-    go build ./cmd/akt_converter
-    ```
-
-3. Run the tools:
-
-   ```bash
-    ./aksharamala
-    ./akt_converter
-    ```
-
-## Commands
-
-- **aksharamala**: Main transliteration tool for converting text using keymaps.
-- **akt_converter**: Converts `.akt` files to `.aksj` JSON format.
-
----
-
-#### **3. Directory Structure**
-Explain the directory structure for better navigation:
-
-## Directory Structure
-
-```graphql
-    cmd/ 
-        ├── aksharamala/ 
-        │       └── main.go # Main transliteration command
-        ├── akt_converter/ 
-        │       └── main.go # AKT-to-JSON converter command
-    docs/ 
-        └── akt_converter.md # Documentation for AKT-to-JSON converter
-    examples/ 
-        ├── example.akt # Example AKT file
-        └── example.aksj # Example JSON keymap file
-    internal/ 
-        ├── akt_converter/ 
-        │       └── utils.go # Utility functions for AKT conversion 
-        ├── keymap/ 
-        │       ├── keymap_store.go # Keymap management logic
-        │       └── transliteration.go # Core transliteration logic 
-        ├── types/ 
-        │       └── scheme.go # Shared types like TransliterationScheme
-    keymaps/ 
-        ├── hindi.aksj # Hindi JSON keymap 
-        ├── telugu.aksj # Telugu JSON keymap 
-        └── marathi.aksj # Marathi JSON keymap
+# Build the project
+$ go build ./cmd/aksharamala
 ```
 
-## Usage
+### Usage
+To convert old `.akt` files to `.aksj` format:
+```bash
+go run ./cmd/akt_converter convert -input myfile.akt -output myfile.aksj
+```
+For dry-run mode:
+```bash
+go run ./cmd/akt_converter convert -input myfile.akt -output myfile.aksj -dry-run
+```
 
-### aksharamala
-Run the main transliteration tool with input text:
+## Architecture
+1. **Transliteration Core**:
+   - Parses and processes mappings.
+   - Handles transliteration with contextual awareness.
+2. **Keymap Store**:
+   - Manages transliteration schemes and metadata.
+   - Validates mappings and supports efficient lookup.
+3. **Utilities**:
+   - Supports metadata extraction and comment normalization.
+4. **Logger**:
+   - Provides configurable logging (debug/production modes).
 
-    ```bash
-    ./aksharamala -keymap hindi -input "example text"
-    ```
+## Roadmap
+### Completed
+- Basic `.akt` to `.aksj` conversion.
+- Transliteration with configurable mappings.
 
-### akt_converter
-Convert a .akt file to .aksj format:
+### Future Enhancements
+* **AI-Driven AKSJ Creation:** Implement machine learning models to analyze .akt files and generate .aksj mappings intelligently, reducing manual effort.
+* **Dynamic Language Support:** Add runtime language detection and mapping support to handle multi-script input dynamically.
+* **API Integration:** Develop REST APIs for transliteration tasks, enabling integration with other tools and systems.
 
-    ```bash
-    ./akt_converter input.akt output.aksj
-    ```
+See the the list of issues and planned enhancements in the Issues section that are more immediate. Please reaach out if you are interested in contributing.
 
----
+## History
+`aks.go` builds upon the legacy Aksharamala project, originally developed as an Indic transliteration system for Windows 2000/XP. By transitioning to Go, `aks.go` modernizes the original concepts and makes them accessible via cloud-based APIs and modern development environments.
 
-#### **5. Contribution Guidelines**
-Encourage contributions and provide instructions:
+For a detailed history, see [history.md](docs/history.md).
 
-```markdown
 ## Contributing
+Contributions are welcome! Please read [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details on our process.
 
-Contributions are welcome! Please follow these steps:
+## License
+This project is licensed under the GNU Affero General Public License (AGPL-3.0-or-later). See [LICENSE](LICENSE) for details.
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix:
-   ```bash
-   git checkout -b my-feature
-   ```
-3. Commit your changes
-    ```bash
-    git commit -m "Add my feature"
-    ```
-4. Push to your fork and submit a pull request.
-For major changes, please open an issue to discuss your proposal.
-Let me know if you’d like further refinements or additions! 😊
+## Acknowledgments
+Special thanks to the community and contributors of the original Aksharamala project for inspiring this modernization effort.

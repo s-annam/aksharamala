@@ -15,7 +15,7 @@ type Aksharamala struct {
 	activeScheme *types.TransliterationScheme
 	context      *types.Context
 	virama       string
-	viramaMode   string
+	viramaMode   types.ViramaMode
 }
 
 func splitAndTrim(s string) []string {
@@ -32,27 +32,30 @@ func splitAndTrim(s string) []string {
 	return parts
 }
 
-func parseVirama(metadata string) (string, string, error) {
-	// Split virama metadata entry into two parts
+func parseVirama(metadata string) (string, types.ViramaMode, error) {
 	parts := splitAndTrim(metadata)
 	if len(parts) != 2 {
-		return "", "", fmt.Errorf("invalid or missing virama metadata: %s", metadata)
+		return "", types.UnknownMode, fmt.Errorf("invalid or missing virama metadata: %s", metadata)
 	}
+
 	viramaString := parts[0]
-	viramaMode := parts[1]
+	mode := types.ParseViramaMode(parts[1])
+	if mode == types.UnknownMode {
+		return "", types.UnknownMode, fmt.Errorf("invalid virama mode: %s", parts[1])
+	}
 
 	// Handle hexadecimal Unicode value, if present
 	if strings.HasPrefix(viramaString, "0x") {
 		codePoint, err := strconv.ParseUint(viramaString[2:], 16, 32)
 		if err != nil {
-			return "", "", fmt.Errorf("invalid Unicode code point: %v", err)
+			return "", types.UnknownMode, fmt.Errorf("invalid Unicode code point: %v", err)
 		}
-		return string(rune(codePoint)), viramaMode, nil
+		return string(rune(codePoint)), mode, nil
 	} else if viramaString == "" {
-		return "", "", fmt.Errorf("empty virama: %s", metadata)
+		return "", types.UnknownMode, fmt.Errorf("empty virama: %s", metadata)
 	}
 
-	return viramaString, viramaMode, nil
+	return viramaString, mode, nil
 }
 
 // NewAksharamala initializes a new Aksharamala instance.
@@ -118,13 +121,11 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 	}
 
 	switch a.viramaMode {
-	case "smart":
+	case types.SmartMode:
 		return true
-	case "normal":
+	case types.NormalMode:
 		return true
-	case "double":
-		return a.context.LatestLookup.Output == nextOutput
-	case "repeat":
+	case types.UnknownMode:
 		return a.context.LatestLookup.Output == nextOutput
 	}
 

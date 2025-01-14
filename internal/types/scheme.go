@@ -40,11 +40,12 @@ type TransliterationScheme struct {
 
 // Metadata contains additional configuration for a transliteration scheme.
 type Metadata struct {
-	Virama       string `json:"virama,omitempty"`
-	FontName     string `json:"font_name,omitempty"`
-	FontSize     int    `json:"font_size,omitempty"`
-	IconEnabled  string `json:"icon_enabled,omitempty"`
-	IconDisabled string `json:"icon_disabled,omitempty"`
+	Virama       string     `json:"virama,omitempty"`
+	ViramaMode   ViramaMode `json:"-"`
+	FontName     string     `json:"font_name,omitempty"`
+	FontSize     int        `json:"font_size,omitempty"`
+	IconEnabled  string     `json:"icon_enabled,omitempty"`
+	IconDisabled string     `json:"icon_disabled,omitempty"`
 }
 
 // Section represents a category of mappings within a transliteration scheme.

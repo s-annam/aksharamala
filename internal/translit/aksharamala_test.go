@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"aks.go/internal/keymap"
+	"aks.go/internal/types"
 )
 
 func TestAksharamala_Transliterate(t *testing.T) {
 	store := keymap.NewKeymapStore()
-	if err := store.LoadKeymaps("./keymaps"); err != nil {
+	if err := store.LoadKeymaps("../../keymaps"); err != nil {
 		fmt.Printf("Failed to load keymaps: %v\n", err)
 		return
 	}
@@ -43,14 +44,14 @@ func TestAksharamala_ParseVirama(t *testing.T) {
 	tests := []struct {
 		metadata       string
 		expectedVirama string
-		expectedMode   string
+		expectedMode   types.ViramaMode
 		shouldError    bool
 	}{
-		{"0x094D,smart", "्", "smart", false},
-		{"्,normal", "्", "normal", false},
-		{"abcd,smart", "abcd", "smart", false},
-		{"0xZZZZ,smart", "", "", true},
-		{"no_comma", "", "", true},
+		{"0x094D,smart", "्", types.SmartMode, false},
+		{"्,normal", "्", types.NormalMode, false},
+		{"abcd,smart", "abcd", types.SmartMode, false},
+		{"0xZZZZ,smart", "", types.UnknownMode, true},
+		{"no_comma", "", types.UnknownMode, true},
 	}
 
 	for _, test := range tests {

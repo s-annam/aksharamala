@@ -13,9 +13,9 @@ import (
 // to perform transliteration operations. It maintains the active transliteration
 // scheme and manages the context for transliteration processes.
 type Aksharamala struct {
-	keymapStore  *keymap.KeymapStore
-	activeScheme *types.TransliterationScheme
-	context      *types.Context
+	keymapStore   *keymap.KeymapStore
+	activeScheme  *types.TransliterationScheme
+	context       *types.Context
 	viramaHandler *types.ViramaHandler
 }
 
@@ -94,6 +94,10 @@ func (a *Aksharamala) Transliterate(input string) string {
 						break
 					}
 
+					// Parse and apply contextual rules
+					baseOutput, rules := types.ParseContextualRules(lookupResult.Output)
+					lookupResult.Output = baseOutput
+
 					// Apply virama if needed
 					nextCategory := a.getCategory(lookupResult.Output)
 					if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
@@ -101,6 +105,13 @@ func (a *Aksharamala) Transliterate(input string) string {
 					}
 
 					result.WriteString(lookupResult.Output)
+
+					// Apply any contextual rules
+					if err := a.context.ApplyContextualRules(rules, &result); err != nil {
+						// Log error but continue with transliteration
+						fmt.Printf("Error applying contextual rules: %v\n", err)
+					}
+
 					a.context.LatestLookup = lookupResult
 					i += j // Move the index forward by the length of the match
 					foundMatch = true
@@ -114,11 +125,22 @@ func (a *Aksharamala) Transliterate(input string) string {
 			char := string(input[i])
 			lookupResult := a.lookup(char)
 			if lookupResult.Output != "" {
+				// Parse and apply contextual rules
+				baseOutput, rules := types.ParseContextualRules(lookupResult.Output)
+				lookupResult.Output = baseOutput
+
 				nextCategory := a.getCategory(lookupResult.Output)
 				if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
 					result.WriteString(a.viramaHandler.Virama)
 				}
 				result.WriteString(lookupResult.Output)
+
+				// Apply any contextual rules
+				if err := a.context.ApplyContextualRules(rules, &result); err != nil {
+					// Log error but continue with transliteration
+					fmt.Printf("Error applying contextual rules: %v\n", err)
+				}
+
 				a.context.LatestLookup = lookupResult
 			} else {
 				result.WriteString(char)
@@ -134,28 +156,6 @@ func (a *Aksharamala) Transliterate(input string) string {
 	}
 
 	return result.String()
-}
-
-// shouldApplyVirama determines if a virama should be inserted before the current character.
-// Returns true if a virama should be applied, false otherwise.
-func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
-	// If the last character wasn't a consonant, no virama needed
-	if a.context.LatestLookup.Category != "consonants" {
-		return false
-	}
-
-	switch a.viramaHandler.Mode {
-	case types.SmartMode:
-		// In smart mode, only apply virama between consonants
-		return a.getCategory(nextOutput) == "consonants"
-	case types.NormalMode:
-		// In normal mode, apply virama after consonants when followed by space or another consonant
-		return nextOutput == " " || a.getCategory(nextOutput) == "consonants"
-	case types.UnknownMode:
-		return a.context.LatestLookup.Output == nextOutput
-	}
-
-	return false
 }
 
 // lookup finds the transliteration for the given string.

@@ -72,13 +72,9 @@ func TestTransliterate(t *testing.T) {
 		expected string
 	}{
 		{
-			"ee rOju oka..",
-			"ఈ రోజు ఒక..",
+			"ee rOju oka AnaMdamaina sudinamu. nEnu chAlA saMtOshaMgaa kotta vishayaalu nErchukOvaDaMlO utsaahaMgaa unnAnu.",
+			"ఈ రోజు ఒక ఆనందమైన సుదినము. నేను చాలా సంతోషంగా కొత్త విషయాలు నేర్చుకోవడంలో ఉత్సాహంగా ఉన్నాను.",
 		},
-		// {
-		// 	"ee roju oka Andamaina sudinamu. nenu chAla santOshamgaa koththa vishayaalu nerchukovadam lo utsaahamgaa unnanu.",
-		// 	"ఈ రోజు ఒక ఆనందమైన సుదినము. నేను చాలా సంతోషంగా కొత్త విషయాలు నేర్చుకోవడం లో ఉత్సాహంగా ఉన్నాను.",
-		// },
 		// {
 		// 	"jeevitam aaScharyaala to nindinadi. prati avakaasAnni dhairyamtho mariyu nammakamto sviikarinchadam manaku avasaram.",
 		// 	"జీవితం ఆశ్చర్యాల తో నిందునాది. ప్రతి అవకాసాన్ని ధైర్యంతో మరియు నమ్మకంతో స్వీకరించడం మనకు అవసరం.",
@@ -89,6 +85,58 @@ func TestTransliterate(t *testing.T) {
 	allTests = append(teluguSmallTests, teluguLargeTests...)
 	for _, test := range allTests {
 		translit(t, aks, test)
+	}
+}
+
+func TestContextualMapping(t *testing.T) {
+	store := keymap.NewKeymapStore()
+	if err := store.LoadKeymaps("../../keymaps"); err != nil {
+		t.Fatalf("Failed to load keymaps: %v", err)
+	}
+
+	aks := NewAksharamala(store)
+	aks.SetActiveKeymap("teluguRts")
+
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Simple context update",
+			input:    "kk",
+			expected: "క్క్", // Assuming TeluguRts.aksj has the contextual mapping for 'k'
+		},
+		{
+			name:     "No context match",
+			input:    "k",
+			expected: "క్", // No context, no modification
+		},
+		{
+			name:     "Multiple context changes",
+			input:    "kkk",
+			expected: "క్క్క్", // Testing chain of contextual rules
+		},
+		{
+			name:     "Context with space",
+			input:    "kk ",
+			expected: "క్క్ ", // Context should persist across space
+		},
+		{
+			name:     "Empty string",
+			input:    "",
+			expected: "", // Edge case
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := aks.Transliterate(test.input)
+			if result != test.expected {
+				t.Errorf("Test %s failed:\nexpected: %q\ngot: %q",
+					test.name, test.expected, result)
+			}
+		})
 	}
 }
 

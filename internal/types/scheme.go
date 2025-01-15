@@ -162,7 +162,7 @@ func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransl
 
 	scheme.IterateCategories(func(category string, section Section) {
 		section.Mappings.NormalizeComments(core.NormalizeComment)
-		sectionJSON, err := json.Marshal(section.Mappings.Entries())
+		sectionJSON, err := json.Marshal(section.Mappings.All())
 		if err != nil {
 			errList = append(errList, fmt.Errorf("failed to marshal category '%s': %w", category, err))
 			return
@@ -187,10 +187,57 @@ func ToCompactTransliterationScheme(scheme TransliterationScheme) (CompactTransl
 	}, nil
 }
 
+// FromCompactTransliterationScheme converts a CompactTransliterationScheme back to a regular TransliterationScheme.
+// It returns the expanded representation of the scheme and any error encountered during conversion.
+func FromCompactTransliterationScheme(compact CompactTransliterationScheme) (TransliterationScheme, error) {
+	scheme := TransliterationScheme{
+		Comments:   compact.Comments,
+		Version:    compact.Version,
+		ID:         compact.ID,
+		Name:       compact.Name,
+		License:    compact.License,
+		Language:   compact.Language,
+		Scheme:     compact.Scheme,
+		Metadata:   compact.Metadata,
+		Categories: make(map[string]Section),
+	}
+
+	for category, rawMappings := range compact.Categories {
+		var mappings []core.Mapping
+		if err := json.Unmarshal(rawMappings, &mappings); err != nil {
+			return TransliterationScheme{}, fmt.Errorf("failed to unmarshal category '%s': %w", category, err)
+		}
+		scheme.Categories[category] = Section{
+			Mappings: core.NewMappings(mappings),
+		}
+	}
+
+	return scheme, nil
+}
+
 // IterateCategories performs an action on each category and section in the scheme.
 // It takes a function as an argument to apply to each category.
 func (s *TransliterationScheme) IterateCategories(action func(string, Section)) {
 	for category, section := range s.Categories {
 		action(category, section)
 	}
+}
+
+// FindMapping looks for a mapping with any matching LHS entry across all sections.
+// Returns the section name, index within that section, and whether the mapping was found.
+func (s *TransliterationScheme) FindMapping(lhs []string) (string, int, bool) {
+	for section, content := range s.Categories {
+		mappings := content.Mappings.All()
+		for i, mapping := range mappings {
+			// Check each LHS entry in the mapping for a match with any input LHS
+			for _, searchLHS := range lhs {
+				for _, existingLHS := range mapping.LHS {
+					if searchLHS == existingLHS {
+						return section, i, true
+					}
+				}
+			}
+		}
+	}
+	return "", -1, false
 }

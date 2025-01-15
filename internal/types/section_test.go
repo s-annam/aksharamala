@@ -21,13 +21,15 @@ func TestAppendLHSToMapping(t *testing.T) {
 
 	// Append a new LHS
 	newLHS := "ka"
-	err := section.AppendLHSToMapping(&initialMapping, newLHS)
-	if err != nil {
-		t.Fatalf("AppendLHSToMapping failed: %v", err)
-	}
+	section.AppendLHSToMapping(&initialMapping, newLHS)
 
 	// Validate that the LHS was appended
-	lastMapping := section.GetMappings()[len(section.GetMappings())-1]
+	mappings := section.GetMappings()
+	if len(mappings) == 0 {
+		t.Fatal("Expected at least one mapping")
+	}
+
+	lastMapping := mappings[len(mappings)-1]
 	if len(lastMapping.LHS) != 2 || lastMapping.LHS[1] != newLHS {
 		t.Errorf("Expected LHS to include '%s', got %v", newLHS, lastMapping.LHS)
 	}

@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-
 	"aks.go/internal/core"
 )
 
@@ -39,26 +37,20 @@ func (s *Section) AddMapping(lhs []string, rhs []string, comment string) {
 	s.Mappings.Add(lhs, rhs, comment)
 }
 
-// AppendLHSToMapping appends an LHS-only pattern to the last mapping in the section.
-// If no last mapping exists, it creates a new mapping with the LHS-only pattern.
-func (s *Section) AppendLHSToMapping(lastMapping *core.Mapping, lhs string) error {
-	entries := s.Mappings.All()
-	if len(entries) == 0 {
-		return fmt.Errorf("no previous mapping found to update")
+// AppendLHSToMapping appends an LHS value to the last mapping in the section.
+func (s *Section) AppendLHSToMapping(lastMapping *core.Mapping, lhs string) {
+	if lastMapping == nil {
+		return
 	}
 
-	// Append LHS to the last mapping
-	lastMapping.LHS = append(lastMapping.LHS, lhs)
-
-	// Find last mapping in the section
-	for i, entry := range s.Mappings.Entries() {
+	entries := s.Mappings.All()
+	for i, entry := range entries {
 		if entry.LHS[0] == lastMapping.LHS[0] {
-			s.Mappings.Entries()[i] = *lastMapping
-			return nil
+			entries[i].LHS = append(entries[i].LHS, lhs)
+			s.Mappings = core.NewMappings(entries)
+			break
 		}
 	}
-
-	return nil
 }
 
 // GetMappings returns all mappings in the section.

@@ -24,9 +24,11 @@ import (
 	"strconv"
 	"strings"
 
+	"aks.go/internal/core"
 	"aks.go/internal/types"
 	"aks.go/logger"
 	"go.uber.org/zap"
+	"encoding/json"
 )
 
 const (
@@ -115,6 +117,8 @@ func handleSingleMapping(value string) string {
 func main() {
 	// Parse flags
 	debug := flag.Bool("debug", false, "Enable debug logging")
+	updateOnly := flag.Bool("update-only", false, "Update existing mappings in-place while keeping sections intact")
+	noUpdate := flag.Bool("no-update", false, "Force creating a new file even if output exists")
 	flag.Parse()
 
 	// Initialize the logger
@@ -124,7 +128,18 @@ func main() {
 	// Parse input and output
 	inputFile, outputFile := parseArgs()
 
-	logger.Info("Starting AKT conversion", zap.String("inputFile", inputFile), zap.String("outputFile", outputFile))
+	// Check if output file exists and determine update mode
+	shouldUpdate := *updateOnly
+	if !*noUpdate {
+		if _, err := os.Stat(outputFile); err == nil {
+			shouldUpdate = true
+		}
+	}
+
+	logger.Info("Starting AKT conversion",
+		zap.String("inputFile", inputFile),
+		zap.String("outputFile", outputFile),
+		zap.Bool("updateOnly", shouldUpdate))
 
 	// Process the input file
 	scheme, err := readAndParseInput(inputFile)
@@ -133,10 +148,30 @@ func main() {
 		return
 	}
 
+	// If in update mode, read the existing output file
+	var existingScheme *types.TransliterationScheme
+	if shouldUpdate {
+		if existingFile, err := os.ReadFile(outputFile); err == nil {
+			var existing types.TransliterationScheme
+			if err := json.Unmarshal(existingFile, &existing); err == nil {
+				existingScheme = &existing
+				logger.Info("Successfully loaded existing scheme", zap.String("outputFile", outputFile))
+			} else {
+				logger.Warn("Failed to parse existing output file, will create new",
+					zap.String("outputFile", outputFile),
+					zap.Error(err))
+			}
+		} else {
+			logger.Warn("Failed to read existing output file, will create new",
+				zap.String("outputFile", outputFile),
+				zap.Error(err))
+		}
+	}
+
 	// Convert to compact scheme
-	compactScheme, err := convertToCompactScheme(scheme, inputFile)
+	compactScheme, err := convertToCompactScheme(scheme, inputFile, existingScheme)
 	if err != nil {
-		logger.Error("Error converting to compact scheme: %v\n", zap.Error(err))
+		logger.Error("Error converting to compact scheme", zap.Error(err))
 		return
 	}
 
@@ -186,12 +221,70 @@ func readAndParseInput(inputFile string) (types.TransliterationScheme, error) {
 // convertToCompactScheme converts a TransliterationScheme to a CompactTransliterationScheme.
 // It takes the scheme and input file path, returning the compact scheme and any error encountered.
 // The function also overrides the comments in the scheme with information about the conversion.
-func convertToCompactScheme(scheme types.TransliterationScheme, inputFile string) (types.CompactTransliterationScheme, error) {
+func convertToCompactScheme(scheme types.TransliterationScheme, inputFile string, existingScheme *types.TransliterationScheme) (types.CompactTransliterationScheme, error) {
 	// Override comments
 	sourceFile := filepath.Base(inputFile)
 	scheme.Comments = []string{
 		fmt.Sprintf("Converted from %s.", sourceFile),
 		"Distributed under the GNU Affero General Public License (AGPL).",
+	}
+
+	if existingScheme != nil {
+		// In update-only mode, start with existing scheme
+		mergedScheme := types.TransliterationScheme{
+			Version:    scheme.Version,
+			License:    scheme.License,
+			ID:         scheme.ID,
+			Name:       scheme.Name,
+			Language:   scheme.Language,
+			Scheme:     scheme.Scheme,
+			Metadata:   scheme.Metadata,
+			Comments:   scheme.Comments,
+			Categories: make(map[string]types.Section),
+		}
+
+		// First copy all existing categories to preserve structure
+		for name, section := range existingScheme.Categories {
+			mergedScheme.Categories[name] = section
+		}
+
+		// Process each mapping from input scheme
+		for inputSection, inputContent := range scheme.Categories {
+			for _, mapping := range inputContent.Mappings.All() {
+				// Try to find this mapping in the existing scheme
+				if section, idx, found := existingScheme.FindMapping(mapping.LHS); found {
+					// Update mapping in its current section
+					existingSection := mergedScheme.Categories[section]
+					existingMappings := existingSection.Mappings.All()
+					// Preserve original LHS while updating RHS and Comment
+					existingMappings[idx].RHS = mapping.RHS
+					existingMappings[idx].Comment = mapping.Comment
+					existingSection.Mappings = core.NewMappings(existingMappings)
+					mergedScheme.Categories[section] = existingSection
+					logger.Info("Updated existing mapping",
+						zap.Strings("lhs", existingMappings[idx].LHS),
+						zap.String("in_section", section))
+				} else {
+					// Mapping not found, add to appropriate section from input
+					if section, exists := mergedScheme.Categories[inputSection]; exists {
+						mappings := section.Mappings.All()
+						mappings = append(mappings, mapping)
+						section.Mappings = core.NewMappings(mappings)
+						mergedScheme.Categories[inputSection] = section
+					} else {
+						// Create new section if it doesn't exist
+						mergedScheme.Categories[inputSection] = types.Section{
+							Mappings: core.NewMappings([]core.Mapping{mapping}),
+						}
+					}
+					logger.Info("Added new mapping",
+						zap.Strings("lhs", mapping.LHS),
+						zap.String("to_section", inputSection))
+				}
+			}
+		}
+
+		return types.ToCompactTransliterationScheme(mergedScheme)
 	}
 
 	return types.ToCompactTransliterationScheme(scheme)

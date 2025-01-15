@@ -46,6 +46,11 @@ func Debug(msg string, fields ...zapcore.Field) {
 	log.Debug(msg, fields...)
 }
 
+// Warn logs a warning message
+func Warn(msg string, fields ...zapcore.Field) {
+	log.Warn(msg, fields...)
+}
+
 // Sync flushes any buffered log entries
 func Sync() {
 	_ = log.Sync() // Flushes any buffered logs; ignore the error for simplicity

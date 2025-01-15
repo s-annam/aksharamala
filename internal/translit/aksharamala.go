@@ -170,7 +170,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 // Returns the LookupResult for the character.
 func (a *Aksharamala) lookup(combination string) core.LookupResult {
 	for category, section := range a.activeScheme.Categories {
-		for _, mapping := range section.Mappings.Entries() {
+		for _, mapping := range section.Mappings.All() {
 			for _, lhs := range mapping.LHS {
 				if lhs == combination {
 					rhs := mapping.RHS
@@ -207,7 +207,7 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 // Returns the category as a string.
 func (a *Aksharamala) getCategory(output string) string {
 	for category, section := range a.activeScheme.Categories {
-		for _, mapping := range section.Mappings.Entries() {
+		for _, mapping := range section.Mappings.All() {
 			for _, rhs := range mapping.RHS {
 				if rhs == output {
 					return category

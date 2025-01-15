@@ -176,3 +176,99 @@ func TestBuildLookupTable(t *testing.T) {
 		t.Errorf("For input 'z': expected empty output and 'other' category, got %+v", result)
 	}
 }
+
+// TestFindMapping tests the FindMapping method of TransliterationScheme.
+// It verifies that mappings can be found by any of their LHS entries.
+func TestFindMapping(t *testing.T) {
+	scheme := TransliterationScheme{
+		Categories: map[string]Section{
+			"consonants": {
+				Mappings: core.NewMappings([]core.Mapping{
+					{
+						LHS: []string{"k", "ka"},
+						RHS: []string{"क"},
+					},
+					{
+						LHS: []string{"kh"},
+						RHS: []string{"ख"},
+					},
+				}),
+			},
+			"vowels": {
+				Mappings: core.NewMappings([]core.Mapping{
+					{
+						LHS: []string{"a", "aa"},
+						RHS: []string{"आ"},
+					},
+				}),
+			},
+		},
+	}
+
+	tests := []struct {
+		name          string
+		searchLHS     []string
+		wantSection   string
+		wantIndex     int
+		wantFound     bool
+		description   string
+	}{
+		{
+			name:        "find by first LHS entry",
+			searchLHS:   []string{"k"},
+			wantSection: "consonants",
+			wantIndex:   0,
+			wantFound:   true,
+			description: "should find mapping by its first LHS entry",
+		},
+		{
+			name:        "find by second LHS entry",
+			searchLHS:   []string{"ka"},
+			wantSection: "consonants",
+			wantIndex:   0,
+			wantFound:   true,
+			description: "should find mapping by its second LHS entry",
+		},
+		{
+			name:        "find with multiple search terms - first matches",
+			searchLHS:   []string{"k", "x"},
+			wantSection: "consonants",
+			wantIndex:   0,
+			wantFound:   true,
+			description: "should find mapping when any search term matches",
+		},
+		{
+			name:        "find in different section",
+			searchLHS:   []string{"aa"},
+			wantSection: "vowels",
+			wantIndex:   0,
+			wantFound:   true,
+			description: "should find mapping in any section",
+		},
+		{
+			name:        "no match found",
+			searchLHS:   []string{"x", "y"},
+			wantSection: "",
+			wantIndex:   -1,
+			wantFound:   false,
+			description: "should return not found for non-existent LHS",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotSection, gotIndex, gotFound := scheme.FindMapping(tt.searchLHS)
+			if gotSection != tt.wantSection || gotIndex != tt.wantIndex || gotFound != tt.wantFound {
+				t.Errorf("%s: FindMapping(%v) = (%s, %d, %v), want (%s, %d, %v)",
+					tt.description,
+					tt.searchLHS,
+					gotSection,
+					gotIndex,
+					gotFound,
+					tt.wantSection,
+					tt.wantIndex,
+					tt.wantFound)
+			}
+		})
+	}
+}

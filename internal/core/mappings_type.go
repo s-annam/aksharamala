@@ -68,8 +68,9 @@ func (m *Mappings) ToLookupTable(category string, table LookupTable) {
 	}
 }
 
-// Entries returns the underlying slice of Mapping.
-func (m *Mappings) Entries() []Mapping {
+// All returns all mappings in the collection as a slice.
+// This is used both for general access and JSON marshaling.
+func (m *Mappings) All() []Mapping {
 	return m.entries
 }
 
@@ -89,11 +90,6 @@ func (m *Mappings) Lookup(lhs string) (string, bool) {
 		}
 	}
 	return "", false
-}
-
-// All returns all mappings in the collection.
-func (m *Mappings) All() []Mapping {
-	return m.entries
 }
 
 // ValidateAll checks the integrity of all mappings in the collection.

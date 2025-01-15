@@ -96,11 +96,19 @@ func (store *KeymapStore) loadKeymapFromFile(filePath string) error {
 
 // GetKeymap retrieves a TransliterationScheme by ID.
 // Returns the TransliterationScheme and a boolean indicating whether it was found.
+// The ID comparison is case-insensitive.
 func (store *KeymapStore) GetKeymap(id string) (types.TransliterationScheme, bool) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
-	scheme, exists := store.Keymaps[id]
-	return scheme, exists
+	
+	// Convert the input ID to lowercase for case-insensitive comparison
+	lowerID := strings.ToLower(id)
+	for k, v := range store.Keymaps {
+		if strings.ToLower(k) == lowerID {
+			return v, true
+		}
+	}
+	return types.TransliterationScheme{}, false
 }
 
 // ListKeymapIDs returns a list of all loaded keymap IDs.

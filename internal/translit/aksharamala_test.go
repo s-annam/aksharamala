@@ -19,7 +19,7 @@ func TestTransliterate(t *testing.T) {
 
 	aks := NewAksharamala(store)
 
-	tests := []struct {
+	hindiSmallTests := []struct {
 		input    string
 		expected string
 	}{
@@ -30,7 +30,7 @@ func TestTransliterate(t *testing.T) {
 		{"", ""}, // Edge case: empty string
 	}
 
-	largeTests := []struct {
+	hindiLargeTests := []struct {
 		input    string
 		expected string
 	}{
@@ -46,13 +46,59 @@ func TestTransliterate(t *testing.T) {
 
 	aks.SetActiveKeymap("hindi")
 
-	// Consolidate simple and large tests
-	for _, test := range append(tests, largeTests...) {
-		output := aks.Transliterate(test.input)
-		if output != test.expected {
-			t.Errorf("For input '%s': expected '%s', got '%s'", test.input, test.expected, output)
-		} else {
-			t.Logf("For input '%s': output matches expected '%s'", test.input, test.expected)
-		}
+	// Consolidate all the Hindi tests and run them
+	allTests := append(hindiSmallTests, hindiLargeTests...)
+	for _, test := range allTests {
+		translit(t, aks, test)
+	}
+
+	// Test with TeluguRTS keymap
+	aks.SetActiveKeymap("teluguRts")
+
+	teluguSmallTests := []struct {
+		input    string
+		expected string
+	}{
+		// {"namastE", "నమస్తే"},
+		{"kka", "క్క"},
+		{"ka", "క"},
+		// {"a1k", "అ౧క్"},
+		{"", ""}, // Edge case: empty string
+	}
+
+	teluguLargeTests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			"ee rOju oka..",
+			"ఈ రోజు ఒక..",
+		},
+		// {
+		// 	"ee roju oka Andamaina sudinamu. nenu chAla santOshamgaa koththa vishayaalu nerchukovadam lo utsaahamgaa unnanu.",
+		// 	"ఈ రోజు ఒక ఆనందమైన సుదినము. నేను చాలా సంతోషంగా కొత్త విషయాలు నేర్చుకోవడం లో ఉత్సాహంగా ఉన్నాను.",
+		// },
+		// {
+		// 	"jeevitam aaScharyaala to nindinadi. prati avakaasAnni dhairyamtho mariyu nammakamto sviikarinchadam manaku avasaram.",
+		// 	"జీవితం ఆశ్చర్యాల తో నిందునాది. ప్రతి అవకాసాన్ని ధైర్యంతో మరియు నమ్మకంతో స్వీకరించడం మనకు అవసరం.",
+		// },
+	}
+
+	// Consolidate all the Telugu RTS tests and run them
+	allTests = append(teluguSmallTests, teluguLargeTests...)
+	for _, test := range allTests {
+		translit(t, aks, test)
+	}
+}
+
+func translit(t *testing.T, aks *Aksharamala, test struct {
+	input    string
+	expected string
+}) {
+	output := aks.Transliterate(test.input)
+	if output != test.expected {
+		t.Errorf("For input '%s': expected '%s', got '%s'", test.input, test.expected, output)
+	} else {
+		t.Logf("For input '%s': output matches expected '%s'", test.input, test.expected)
 	}
 }

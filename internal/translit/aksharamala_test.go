@@ -30,8 +30,24 @@ func TestAksharamala_Transliterate(t *testing.T) {
 		{"", ""}, // Edge case: empty string
 	}
 
+	largeTests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			"yah ek su.ndar din hai. aaj ham bahut khush hai.n. hamane bahut saaree cheeze.n seekhee hai.n.",
+			"यह एक सुंदर दिन है। आज हम बहुत खुश हैं। हमने बहुत सारी चीज़ें सीखी हैं।",
+		},
+		{
+			"aur ab ham tayyaar hai.n naye anubhavo.n ke liye.",
+			"और अब हम तय्यार हैं नये अनुभवों के लिये।",
+		},
+	}
+
 	aks.SetActiveKeymap("hindi")
-	for _, test := range tests {
+
+	// Consolidate simple and large tests
+	for _, test := range append(tests, largeTests...) {
 		output := aks.Transliterate(test.input)
 		if output != test.expected {
 			t.Errorf("For input '%s': expected '%s', got '%s'", test.input, test.expected, output)

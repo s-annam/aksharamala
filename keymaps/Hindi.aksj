@@ -89,16 +89,23 @@
       {"lhs":["8"],"rhs":["८"],"comment":"eight"},
       {"lhs":["9"],"rhs":["९"],"comment":"nine"},
       {"lhs":["."],"rhs":["।"],"comment":"danda"},
-      {"lhs":[".."],"rhs":["॥"],"comment":"double danda"},
+      {"lhs":[".."],"rhs":["॥"],"comment":"double danda"}
+    ],
+    "others": [
       {"lhs":["\\u005C."],"rhs":["'.'"],"comment":"ASCII period"},
       {"lhs":["\\u005C\\u007D"],"rhs":["\\u007D"]},
       {"lhs":["\\u005C\\u007B"],"rhs":["\\u007B"]},
-      {"lhs":["\\u005Cthreedots"],"rhs":["'...'"],"comment":"three dots"}
-    ],
-    "others": [
+      {"lhs":["\\u005Cthreedots"],"rhs":["'...'"],"comment":"three dots"},
       {"lhs":["_"],"rhs":["\u0000"],"comment":"special handling"},
       {"lhs":["\\##"],"rhs":["￾"],"comment":"switch between english and hindi"},
-      {"lhs":["\\u005Cnukta"],"rhs":["़"],"comment":"nukta"}
+      {"lhs":["\\u005Cnukta"],"rhs":["़"],"comment":"nukta"},
+      {"lhs":[".N"],"rhs":["ँ"],"comment":"candrabindu"},
+      {"lhs":["M",".n",".m"],"rhs":["ं"],"comment":"anusvara"},
+      {"lhs":["H"],"rhs":["ः"],"comment":"visarga"},
+      {"lhs":[".a"],"rhs":["ऽ"],"comment":"avagraha"},
+      {"lhs":[".h"],"rhs":["्‌"],"comment":"virama == halant"},
+      {"lhs":["AUM","OM"],"rhs":["ॐ"],"comment":"OM"},
+      {"lhs":["R"],"rhs":["र्‍"],"comment":"Marathi half-R (as in daRyaa)"}
     ],
     "vedic": [
       {"lhs":["\\u005C`"],"rhs":["॑"],"comment":"udatta"},

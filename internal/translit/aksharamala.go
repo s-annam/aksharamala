@@ -56,26 +56,50 @@ func (a *Aksharamala) Transliterate(input string) string {
 	a.context = types.NewContext()
 
 	var result strings.Builder
-	for _, char := range input {
-		lookupResult := a.lookup(string(char))
-		if lookupResult.Output == "\x00" && a.context.LatestLookup.Category == "consonants" {
-			a.context.LatestLookup = lookupResult
-			continue
+	length := len(input)
+	for i := 0; i < length; {
+		foundMatch := false
+
+		// Greedily match substrings to find the longest match
+		for j := length - i; j > 0; j-- {
+			if i+j <= length {
+				combination := input[i : i+j]
+				lookupResult := a.lookup(combination)
+
+				if lookupResult.Output != "" {
+					if lookupResult.Output == "\x00" && a.context.LatestLookup.Category == "consonants" {
+						a.context.LatestLookup = lookupResult
+						i += j // Move the index forward by the length of the match
+						foundMatch = true
+						break
+					}
+
+					// Apply virama if needed
+					if a.shouldApplyVirama(lookupResult.Output) {
+						result.WriteString(a.virama)
+					}
+
+					result.WriteString(lookupResult.Output)
+					a.context.LatestLookup = lookupResult
+					i += j // Move the index forward by the length of the match
+					foundMatch = true
+					break // Exit the loop once a match is found
+				}
+			}
 		}
 
-		if lookupResult.Output != "" {
-			// Handle virama based on mode and context
-			if a.shouldApplyVirama(lookupResult.Output) {
-				result.WriteString(a.virama)
+		// If no match was found, process the current character
+		if !foundMatch {
+			char := string(input[i])
+			lookupResult := a.lookup(char)
+			if lookupResult.Output != "" {
+				result.WriteString(lookupResult.Output)
+				a.context.LatestLookup = lookupResult
+			} else {
+				result.WriteString(char) // Handle unmatched characters
+				a.context.LatestLookup = core.LookupResult{Output: char, Category: "other"}
 			}
-
-			// Update context and write output
-			a.context.LatestLookup = lookupResult
-			result.WriteString(lookupResult.Output)
-		} else {
-			// For unmatched characters, treat as "other"
-			result.WriteString(string(char))
-			a.context.LatestLookup = core.LookupResult{Output: string(char), Category: "other"}
+			i++ // Move to the next character
 		}
 	}
 	return result.String()
@@ -100,13 +124,13 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 	return false
 }
 
-// lookup finds the transliteration for a single character.
+// lookup finds the transliteration for the given string.
 // Returns the LookupResult for the character.
-func (a *Aksharamala) lookup(char string) core.LookupResult {
+func (a *Aksharamala) lookup(combination string) core.LookupResult {
 	for category, section := range a.activeScheme.Categories {
 		for _, mapping := range section.Mappings.Entries() {
 			for _, lhs := range mapping.LHS {
-				if lhs == char {
+				if lhs == combination {
 					// Use matra (RHS[1]) if the previous character is a consonant
 					if category == "vowels" && a.context.LatestLookup.Category == "consonants" && len(mapping.RHS) > 1 {
 						return core.LookupResult{Output: mapping.RHS[1], Category: category}

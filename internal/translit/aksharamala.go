@@ -16,8 +16,7 @@ type Aksharamala struct {
 	keymapStore  *keymap.KeymapStore
 	activeScheme *types.TransliterationScheme
 	context      *types.Context
-	virama       string
-	viramaMode   types.ViramaMode
+	viramaHandler *types.ViramaHandler
 }
 
 // NewAksharamala initializes a new Aksharamala instance.
@@ -29,14 +28,20 @@ func NewAksharamala(store *keymap.KeymapStore) *Aksharamala {
 }
 
 // SetActiveKeymap sets the active keymap by ID for transliteration.
-// Returns an error if the keymap ID is not found.
 func (a *Aksharamala) SetActiveKeymap(id string) error {
 	scheme, exists := a.keymapStore.GetKeymap(id)
 	if !exists {
 		return fmt.Errorf("keymap with ID '%s' not found", id)
 	}
+
+	virama, viramaMode, err := types.ParseVirama(scheme.Metadata.Virama)
+	if err != nil {
+		return fmt.Errorf("failed to parse virama: %v", err)
+	}
+
 	a.activeScheme = &scheme
-	a.virama, a.viramaMode, _ = types.ParseVirama(scheme.Metadata.Virama) // Assuming validation is done earlier
+	a.context = types.NewContext()
+	a.viramaHandler = types.NewViramaHandler(viramaMode, virama, a.context)
 	return nil
 }
 
@@ -54,17 +59,22 @@ func (a *Aksharamala) TransliterateWithKeymap(id, input string) (string, error) 
 func (a *Aksharamala) Transliterate(input string) string {
 	// Reset context for a clean state
 	a.context = types.NewContext()
+	a.viramaHandler = types.NewViramaHandler(a.viramaHandler.Mode, a.viramaHandler.Virama, a.context)
 
 	var result strings.Builder
 	length := len(input)
 	for i := 0; i < length; {
 		foundMatch := false
 
-		// Handle space after consonant in normal mode
-		if i < length && input[i] == ' ' && a.viramaMode == types.NormalMode && 
-		   a.context.LatestLookup.Category == "consonants" {
-			result.WriteString(a.virama)
-			result.WriteRune(' ')
+		// Handle space character
+		if i < length && input[i] == ' ' {
+			shouldAddVirama, shouldAddSpace := a.viramaHandler.HandleSpace()
+			if shouldAddVirama {
+				result.WriteString(a.viramaHandler.Virama)
+			}
+			if shouldAddSpace {
+				result.WriteRune(' ')
+			}
 			i++
 			a.context.LatestLookup = core.LookupResult{Output: " ", Category: "other"}
 			continue
@@ -85,8 +95,9 @@ func (a *Aksharamala) Transliterate(input string) string {
 					}
 
 					// Apply virama if needed
-					if a.shouldApplyVirama(lookupResult.Output) {
-						result.WriteString(a.virama)
+					nextCategory := a.getCategory(lookupResult.Output)
+					if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
+						result.WriteString(a.viramaHandler.Virama)
 					}
 
 					result.WriteString(lookupResult.Output)
@@ -103,18 +114,13 @@ func (a *Aksharamala) Transliterate(input string) string {
 			char := string(input[i])
 			lookupResult := a.lookup(char)
 			if lookupResult.Output != "" {
-				// Apply virama if needed before writing the output
-				if a.shouldApplyVirama(lookupResult.Output) {
-					result.WriteString(a.virama)
+				nextCategory := a.getCategory(lookupResult.Output)
+				if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
+					result.WriteString(a.viramaHandler.Virama)
 				}
 				result.WriteString(lookupResult.Output)
 				a.context.LatestLookup = lookupResult
 			} else {
-				// Handle space after consonant in normal mode
-				if char == " " && a.viramaMode == types.NormalMode && 
-				   a.context.LatestLookup.Category == "consonants" {
-					result.WriteString(a.virama)
-				}
 				result.WriteString(char)
 				a.context.LatestLookup = core.LookupResult{Output: char, Category: "other"}
 			}
@@ -122,9 +128,9 @@ func (a *Aksharamala) Transliterate(input string) string {
 		}
 	}
 
-	// Handle end of string in normal mode - add virama if ending with consonant
-	if a.viramaMode == types.NormalMode && a.context.LatestLookup.Category == "consonants" {
-		result.WriteString(a.virama)
+	// Handle end of input
+	if a.viramaHandler.HandleEndOfInput() {
+		result.WriteString(a.viramaHandler.Virama)
 	}
 
 	return result.String()
@@ -138,7 +144,7 @@ func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
 		return false
 	}
 
-	switch a.viramaMode {
+	switch a.viramaHandler.Mode {
 	case types.SmartMode:
 		// In smart mode, only apply virama between consonants
 		return a.getCategory(nextOutput) == "consonants"

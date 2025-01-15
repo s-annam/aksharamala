@@ -88,3 +88,58 @@ func ParseVirama(metadata string) (string, ViramaMode, error) {
 
 	return viramaString, mode, nil
 }
+
+// ViramaHandler handles the logic for when and how to insert viramas
+// based on the current mode and context.
+type ViramaHandler struct {
+	Mode    ViramaMode
+	Virama  string
+	Context *Context
+}
+
+// NewViramaHandler creates a new ViramaHandler with the specified mode and virama.
+func NewViramaHandler(mode ViramaMode, virama string, ctx *Context) *ViramaHandler {
+	return &ViramaHandler{
+		Mode:    mode,
+		Virama:  virama,
+		Context: ctx,
+	}
+}
+
+// ShouldInsertVirama determines if a virama should be inserted based on the current context
+// and the next character to be processed.
+func (vh *ViramaHandler) ShouldInsertVirama(nextOutput string, nextCategory string) bool {
+	// If the last character wasn't a consonant, no virama needed
+	if vh.Context.LatestLookup.Category != "consonants" {
+		return false
+	}
+
+	switch vh.Mode {
+	case SmartMode:
+		// In smart mode, only apply virama between consonants
+		return nextCategory == "consonants"
+	case NormalMode:
+		// In normal mode, apply virama after consonants when followed by space or another consonant
+		return nextOutput == " " || nextCategory == "consonants"
+	case UnknownMode:
+		return vh.Context.LatestLookup.Output == nextOutput
+	}
+
+	return false
+}
+
+// HandleEndOfInput determines if a virama should be inserted at the end of input
+func (vh *ViramaHandler) HandleEndOfInput() bool {
+	return vh.Mode == NormalMode && vh.Context.LatestLookup.Category == "consonants"
+}
+
+// HandleSpace determines if and how a space should be handled in the current context
+// Returns:
+// - shouldAddVirama: whether a virama should be added before the space
+// - shouldAddSpace: whether the space should be added to the output
+func (vh *ViramaHandler) HandleSpace() (shouldAddVirama bool, shouldAddSpace bool) {
+	if vh.Mode == NormalMode && vh.Context.LatestLookup.Category == "consonants" {
+		return true, true
+	}
+	return false, true
+}

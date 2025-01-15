@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Keymap {
   id: string;
@@ -13,7 +13,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    // Fetch available keymaps when component mounts
     fetchKeymaps()
   }, [])
 
@@ -43,7 +42,7 @@ function App() {
         }),
       })
       const data = await response.json()
-      setOutputText(data.result)
+      setOutputText(data.result || '')
     } catch (error) {
       console.error('Error during transliteration:', error)
     } finally {
@@ -52,25 +51,86 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Aksharamala</h1>
-          <p className="text-gray-600">Indic Script Transliteration</p>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 font-['Plus_Jakarta_Sans']">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        {/* Header */}
+        <header className="text-center mb-16">
+          <h1 className="text-6xl font-bold text-primary-900 mb-4 font-['Plus_Jakarta_Sans']">
+            Aksharamala
+          </h1>
+          <p className="text-xl text-primary-700 mb-12 font-['Plus_Jakarta_Sans']">
+            Indic Script Transliteration
+          </p>
+
+          {/* Help Section */}
+          <div className="bg-white/80 backdrop-blur-md border border-primary-200 rounded-2xl p-8 max-w-3xl mx-auto shadow-glass">
+            <h2 className="text-2xl font-semibold text-primary-900 mb-4 font-['Plus_Jakarta_Sans']">
+              Transliteration Help
+            </h2>
+            <p className="text-lg text-primary-700 mb-6 font-['Plus_Jakarta_Sans']">
+              Type Roman letters to get the corresponding Indic script. Choose your preferred scheme:
+            </p>
+            <ul className="space-y-4 text-lg text-primary-600 mb-6">
+              <li className="flex items-start">
+                <span className="flex-shrink-0 w-24 font-semibold">ITRANS</span>
+                <span className="mx-2">—</span>
+                <span>
+                  Used for Hindi and Marathi{' '}
+                  <a
+                    href="https://www.aczoom.com/itrans/html/tblall/tblall.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-700 hover:text-primary-900 underline decoration-2 underline-offset-2"
+                  >
+                    (View Scheme)
+                  </a>
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="flex-shrink-0 w-24 font-semibold">RTS</span>
+                <span className="mx-2">—</span>
+                <span>
+                  Rice Transliteration System for Telugu{' '}
+                  <a
+                    href="https://web.cs.ucdavis.edu/~vemuri/Grammar/2.%20RTS.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-700 hover:text-primary-900 underline decoration-2 underline-offset-2"
+                  >
+                    (View Scheme)
+                  </a>
+                </span>
+              </li>
+            </ul>
+            <div className="text-primary-700 p-4 bg-primary-50 rounded-xl">
+              <span className="font-medium">Example:</span> Type{' '}
+              <code className="px-2 py-1 bg-white rounded-md font-mono text-primary-700">
+                namaste
+              </code>{' '}
+              with Hindi scheme to get नमस्ते
+            </div>
+          </div>
         </header>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="mb-6">
-            <label htmlFor="keymap" className="block text-sm font-medium text-gray-700 mb-2">
-              Select Keymap
+        {/* Main Content */}
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 mb-8">
+          {/* Script Selection */}
+          <div className="mb-8">
+            <label
+              htmlFor="keymap"
+              className="block text-xl font-semibold text-primary-900 mb-3 font-['Plus_Jakarta_Sans']"
+            >
+              Select Script
             </label>
             <select
               id="keymap"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 text-lg border border-primary-200 rounded-xl 
+                       shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 
+                       bg-white text-primary-900 appearance-none font-['Plus_Jakarta_Sans']"
               value={selectedKeymap}
               onChange={(e) => setSelectedKeymap(e.target.value)}
             >
-              <option value="">Select a keymap...</option>
+              <option value="">Select a script...</option>
               {keymaps.map((keymap) => (
                 <option key={keymap.id} value={keymap.id}>
                   {keymap.name}
@@ -79,48 +139,74 @@ function App() {
             </select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="input" className="block text-sm font-medium text-gray-700 mb-2">
+          {/* Transliteration Interface */}
+          <div className="grid grid-cols-[1fr,auto,1fr] gap-8 items-stretch relative">
+            {/* Input */}
+            <div className="space-y-3">
+              <label
+                htmlFor="input"
+                className="block text-xl font-semibold text-primary-900 font-['Plus_Jakarta_Sans']"
+              >
                 Input Text
               </label>
               <textarea
                 id="input"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={6}
+                className="w-full px-4 py-3 text-lg border border-primary-200 
+                         rounded-xl shadow-sm focus:outline-none focus:ring-2 
+                         focus:ring-primary-500 bg-white min-h-[200px]
+                         font-['Plus_Jakarta_Sans'] leading-relaxed"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Enter text to transliterate..."
               />
             </div>
 
-            <div>
-              <label htmlFor="output" className="block text-sm font-medium text-gray-700 mb-2">
+            {/* Arrow Button */}
+            <div className="flex items-center justify-center">
+              <button
+                onClick={handleTransliterate}
+                disabled={!selectedKeymap || !inputText || isLoading}
+                className="p-6 rounded-full bg-primary-600 hover:bg-primary-700 
+                         disabled:bg-primary-200 transition-all duration-200 
+                         transform hover:scale-105 disabled:hover:scale-100
+                         shadow-lg disabled:shadow-none"
+                title="Transliterate"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Output */}
+            <div className="space-y-3">
+              <label
+                htmlFor="output"
+                className="block text-xl font-semibold text-primary-900 font-['Plus_Jakarta_Sans']"
+              >
                 Output Text
               </label>
               <textarea
                 id="output"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50"
-                rows={6}
+                className="w-full px-4 py-3 text-lg border border-primary-200 
+                         rounded-xl shadow-sm bg-primary-50 font-devanagari
+                         min-h-[200px] leading-relaxed"
                 value={outputText}
                 readOnly
                 placeholder="Transliterated text will appear here..."
               />
             </div>
-          </div>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={handleTransliterate}
-              disabled={!selectedKeymap || !inputText || isLoading}
-              className={`px-6 py-2 rounded-md text-white font-medium
-                ${!selectedKeymap || !inputText || isLoading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-            >
-              {isLoading ? 'Transliterating...' : 'Transliterate'}
-            </button>
           </div>
         </div>
       </div>

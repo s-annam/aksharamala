@@ -62,7 +62,8 @@ func TestTransliterate(t *testing.T) {
 		// {"namastE", "నమస్తే"},
 		{"kka", "క్క"},
 		{"ka", "క"},
-		// {"a1k", "అ౧క్"},
+		{"a1k", "అ1క్"},
+		{"daas", "దాస్"},
 		{"", ""}, // Edge case: empty string
 	}
 

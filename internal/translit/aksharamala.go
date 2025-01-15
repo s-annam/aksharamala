@@ -60,6 +60,16 @@ func (a *Aksharamala) Transliterate(input string) string {
 	for i := 0; i < length; {
 		foundMatch := false
 
+		// Handle space after consonant in normal mode
+		if i < length && input[i] == ' ' && a.viramaMode == types.NormalMode && 
+		   a.context.LatestLookup.Category == "consonants" {
+			result.WriteString(a.virama)
+			result.WriteRune(' ')
+			i++
+			a.context.LatestLookup = core.LookupResult{Output: " ", Category: "other"}
+			continue
+		}
+
 		// Greedily match substrings to find the longest match
 		for j := length - i; j > 0; j-- {
 			if i+j <= length {
@@ -93,30 +103,48 @@ func (a *Aksharamala) Transliterate(input string) string {
 			char := string(input[i])
 			lookupResult := a.lookup(char)
 			if lookupResult.Output != "" {
+				// Apply virama if needed before writing the output
+				if a.shouldApplyVirama(lookupResult.Output) {
+					result.WriteString(a.virama)
+				}
 				result.WriteString(lookupResult.Output)
 				a.context.LatestLookup = lookupResult
 			} else {
-				result.WriteString(char) // Handle unmatched characters
+				// Handle space after consonant in normal mode
+				if char == " " && a.viramaMode == types.NormalMode && 
+				   a.context.LatestLookup.Category == "consonants" {
+					result.WriteString(a.virama)
+				}
+				result.WriteString(char)
 				a.context.LatestLookup = core.LookupResult{Output: char, Category: "other"}
 			}
 			i++ // Move to the next character
 		}
 	}
+
+	// Handle end of string in normal mode - add virama if ending with consonant
+	if a.viramaMode == types.NormalMode && a.context.LatestLookup.Category == "consonants" {
+		result.WriteString(a.virama)
+	}
+
 	return result.String()
 }
 
 // shouldApplyVirama determines if a virama should be inserted before the current character.
 // Returns true if a virama should be applied, false otherwise.
 func (a *Aksharamala) shouldApplyVirama(nextOutput string) bool {
-	if a.context.LatestLookup.Category != "consonants" || a.getCategory(nextOutput) != "consonants" {
+	// If the last character wasn't a consonant, no virama needed
+	if a.context.LatestLookup.Category != "consonants" {
 		return false
 	}
 
 	switch a.viramaMode {
 	case types.SmartMode:
-		return true
+		// In smart mode, only apply virama between consonants
+		return a.getCategory(nextOutput) == "consonants"
 	case types.NormalMode:
-		return true
+		// In normal mode, apply virama after consonants when followed by space or another consonant
+		return nextOutput == " " || a.getCategory(nextOutput) == "consonants"
 	case types.UnknownMode:
 		return a.context.LatestLookup.Output == nextOutput
 	}

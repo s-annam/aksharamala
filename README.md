@@ -1,10 +1,10 @@
-# aks.go - Transliteration for Indian Languages
+# Aksharamala - Transliteration for Indian Languages
 
 ## Overview
-`aks.go` is a modern, extensible transliteration system for Indian languages, reimagining the original Aksharamala project (2000-2005) in Go. It provides developers with a robust, portable, and cloud-compatible toolkit to handle transliteration across languages and scripts efficiently.
+`aksharamala` is a modern, extensible transliteration system for Indian languages, reimagining the original Aksharamala project (2000-2005) in Go. It provides developers with a robust, portable, and cloud-compatible toolkit to handle transliteration across languages and scripts efficiently.
 
 ## Purpose
-Indian language data often exists in legacy formats or custom encodings, making it inaccessible to modern applications. `aks.go` bridges this gap by providing tools to convert and transliterate such data into standardized Unicode representations. This empowers developers to preserve and modernize historical content while supporting future innovations.
+Indian language data often exists in legacy formats or custom encodings, making it inaccessible to modern applications. `aksharamala` bridges this gap by providing tools to convert and transliterate such data into standardized Unicode representations. This empowers developers to preserve and modernize historical content while supporting future innovations.
 
 ## Features
 - **Transliteration Engine**:
@@ -27,7 +27,7 @@ Indian language data often exists in legacy formats or custom encodings, making 
 ### Installation
 ```bash
 # Clone the repository
-$ git clone https://github.com/s-annam/aks.go.git
+$ git clone https://github.com/s-annam/aksharamala.git
 
 # Navigate to the directory
 $ cd aks.go

@@ -7,10 +7,10 @@ import (
 	"aks.go/internal/keymap"
 )
 
-// TestAksharamala_Transliterate tests the Transliterate method of the Aksharamala struct.
+// TestTransliterate tests the Transliterate method of the Aksharamala struct.
 // It verifies that the transliteration works correctly for various input cases.
 // The test loads keymaps and checks the output against expected results.
-func TestAksharamala_Transliterate(t *testing.T) {
+func TestTransliterate(t *testing.T) {
 	store := keymap.NewKeymapStore()
 	if err := store.LoadKeymaps("../../keymaps"); err != nil {
 		fmt.Printf("Failed to load keymaps: %v\n", err)

@@ -6,9 +6,9 @@ import (
 	"aks.go/internal/core"
 )
 
-// TestContext_Reset tests the Reset method of the Context struct.
+// TestContextReset tests the Reset method of the Context struct.
 // It verifies that the context state is cleared after calling Reset.
-func TestContext_Reset(t *testing.T) {
+func TestContextReset(t *testing.T) {
 	ctx := NewContext()
 
 	// Update the context

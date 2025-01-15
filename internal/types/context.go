@@ -2,82 +2,147 @@ package types
 
 import (
 	"strings"
+
 	"aks.go/internal/core"
 )
 
 // Context represents the current state of transliteration processing,
 // including the latest lookup result and contextual information.
 type Context struct {
-	LatestLookup core.LookupResult // Tracks the result of the last lookup
-	CurrentContext string // The current context marker (e.g., "M", "x")
+	LatestLookup   core.LookupResult // Tracks the result of the last lookup
+	CurrentContext string            // The current context marker (e.g., "M", "x")
+	Input          string            // The full input string being processed
+	Position       int               // Current position in the input string
 }
 
 // NewContext creates a new Context instance with default values.
 func NewContext() *Context {
 	return &Context{
-		LatestLookup: core.LookupResult{
-			Output:   "",
-			Category: "",
-		},
+		LatestLookup:   core.LookupResult{},
 		CurrentContext: "",
+		Input:          "",
+		Position:       0,
 	}
 }
 
-// Reset clears the context state, setting LatestLookup to its default values.
+// Reset clears the context state, setting all fields to their default values.
 func (ctx *Context) Reset() {
-	ctx.LatestLookup = core.LookupResult{
-		Output:   "",
-		Category: "",
-	}
+	ctx.LatestLookup = core.LookupResult{}
+	ctx.CurrentContext = ""
+	ctx.Input = ""
+	ctx.Position = 0
 }
 
 // ContextualRule represents a rule for modifying output based on context.
 type ContextualRule struct {
-	ChangePrevious bool   // [c] flag
-	RequiredContext string // [M] - required context for rule to apply
-	NewContext     string // [m] - context to set after applying rule
-	Modification   string // The actual modification to apply
+	ChangePrevious     bool   // (c) flag
+	RequiredContext    string // (M) - required context for rule to apply
+	NewContext         string // (m) - context to set after applying rule
+	WhitespaceRequired bool   // (W) flag - requires next char to be whitespace or EOS
+	Modification       string // The actual modification to apply
+}
+
+// IsSeparator checks if the next character in the input is a separator (whitespace, punctuation, etc.)
+// or if we're at the end of input. A separator is any character that's not part of a consonant or vowel.
+func (ctx *Context) IsSeparator() bool {
+	// Check if we're at the end of the input
+	if ctx.Position >= len(ctx.Input) {
+		return true
+	}
+
+	// Get the next character
+	nextChar := ctx.Input[ctx.Position+1:]
+	if len(nextChar) == 0 {
+		return true
+	}
+
+	// Check if it's a whitespace, punctuation, or any non-letter character
+	next := nextChar[0]
+	return next == ' ' || next == '.' || next == ',' || next == '?' || next == '!' ||
+		next == ';' || next == ':' || next == '(' || next == ')' || next == '[' ||
+		next == ']' || next == '{' || next == '}' || next == '-' || next == '_' ||
+		next == '\n' || next == '\t' || next == '\r'
+}
+
+// ShouldApplyRule determines if a contextual rule should be applied based on all conditions
+func (ctx *Context) ShouldApplyRule(rule ContextualRule) bool {
+	// Check context requirement
+	if rule.RequiredContext != "" && rule.RequiredContext != ctx.CurrentContext {
+		return false
+	}
+
+	// Check whitespace requirement
+	if rule.WhitespaceRequired && !ctx.IsSeparator() {
+		return false
+	}
+
+	return true
+}
+
+// parseRule extracts a single contextual rule from a rule string
+func parseRule(ruleStr string) (ContextualRule, bool) {
+	var rule ContextualRule
+	if len(ruleStr) < 1 {
+		return rule, false
+	}
+
+	switch ruleStr[0] {
+	case 'W':
+		rule.WhitespaceRequired = true
+		rule.Modification = ruleStr[1:]
+	case 'c':
+		rule.ChangePrevious = true
+		rule.Modification = ruleStr[1:]
+	case 'M':
+		rule.RequiredContext = ruleStr
+	case 'x':
+		rule.NewContext = ruleStr
+	default:
+		return rule, false
+	}
+	return rule, true
 }
 
 // ParseContextualRules parses the RHS string to extract contextual rules.
 // Returns the base output and any contextual rules found.
 func ParseContextualRules(rhs string) (string, []ContextualRule) {
 	var rules []ContextualRule
-	var baseOutput string
 
-	// Split the RHS into parts by parentheses
-	parts := strings.Split(rhs, "(")
-	baseOutput = parts[0]
+	// Find the first rule marker
+	firstRule := strings.Index(rhs, "(")
+	if firstRule == -1 {
+		return rhs, nil // No rules found
+	}
 
-	for _, part := range parts[1:] {
-		if !strings.HasSuffix(part, ")") {
+	// Extract base output (text before first rule)
+	baseOutput := rhs[:firstRule]
+
+	// Split remaining string into segments
+	segments := strings.Split(rhs[firstRule:], ")")
+
+	for i, segment := range segments {
+		if len(segment) == 0 {
 			continue
 		}
-		part = strings.TrimSuffix(part, ")")
 
-		rule := ContextualRule{}
-
-		switch {
-		case strings.HasPrefix(part, "c"):
-			// Change previous character rule
-			rule.ChangePrevious = true
-			part = strings.TrimPrefix(part, "c")
-			fallthrough
-
-		case strings.HasPrefix(part, "M") || strings.HasPrefix(part, "x"):
-			if strings.HasPrefix(part, "M") {
-				// Context check rule
-				rule.RequiredContext = string(part[0])
-				part = part[1:]
+		// Extract rule content from parentheses
+		ruleStart := strings.Index(segment, "(")
+		if ruleStart == -1 {
+			// This is a modification for the previous rule
+			if len(rules) > 0 {
+				rules[len(rules)-1].Modification = segment
 			}
-			if len(part) > 0 {
-				// Context update rule
-				rule.NewContext = string(part[0])
-				part = part[1:]
-			}
-			if len(part) > 0 {
-				// Remaining part is the modification
-				rule.Modification = part
+			continue
+		}
+
+		ruleContent := segment[ruleStart+1:]
+		if rule, valid := parseRule(ruleContent); valid {
+			// Check for modification text before next rule
+			if i < len(segments)-1 {
+				nextRuleStart := strings.Index(segments[i+1], "(")
+				if nextRuleStart > 0 {
+					rule.Modification = segments[i+1][:nextRuleStart]
+				}
 			}
 			rules = append(rules, rule)
 		}
@@ -93,8 +158,8 @@ func (ctx *Context) ApplyContextualRules(rules []ContextualRule, builder *string
 	modified := false
 
 	for _, rule := range rules {
-		// Skip if required context doesn't match
-		if rule.RequiredContext != "" && rule.RequiredContext != ctx.CurrentContext {
+		// Check if rule should be applied
+		if !ctx.ShouldApplyRule(rule) {
 			continue
 		}
 

@@ -59,11 +59,13 @@ func (a *Aksharamala) TransliterateWithKeymap(id, input string) (string, error) 
 func (a *Aksharamala) Transliterate(input string) string {
 	// Reset context for a clean state
 	a.context = types.NewContext()
+	a.context.Input = input
 	a.viramaHandler = types.NewViramaHandler(a.viramaHandler.Mode, a.viramaHandler.Virama, a.context)
 
 	var result strings.Builder
 	length := len(input)
 	for i := 0; i < length; {
+		a.context.Position = i
 		foundMatch := false
 
 		// Handle space character
@@ -98,10 +100,12 @@ func (a *Aksharamala) Transliterate(input string) string {
 					baseOutput, rules := types.ParseContextualRules(lookupResult.Output)
 					lookupResult.Output = baseOutput
 
-					// Apply virama if needed
-					nextCategory := a.getCategory(lookupResult.Output)
-					if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
-						result.WriteString(a.viramaHandler.Virama)
+					// Only add virama for regular consonants, not for word boundary markers
+					if lookupResult.Category != "word_boundary" {
+						nextCategory := a.getCategory(lookupResult.Output)
+						if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
+							result.WriteString(a.viramaHandler.Virama)
+						}
 					}
 
 					result.WriteString(lookupResult.Output)
@@ -129,10 +133,14 @@ func (a *Aksharamala) Transliterate(input string) string {
 				baseOutput, rules := types.ParseContextualRules(lookupResult.Output)
 				lookupResult.Output = baseOutput
 
-				nextCategory := a.getCategory(lookupResult.Output)
-				if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
-					result.WriteString(a.viramaHandler.Virama)
+				// Only add virama for regular consonants, not for word boundary markers
+				if lookupResult.Category != "word_boundary" {
+					nextCategory := a.getCategory(lookupResult.Output)
+					if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
+						result.WriteString(a.viramaHandler.Virama)
+					}
 				}
+
 				result.WriteString(lookupResult.Output)
 
 				// Apply any contextual rules
@@ -165,11 +173,29 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 		for _, mapping := range section.Mappings.Entries() {
 			for _, lhs := range mapping.LHS {
 				if lhs == combination {
-					// Use matra (RHS[1]) if the previous character is a consonant
-					if category == "vowels" && a.context.LatestLookup.Category == "consonants" && len(mapping.RHS) > 1 {
-						return core.LookupResult{Output: mapping.RHS[1], Category: category}
+					rhs := mapping.RHS
+					if len(rhs) == 0 {
+						continue
 					}
-					return core.LookupResult{Output: mapping.RHS[0], Category: category} // Use full form otherwise
+
+					// Check for word boundary variants first
+					if len(rhs) > 1 {
+						// Check if the second option has a word boundary condition
+						if strings.Contains(rhs[1], "(W)") {
+							if a.context.IsSeparator() {
+								// Remove the (W) marker and return the rest
+								output := strings.Replace(rhs[1], "(W)", "", 1)
+								// Mark this as a special category so virama isn't added
+								return core.LookupResult{Output: output, Category: "word_boundary"}
+							}
+						} else if category == "vowels" && a.context.LatestLookup.Category == "consonants" {
+							// Use matra if the previous character is a consonant
+							return core.LookupResult{Output: rhs[1], Category: category}
+						}
+					}
+					
+					// Use first option as default
+					return core.LookupResult{Output: rhs[0], Category: category}
 				}
 			}
 		}

@@ -59,11 +59,13 @@ func TestTransliterate(t *testing.T) {
 		input    string
 		expected string
 	}{
-		// {"namastE", "నమస్తే"},
+		{"namastE", "నమస్తే"},
 		{"kka", "క్క"},
 		{"ka", "క"},
 		{"a1k", "అ1క్"},
 		{"daas", "దాస్"},
+		{"jeevitam", "జీవితం"},
+		{"avasaram.", "అవసరం."},
 		{"", ""}, // Edge case: empty string
 	}
 
@@ -75,10 +77,10 @@ func TestTransliterate(t *testing.T) {
 			"ee rOju oka AnaMdamaina sudinamu. nEnu chAlA saMtOshaMgaa kotta vishayaalu nErchukOvaDaMlO utsaahaMgaa unnAnu.",
 			"ఈ రోజు ఒక ఆనందమైన సుదినము. నేను చాలా సంతోషంగా కొత్త విషయాలు నేర్చుకోవడంలో ఉత్సాహంగా ఉన్నాను.",
 		},
-		// {
-		// 	"jeevitam aaScharyaala to nindinadi. prati avakaasAnni dhairyamtho mariyu nammakamto sviikarinchadam manaku avasaram.",
-		// 	"జీవితం ఆశ్చర్యాల తో నిందునాది. ప్రతి అవకాసాన్ని ధైర్యంతో మరియు నమ్మకంతో స్వీకరించడం మనకు అవసరం.",
-		// },
+		{
+			"jeevitam aaScharyaala tO niMDinadi. prati avakaasAnni dhairyaMtO mariyu nammakaMtO sviikariMchaDam manaku avasaram.",
+			"జీవితం ఆశ్చర్యాల తో నిండినది. ప్రతి అవకాసాన్ని ధైర్యంతో మరియు నమ్మకంతో స్వీకరించడం మనకు అవసరం.",
+		},
 	}
 
 	// Consolidate all the Telugu RTS tests and run them

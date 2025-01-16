@@ -58,6 +58,64 @@ go run ./cmd/akt_converter convert -input myfile.akt -output myfile.aksj -dry-ru
 4. **Logger**:
    - Provides configurable logging (debug/production modes).
 
+See the following architecture diagram for a detailed overview of the components and their interactions:
+
+```mermaid
+flowchart TB
+    subgraph Main Application
+        CLI[CLI Interface]
+        Logger[Logger System]
+    end
+
+    subgraph Core Engine
+        Aks[Aksharamala Engine]
+        Trans[Transliteration Processor]
+        Context[Context Manager]
+    end
+
+    subgraph Keymap Management
+        KStore[Keymap Store]
+        KLoader[Keymap Loader]
+        Lookup[Lookup Table]
+    end
+
+    subgraph Types and Rules
+        Scheme[Transliteration Scheme]
+        Rules[Contextual Rules]
+        Virama[Virama Handler]
+    end
+
+    subgraph Format Conversion
+        Conv[AKT Converter]
+        Parser[Keymap Parser]
+        Format[JSON Formatter]
+    end
+
+    %% Connections
+    CLI --> Logger
+    CLI --> Aks
+    CLI --> Conv
+
+    Aks --> KStore
+    Aks --> Trans
+    Trans --> Context
+    Trans --> Virama
+
+    KStore --> KLoader
+    KStore --> Lookup
+    KLoader --> Parser
+    
+    Parser --> Scheme
+    Scheme --> Rules
+    
+    Conv --> Parser
+    Conv --> Format
+    
+    %% Data flow
+    Keymap[(.aksj Files)] --> KLoader
+    AKT[(.akt Files)] --> Conv
+```
+
 ## Roadmap
 ### Completed
 - Basic `.akt` to `.aksj` conversion.

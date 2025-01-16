@@ -16,9 +16,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-gradient-to-r from-blue-500 to-indigo-500 text-gray-800 antialiased font-sans">
+  <body class="bg-gradient-to-r from-blue-500 to-indigo-500 text-gray-800 antialiased font-sans min-h-screen flex flex-col">
     <!-- Root Div for React -->
-    <div id="root" class="container mx-auto">
+    <div id="root" class="flex-grow container mx-auto">
       <!-- Main Content -->
       <div class="min-h-screen flex flex-col items-center justify-start pt-12">
         <!-- Header Section -->
@@ -100,13 +100,9 @@
     </div>
 
     <!-- Footer -->
-    <footer class="container py-6 mt-12 text-center text-gray-200">
-      <p class="text-sm">
-        &copy; 2025 Aksharamala. All rights reserved.
-      </p>
-      <p class="text-sm mt-2">
-        Made with ❤️ using Tailwind CSS
-      </p>
+    <footer class="py-6 text-center text-gray-200">
+      <p class="text-sm">&copy; 2025 Aksharamala. All rights reserved.</p>
+      <p class="text-sm mt-2">Made with ❤️ using Tailwind CSS</p>
     </footer>
 
     <script type="module" src="/src/main.tsx"></script>

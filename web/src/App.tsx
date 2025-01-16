@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Footer from './Footer'
 
 const Navbar = () => {
   return (
@@ -89,46 +90,14 @@ function App() {
               Transliteration Help
             </h2>
             <p className="text-lg text-primary-700 mb-6 font-['Plus_Jakarta_Sans']">
-              Type Roman letters to get the corresponding Indic script. Choose your preferred scheme:
+              Type Roman letters to get the corresponding Indic script.
             </p>
-            <ul className="space-y-4 text-lg text-primary-600 mb-6">
-              <li className="flex items-start">
-                <span className="flex-shrink-0 w-24 font-semibold">ITRANS</span>
-                <span className="mx-2">—</span>
-                <span>
-                  Used for Hindi and Marathi{' '}
-                  <a
-                    href="https://www.aczoom.com/itrans/html/tblall/tblall.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary-700 hover:text-primary-900 underline decoration-2 underline-offset-2"
-                  >
-                    (View Scheme)
-                  </a>
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="flex-shrink-0 w-24 font-semibold">RTS</span>
-                <span className="mx-2">—</span>
-                <span>
-                  Rice Transliteration System for Telugu{' '}
-                  <a
-                    href="https://web.cs.ucdavis.edu/~vemuri/Grammar/2.%20RTS.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary-700 hover:text-primary-900 underline decoration-2 underline-offset-2"
-                  >
-                    (View Scheme)
-                  </a>
-                </span>
-              </li>
-            </ul>
             <div className="text-primary-700 p-4 bg-primary-50 rounded-xl">
               <span className="font-medium">Example:</span> Type{' '}
               <code className="px-2 py-1 bg-white rounded-md font-mono text-primary-700">
                 namaste
               </code>{' '}
-              with Hindi scheme to get नमस्ते
+              with ITRANS scheme to get नमस्ते
             </div>
           </div>
         </header>
@@ -230,6 +199,7 @@ function App() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     </div>
   )

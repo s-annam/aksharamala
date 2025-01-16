@@ -7,7 +7,7 @@ const tcpPortUsed = require(path.resolve(__dirname, '../web/node_modules/tcp-por
 async function checkPort(port) {
     return new Promise((resolve) => {
         const cmd = process.platform === 'win32'
-            ? `powershell.exe -NoProfile -Command "Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue"`
+            ? `powershell.exe -NoProfile -Command "Get-NetTCPConnection -LocalPort ${port} | Select-Object -ExpandProperty OwningProcess"`
             : `lsof -i :${port} -t`;
 
         exec(cmd, (error, stdout, stderr) => {
@@ -17,47 +17,51 @@ async function checkPort(port) {
                 resolve(false);
                 return;
             }
-            resolve(!!stdout.trim());
+
+            const pids = stdout
+                .split('\n')
+                .map((line) => line.trim())
+                .filter((line) => line && !isNaN(line)); // Ensure we only keep numeric values
+
+            if (pids.length > 0) {
+                console.log(`Port ${port} is occupied by PID(s): ${pids.join(', ')}`);
+                resolve(true);
+            } else {
+                console.log(`Port ${port} is free.`);
+                resolve(false);
+            }
         });
     });
 }
 
 // Helper to kill processes by port
 async function killProcessOnPort(port) {
-    const cmd = process.platform === 'win32'
-        ? `netstat -ano | findstr :${port}`
-        : `lsof -i :${port} -t`;
-
     return new Promise((resolve) => {
-        exec(cmd, async (error, stdout) => {
+        const cmd = process.platform === 'win32'
+            ? `powershell.exe -NoProfile -Command "Get-NetTCPConnection -LocalPort ${port} | ForEach-Object {Stop-Process -Id $_.OwningProcess -Force}"`
+            : `lsof -i :${port} -t | xargs kill -9`;
+
+        exec(cmd, async (error, stdout, stderr) => {
             if (error) {
-                console.error(`Error executing ${cmd}:`, error.message);
+                console.error(`Error executing ${cmd}: ${error.message}`);
+                console.error(stderr);
                 resolve(false);
                 return;
             }
 
-            const pids = stdout.split('\n')
-                .map(line => line.trim().split(/\s+/).pop()) // Extract the PID
-                .filter(pid => !isNaN(pid));
+            console.log(`Successfully freed port ${port}.`);
 
-            for (const pid of pids) {
-                try {
-                    process.platform === 'win32'
-                        ? exec(`taskkill /F /PID ${pid}`)
-                        : exec(`kill -9 ${pid}`);
-                } catch (e) {
-                    // Ignore errors if process is already gone
+            // Double-check if the port is still in use
+            setTimeout(async () => {
+                const stillInUse = await checkPort(port);
+                if (stillInUse) {
+                    console.error(`Port ${port} is still occupied! Attempting to kill again...`);
+                    await killProcessOnPort(port);
+                } else {
+                    console.log(`Port ${port} is now free.`);
                 }
-            }
-
-            // Wait and verify
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            const stillInUse = await checkPort(port);
-            if (stillInUse) {
-                console.error(`Failed to free port ${port}.`);
-            }
-
-            resolve();
+                resolve();
+            }, 1000);
         });
     });
 }
@@ -102,18 +106,29 @@ async function main() {
         console.error('Failed to start frontend:', err);
     });
 
-    const cleanup = () => {
-        if (goServer && !goServer.killed) goServer.kill();
-        if (frontend && !frontend.killed) frontend.kill();
+    const cleanup = async () => {
+        console.log('Cleaning up...');
+    
+        await killProcessOnPort(8080);
+        await killProcessOnPort(5173);
+        await killProcessOnPort(5174);
+    
+        console.log('Cleanup complete. Exiting...');
         process.exit();
     };
-
+    
     process.on('exit', cleanup);
-    process.on('SIGINT', cleanup);
-    process.on('SIGTERM', cleanup);
-    process.on('uncaughtException', (err) => {
+    process.on('SIGINT', async () => {
+        console.log('Received SIGINT (Ctrl+C), performing cleanup...');
+        await cleanup();
+    });
+    process.on('SIGTERM', async () => {
+        console.log('Received SIGTERM, performing cleanup...');
+        await cleanup();
+    });
+    process.on('uncaughtException', async (err) => {
         console.error('Uncaught exception:', err);
-        cleanup();
+        await cleanup();
     });
 
     console.log('\nDevelopment servers started!');

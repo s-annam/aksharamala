@@ -1,20 +1,23 @@
 const { spawn, exec } = require('child_process');
 const process = require('process');
 const path = require('path');
+const tcpPortUsed = require(path.resolve(__dirname, '../web/node_modules/tcp-port-used'));
 
 // Helper to check if port is in use
 async function checkPort(port) {
     return new Promise((resolve) => {
         const cmd = process.platform === 'win32'
-            ? `netstat -ano | findstr :${port}`
+            ? `powershell.exe -NoProfile -Command "Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue"`
             : `lsof -i :${port} -t`;
 
-        exec(cmd, (error, stdout) => {
-            if (error || !stdout) {
+        exec(cmd, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error executing ${cmd}: ${error.message}`);
+                console.error(stderr);
                 resolve(false);
                 return;
             }
-            resolve(true);
+            resolve(!!stdout.trim());
         });
     });
 }
@@ -27,16 +30,15 @@ async function killProcessOnPort(port) {
 
     return new Promise((resolve) => {
         exec(cmd, async (error, stdout) => {
-            if (error || !stdout) {
-                resolve();
+            if (error) {
+                console.error(`Error executing ${cmd}:`, error.message);
+                resolve(false);
                 return;
             }
 
             const pids = stdout.split('\n')
-                .map(line => process.platform === 'win32'
-                    ? line.split(/\s+/).pop()
-                    : line.trim())
-                .filter(Boolean);
+                .map(line => line.trim().split(/\s+/).pop()) // Extract the PID
+                .filter(pid => !isNaN(pid));
 
             for (const pid of pids) {
                 try {
@@ -50,12 +52,9 @@ async function killProcessOnPort(port) {
 
             // Wait and verify
             await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Check if port is still in use
             const stillInUse = await checkPort(port);
             if (stillInUse) {
-                console.log(`Port ${port} is still in use. Attempting to kill again...`);
-                await killProcessOnPort(port); // Recursive call
+                console.error(`Failed to free port ${port}.`);
             }
 
             resolve();
@@ -67,57 +66,59 @@ async function main() {
     console.log('Stopping any existing processes...');
 
     // Kill existing processes
-    await killProcessOnPort(8081); // Go server
-    await killProcessOnPort(5173); // Vite dev server
-    await killProcessOnPort(5174); // Backup Vite port
+    await killProcessOnPort(8080);
+    await killProcessOnPort(5173);
+    await killProcessOnPort(5174);
 
     // Verify ports are free
     const port5173InUse = await checkPort(5173);
     const port5174InUse = await checkPort(5174);
-    const port8081InUse = await checkPort(8081);
+    const port8080InUse = await checkPort(8080);
 
-    if (port5173InUse || port5174InUse || port8081InUse) {
+    if (port5173InUse || port5174InUse || port8080InUse) {
         console.error('Unable to free required ports. Please check running processes manually.');
         process.exit(1);
     }
 
     console.log('Starting development servers...');
 
-    // Start Go server
     const goServer = spawn('go', ['run', 'cmd/webserver/main.go'], {
         cwd: path.join(__dirname, '..'),
         stdio: 'inherit',
-        shell: true
+        shell: true,
     });
 
     goServer.on('error', (err) => {
         console.error('Failed to start Go server:', err);
     });
 
-    // Start frontend
     const frontend = spawn('npm', ['start'], {
         cwd: path.join(__dirname, '..', 'web'),
         stdio: 'inherit',
-        shell: true
+        shell: true,
     });
 
     frontend.on('error', (err) => {
         console.error('Failed to start frontend:', err);
     });
 
-    // Handle cleanup on exit
     const cleanup = () => {
-        goServer.kill();
-        frontend.kill();
+        if (goServer && !goServer.killed) goServer.kill();
+        if (frontend && !frontend.killed) frontend.kill();
         process.exit();
     };
 
+    process.on('exit', cleanup);
     process.on('SIGINT', cleanup);
     process.on('SIGTERM', cleanup);
+    process.on('uncaughtException', (err) => {
+        console.error('Uncaught exception:', err);
+        cleanup();
+    });
 
     console.log('\nDevelopment servers started!');
     console.log('Frontend: http://localhost:5173');
-    console.log('Backend: http://localhost:8081\n');
+    console.log('Backend: http://localhost:8080\n');
     console.log('Press Ctrl+C to stop both servers.\n');
 }
 

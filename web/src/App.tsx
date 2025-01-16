@@ -1,5 +1,26 @@
 import { useState, useEffect } from 'react'
 
+const Navbar = () => {
+  return (
+    <nav className="bg-blue-600 text-white shadow-md fixed top-0 w-full z-10">
+      <div className="container mx-auto flex items-center justify-between px-4 py-2">
+        <a href="/" className="text-lg font-bold">Aksharamala</a>
+        <div className="space-x-4">
+          <a href="/" className="hover:underline">Home</a>
+          <a href="/history" className="hover:underline">History</a>
+          <a href="/docs" className="hover:underline">Documentation</a>
+          <a href="https://github.com/your-repo" target="_blank" rel="noopener noreferrer" className="hover:underline">
+            GitHub
+          </a>
+          <a href="/about" className="hover:underline">About</a>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export { Navbar };
+
 interface Keymap {
   id: string;
   name: string;
@@ -51,7 +72,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 font-['Plus_Jakarta_Sans']">
+    <div className="min-h-screen font-['Plus_Jakarta_Sans']">
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <header className="text-center mb-16">

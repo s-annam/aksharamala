@@ -4,12 +4,111 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aksharamala</title>
+
+    <!-- Preconnect for Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="bg-gradient-to-r from-blue-500 to-indigo-500 text-gray-800 antialiased font-sans">
+    <!-- Root Div for React -->
+    <div id="root" class="container mx-auto">
+      <!-- Main Content -->
+      <div class="min-h-screen flex flex-col items-center justify-start pt-12">
+        <!-- Header Section -->
+        <header class="text-center mb-16">
+          <h1 class="text-6xl font-bold text-white mb-4 animate-fade-in">Aksharamala</h1>
+          <p class="text-xl text-gray-200 mb-12">Indic Script Transliteration</p>
+          <div class="bg-white/50 backdrop-blur-md border border-primary-200 rounded-2xl p-8 shadow-xl">
+            <h2 class="text-2xl font-semibold text-primary-900 mb-4">Transliteration Help</h2>
+            <p class="text-lg text-primary-700 mb-6">
+              Type Roman letters to get the corresponding Indic script. Choose your preferred scheme:
+            </p>
+            <ul class="space-y-4 text-lg text-primary-600 mb-6">
+              <li class="flex items-start">
+                <span class="flex-shrink-0 w-24 font-semibold">ITRANS</span>
+                <span class="mx-2">—</span>
+                <span>
+                  Used for Hindi and Marathi
+                  <a
+                    href="https://www.aczoom.com/itrans/html/tblall/tblall.html"
+                    class="text-primary-700 hover:text-primary-900 underline"
+                  >
+                    (View Scheme)
+                  </a>
+                </span>
+              </li>
+              <li class="flex items-start">
+                <span class="flex-shrink-0 w-24 font-semibold">RTS</span>
+                <span class="mx-2">—</span>
+                <span>
+                  Rice Transliteration System for Telugu
+                  <a
+                    href="https://web.cs.ucdavis.edu/~vemuri/Grammar/2.%20RTS.pdf"
+                    class="text-primary-700 hover:text-primary-900 underline"
+                  >
+                    (View Scheme)
+                  </a>
+                </span>
+              </li>
+            </ul>
+            <div class="text-primary-700 p-4 bg-primary-50 rounded-xl">
+              <span class="font-medium">Example:</span> Type
+              <code class="px-2 py-1 bg-white rounded-md font-mono text-primary-700">namaste</code>
+              with Hindi scheme to get नमस्ते
+            </div>
+          </div>
+        </header>
+
+        <!-- Select Script Section -->
+        <section class="w-full max-w-4xl bg-white/70 backdrop-blur-md border border-primary-200 rounded-2xl p-8 shadow-lg">
+          <h2 class="text-xl font-semibold text-primary-900 mb-4">Select Script</h2>
+          <select
+            class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="" disabled selected>Select a script...</option>
+            <option value="hindi">Hindi</option>
+            <option value="telugu">Telugu</option>
+          </select>
+        </section>
+
+        <!-- Input/Output Section -->
+        <section class="w-full max-w-4xl mt-8 grid grid-cols-2 gap-8 bg-white/70 backdrop-blur-md border border-primary-200 rounded-2xl p-8 shadow-lg">
+          <div>
+            <h3 class="text-lg font-semibold text-primary-900 mb-2">Input Text</h3>
+            <textarea
+              class="w-full border border-gray-300 rounded-lg p-2 h-32 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              placeholder="Enter text to transliterate..."
+            ></textarea>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-primary-900 mb-2">Output Text</h3>
+            <textarea
+              class="w-full border border-gray-300 rounded-lg p-2 h-32 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              placeholder="Transliterated text will appear here..."
+              readonly
+            ></textarea>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="container py-6 mt-12 text-center text-gray-200">
+      <p class="text-sm">
+        &copy; 2025 Aksharamala. All rights reserved.
+      </p>
+      <p class="text-sm mt-2">
+        Made with ❤️ using Tailwind CSS
+      </p>
+    </footer>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

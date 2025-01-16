@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "*.aksj": "json"
-    }
+    },
+    "css.lint.unknownAtRules": "ignore"
 }

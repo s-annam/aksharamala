@@ -2,7 +2,6 @@ package translit
 
 import (
 	"strings"
-	"unicode/utf8"
 
 	"aks.go/internal/types"
 )
@@ -19,56 +18,52 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 
 	var result strings.Builder
 	runes := []rune(input)
+	length := len(runes)
 
-	for i := 0; i < len(runes); {
+	for i := 0; i < length; {
 		a.context.Position = i
+		foundMatch := false
 
-		// 1. Try full conjunct matches first
-		fullStr := string(runes[i:])
-		lookup := a.lookup(fullStr)
-		if lookup.Found && lookup.Category == "conjuncts" {
-			if viramaMode == types.NormalMode {
-				result.WriteString(lookup.Output + virama)
-			} else {
-				result.WriteString(lookup.Output)
-			}
-			i += utf8.RuneCountInString(fullStr) // Skip the full conjunct
-			continue
-		}
+		// Greedily match substrings to find the longest match
+		for j := length - i; j > 0; j-- {
+			if i+j <= length {
+				substr := string(runes[i : i+j])
+				lookup := a.lookup(substr)
 
-		// 2. Single character handling
-		lookup = a.lookup(string(runes[i]))
-		if !lookup.Found {
-			result.WriteString(string(runes[i]))
-			i++
-			continue
-		}
+				if lookup.Found {
+					// Handle based on category
+					switch lookup.Category {
+					case "consonants":
+						result.WriteString(lookup.Output)
+						// Add virama if we're at the end OR if next char isn't a matra
+						if i+j >= length ||
+							(i+j < length && a.lookup(string(runes[i+j])).Category != "matras") {
+							if viramaMode == types.NormalMode {
+								result.WriteString(virama)
+							} else if viramaMode == types.SmartMode && !a.context.IsSeparator() {
+								result.WriteString(virama)
+							}
+						}
+					case "matras":
+						if lookup.Output != "\u0000" { // Ignore empty matra
+							result.WriteString(lookup.Output)
+						}
+					case "vowels", "others", "digits":
+						result.WriteString(lookup.Output)
+					}
 
-		// 3. Check if the next charcter is a matra
-		matraUpNext := false
-		if i+1 < len(runes) && a.lookup(string(runes[i+1])).Category == "matras" {
-			matraUpNext = true
-		}
-
-		switch lookup.Category {
-		case "consonants":
-			result.WriteString(lookup.Output)
-			if !matraUpNext { // No virama if matra is up next
-				if viramaMode == types.NormalMode {
-					result.WriteString(virama)
-				} else if viramaMode == types.SmartMode && !a.context.IsSeparator() {
-					result.WriteString(virama)
+					i += j // Move the index forward by the length of the match
+					foundMatch = true
+					break
 				}
 			}
-		case "matras":
-			if lookup.Output != "\u0000" { // Ignore empty matra
-				result.WriteString(lookup.Output)
-			}
-		case "vowels", "others", "digits":
-			result.WriteString(lookup.Output)
 		}
 
-		i++
+		// If no match was found, copy the character as is
+		if !foundMatch {
+			result.WriteString(string(runes[i]))
+			i++
+		}
 	}
 
 	return result.String(), nil

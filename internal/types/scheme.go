@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"unicode/utf8"
 
 	"aks.go/internal/core"
 )
@@ -133,20 +132,6 @@ func (s *TransliterationScheme) Validate() error {
 
 	if len(missingFields) > 0 {
 		return fmt.Errorf("mandatory fields missing: %s", strings.Join(missingFields, ", "))
-	}
-
-	// Additional validation for Reversliteration schemes
-	if s.Scheme == "Unicode" {
-		for category, section := range s.Categories {
-			for _, mapping := range section.Mappings.All() {
-				for _, lhs := range mapping.LHS {
-					if utf8.RuneCountInString(lhs) > 1 && category != "conjuncts" {
-						return fmt.Errorf("in Unicode scheme '%s', category '%s' contains multi-character sequence '%s' - should be in conjuncts section",
-							s.ID, category, lhs)
-					}
-				}
-			}
-		}
 	}
 
 	return nil

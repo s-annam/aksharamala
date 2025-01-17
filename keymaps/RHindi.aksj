@@ -11,19 +11,6 @@
   "scheme": "Unicode",
   "metadata": {"virama":"a, smart"},
   "categories": {
-    "conjuncts": [
-      {"lhs":["क्ष"],"rhs":["x","ax"],"comment":"x = ksh"},
-      {"lhs":["ज्ञ"],"rhs":["GY","aGY"],"comment":"GY = dny"},
-      {"lhs":["्‌"],"rhs":[".h"]},
-      {"lhs":["क़","क़"],"rhs":["q","aq"]},
-      {"lhs":["ख़","ख़"],"rhs":["K","aK"]},
-      {"lhs":["ग़","ग़"],"rhs":["G","aG"]},
-      {"lhs":["ज़","ज़"],"rhs":["z","az"]},
-      {"lhs":["ड़","ड़"],"rhs":[".D","a.D"]},
-      {"lhs":["ढ़","ढ़"],"rhs":[".Dh","a.Dh"]},
-      {"lhs":["फ़","फ़"],"rhs":["f","af"]},
-      {"lhs":["य़","य़"],"rhs":["Y","aY"]}
-    ],
     "consonants": [
       {"lhs":["क"],"rhs":["k","ak"]},
       {"lhs":["ख"],"rhs":["kh","akh"]},
@@ -61,7 +48,18 @@
       {"lhs":["श"],"rhs":["S","aS"]},
       {"lhs":["ष"],"rhs":["Sh","aSh"]},
       {"lhs":["स"],"rhs":["s","as"]},
-      {"lhs":["ह"],"rhs":["h","ah"]}
+      {"lhs":["ह"],"rhs":["h","ah"]},
+      {"lhs":["क्ष"],"rhs":["x","ax"],"comment":"x = ksh"},
+      {"lhs":["ज्ञ"],"rhs":["GY","aGY"],"comment":"GY = dny"},
+      {"lhs":["्‌"],"rhs":[".h"]},
+      {"lhs":["क़","क़"],"rhs":["q","aq"]},
+      {"lhs":["ख़","ख़"],"rhs":["K","aK"]},
+      {"lhs":["ग़","ग़"],"rhs":["G","aG"]},
+      {"lhs":["ज़","ज़"],"rhs":["z","az"]},
+      {"lhs":["ड़","ड़"],"rhs":[".D","a.D"]},
+      {"lhs":["ढ़","ढ़"],"rhs":[".Dh","a.Dh"]},
+      {"lhs":["फ़","फ़"],"rhs":["f","af"]},
+      {"lhs":["य़","य़"],"rhs":["Y","aY"]}
     ],
     "digits": [
       {"lhs":["०"],"rhs":["0"]},

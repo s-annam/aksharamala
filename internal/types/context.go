@@ -58,7 +58,9 @@ func (ctx *Context) IsSeparator() bool {
 	nextRune := runes[ctx.Position+1]
 
 	// Check if it's a separator (whitespace, punctuation, or non-letter)
-	return unicode.IsSpace(nextRune) || unicode.IsPunct(nextRune) || !unicode.IsLetter(nextRune)
+	// IsLetter() alone is not enough as it doesn't include combining marks
+	return unicode.IsSpace(nextRune) || unicode.IsPunct(nextRune) ||
+		!(unicode.IsLetter(nextRune) || unicode.IsMark(nextRune))
 }
 
 // ShouldApplyRule determines if a contextual rule should be applied based on all conditions

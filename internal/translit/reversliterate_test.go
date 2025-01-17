@@ -37,7 +37,7 @@ func TestReversliterate(t *testing.T) {
 		{"नमस्ते", "namaste", "basic word with conjunct"},
 		{"प्रेम", "prem", "word with ra-conjunct"},
 		{"क्षमा", "xamaa", "word starting with special conjunct"},
-		{"ज्ञान", "GYan", "word with special conjunct and long vowel"},
+		{"ज्ञान", "GYaan", "word with special conjunct and long vowel"},
 
 		// Complex cases
 		{"संस्कृत", "saMskRRit", "complex word with anusvara and vocalic r"},

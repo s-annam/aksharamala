@@ -9,18 +9,17 @@ type OrderedCategories struct {
 }
 
 // OrderedCategoriesMap returns an OrderedCategories instance with categories arranged
-// in a predefined order: conjuncts, consonants, matras, vowels, digits, vedic, others,
+// in a predefined order: consonants, matras, vowels, digits, vedic, others,
 // followed by any remaining categories in alphabetical order.
 func (s *TransliterationScheme) OrderedCategoriesMap() *OrderedCategories {
 	// Define the priority order
 	priorityOrder := map[string]int{
-		"conjuncts":  0,
-		"consonants": 1,
-		"matras":     2,
-		"vowels":     3,
-		"digits":     4,
-		"vedic":      5,
-		"others":     6,
+		"consonants": 0,
+		"matras":     1,
+		"vowels":     2,
+		"digits":     3,
+		"vedic":      4,
+		"others":     5,
 	}
 
 	// Collect all category names

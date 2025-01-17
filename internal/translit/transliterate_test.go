@@ -134,7 +134,7 @@ func TestContextualMapping(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := aks.Transliterate(test.input)
+			result, _ := aks.Transliterate(test.input)
 			if result != test.expected {
 				t.Errorf("Test %s failed:\nexpected: %q\ngot: %q",
 					test.name, test.expected, result)
@@ -147,7 +147,7 @@ func translit(t *testing.T, aks *Aksharamala, test struct {
 	input    string
 	expected string
 }) {
-	output := aks.Transliterate(test.input)
+	output, _ := aks.Transliterate(test.input)
 	if output != test.expected {
 		t.Errorf("For input '%s': expected '%s', got '%s'", test.input, test.expected, output)
 	} else {

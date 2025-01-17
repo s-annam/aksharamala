@@ -53,7 +53,7 @@ function App() {
 
     setIsLoading(true)
     try {
-      const response = await fetch('/api/transliterate', {
+      const response = await fetch('/api/m', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

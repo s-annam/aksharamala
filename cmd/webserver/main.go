@@ -57,17 +57,19 @@ func main() {
 
 		// Get keymaps from the store
 		keymaps := []Keymap{
-			{ID: "Hindi", Name: "Hindi (Devanagari)"},
-			{ID: "Marathi", Name: "Marathi (Devanagari)"},
-			{ID: "TeluguRts", Name: "Telugu (RTS)"},
+			{ID: "Hindi", Name: "Hindi (ITRANS -> Unicode)"},
+			{ID: "Marathi", Name: "Marathi (ITRANS -> Unicode)"},
+			{ID: "TeluguRts", Name: "Telugu (RTS -> Unicode)"},
+			{ID: "RHindi", Name: "Hindi (Unicode -> ITRANS)"},
+			{ID: "RSanskrit", Name: "Sanskrit (Unicode -> ITRANS)"},
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(keymaps)
 	})
 
-	// Transliterate endpoint
-	http.HandleFunc("/api/transliterate", func(w http.ResponseWriter, r *http.Request) {
+	// Map the given text using the selected keymap
+	http.HandleFunc("/api/m", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return

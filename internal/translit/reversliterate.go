@@ -1,11 +1,26 @@
 package translit
 
 import (
+	"fmt"
 	"strings"
 
 	"aks.go/internal/core"
 	"aks.go/internal/types"
 )
+
+// ReversliterateWithKeymap performs reversliteration of text (generally from Unicode to ITRANS).
+func (a *Aksharamala) ReversliterateWithKeymap(id, input string) (string, error) {
+	if err := a.SetActiveKeymap(id); err != nil {
+		return "", err
+	}
+
+	// Check if this is a Unicode scheme
+	if a.activeScheme.Scheme != "Unicode" {
+		return "", fmt.Errorf("reversliteration is only supported for Unicode schemes")
+	}
+
+	return a.Reversliterate(input)
+}
 
 func (a *Aksharamala) Reversliterate(input string) (string, error) {
 	// Reset context for a clean state

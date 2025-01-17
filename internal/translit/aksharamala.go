@@ -204,6 +204,8 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 						continue
 					}
 
+					matchLen := len([]rune(combination))
+
 					// Check for word boundary variants first
 					if len(rhs) > 1 {
 						// Check if the second option has a word boundary condition
@@ -212,20 +214,35 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 								// Remove the (W) marker and return the rest
 								output := strings.Replace(rhs[1], "(W)", "", 1)
 								// Mark this as a special category so virama isn't added
-								result = core.LookupResult{Output: output, Category: "word_boundary", Found: true}
+								result = core.LookupResult{
+									Output:      output,
+									Category:    "word_boundary",
+									Found:       true,
+									MatchLength: matchLen,
+								}
 								found = true
 								return false // Stop iteration
 							}
 						} else if category == "vowels" && a.context.LatestLookup.Category == "consonants" {
 							// Use matra if the previous character is a consonant
-							result = core.LookupResult{Output: rhs[1], Category: category, Found: true}
+							result = core.LookupResult{
+								Output:      rhs[1],
+								Category:    category,
+								Found:       true,
+								MatchLength: matchLen,
+							}
 							found = true
 							return false // Stop iteration
 						}
 					}
 
 					// Use first option as default
-					result = core.LookupResult{Output: rhs[0], Category: category, Found: true}
+					result = core.LookupResult{
+						Output:      rhs[0],
+						Category:    category,
+						Found:       true,
+						MatchLength: matchLen,
+					}
 					found = true
 					return false // Stop iteration
 				}
@@ -237,7 +254,13 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 	if found {
 		return result
 	}
-	return core.LookupResult{Output: "", Category: "other", Found: false} // No match found
+	// No match found
+	return core.LookupResult{
+		Output:      "",
+		Category:    "other",
+		Found:       false,
+		MatchLength: 0,
+	}
 }
 
 // getCategoryForRHS determines which category a character belongs to

@@ -76,6 +76,7 @@ func TestTransliterate(t *testing.T) {
 		{
 			"ee rOju oka AnaMdamaina sudinamu. nEnu chAlA saMtOshaMgaa kotta vishayaalu nErchukOvaDaMlO utsaahaMgaa unnAnu.",
 			"ఈ రోజు ఒక ఆనందమైన సుదినము. నేను చాలా సంతోషంగా కొత్త విషయాలు నేర్చుకోవడంలో ఉత్సాహంగా ఉన్నాను.",
+			// ఈ రోజు ఒక ఆనందమైంఅ సుదినము. నేను చాలా సంతోషంగా కొత్త విషయాలు నేర్చుకోవడంలో ఉత్సాహంగా ఉన్నాను.
 		},
 		{
 			"jeevitam aaScharyaala tO niMDinadi. prati avakaasAnni dhairyaMtO mariyu nammakaMtO sviikariMchaDam manaku avasaram.",

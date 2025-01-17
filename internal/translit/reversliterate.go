@@ -3,6 +3,7 @@ package translit
 import (
 	"strings"
 
+	"aks.go/internal/core"
 	"aks.go/internal/types"
 )
 
@@ -31,6 +32,8 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 				lookup := a.lookup(substr)
 
 				if lookup.Found {
+					a.context.LatestLookup = lookup
+
 					// Handle based on category
 					switch lookup.Category {
 					case "consonants":
@@ -62,6 +65,12 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 		// If no match was found, copy the character as is
 		if !foundMatch {
 			result.WriteString(string(runes[i]))
+			a.context.LatestLookup = core.LookupResult{
+				Output:      string(runes[i]),
+				Category:    "other",
+				Found:       false,
+				MatchLength: 1,
+			}
 			i++
 		}
 	}

@@ -2,10 +2,11 @@ package core
 
 // LookupResult represents the result of a lookup operation.
 type LookupResult struct {
-	Output    string // Primary output (first RHS)
-	AltOutput string // Alternate output (second RHS)
-	Category  string // Category of the mapping
-	Found     bool   // Whether the lookup found a match
+	Output      string // Primary output (first RHS)
+	AltOutput   string // Alternate output (second RHS)
+	Category    string // Category of the mapping
+	Found       bool   // Whether the lookup found a match
+	MatchLength int    // Length of the current match in runes
 }
 
 // LookupTable maps input strings to their lookup results

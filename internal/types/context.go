@@ -43,24 +43,28 @@ type ContextualRule struct {
 	Modification       string // The actual modification to apply
 }
 
-// IsSeparator checks if the next character in the input is a separator (whitespace, punctuation, etc.)
-// or if we're at the end of input. A separator is any character that's not part of a consonant or vowel.
+// IsSeparator checks if we're at a word boundary position in the input
 func (ctx *Context) IsSeparator() bool {
 	// Get all runes from the input
 	runes := []rune(ctx.Input)
 
-	// Check if we're at the last position
-	if ctx.Position+1 >= len(runes) {
+	// Get the next position
+	length := ctx.LatestLookup.MatchLength
+	if !ctx.LatestLookup.Found {
+		length = 1
+	}
+	nextPos := ctx.Position + length
+
+	// Check if we're at the end of input
+	if nextPos >= len(runes) {
 		return true
 	}
 
-	// Get the next rune
-	nextRune := runes[ctx.Position+1]
+	// Get the rune at the next position
+	nextRune := runes[nextPos]
 
-	// Check if it's a separator (whitespace, punctuation, or non-letter)
-	// IsLetter() alone is not enough as it doesn't include combining marks
-	return unicode.IsSpace(nextRune) || unicode.IsPunct(nextRune) ||
-		!(unicode.IsLetter(nextRune) || unicode.IsMark(nextRune))
+	// Check if it's a separator (whitespace, punctuation, or non-letter/non-mark)
+	return unicode.IsSpace(nextRune) || unicode.IsPunct(nextRune) || !(unicode.IsLetter(nextRune) || unicode.IsMark(nextRune))
 }
 
 // ShouldApplyRule determines if a contextual rule should be applied based on all conditions

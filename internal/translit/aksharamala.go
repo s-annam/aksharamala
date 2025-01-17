@@ -191,7 +191,11 @@ func (a *Aksharamala) Transliterate(input string) string {
 // lookup finds the transliteration for the given string.
 // Returns the LookupResult for the character.
 func (a *Aksharamala) lookup(combination string) core.LookupResult {
-	for category, section := range a.activeScheme.Categories {
+	var result core.LookupResult
+	found := false
+
+	orderedCats := a.activeScheme.OrderedCategoriesMap()
+	orderedCats.Range(func(category string, section types.Section) bool {
 		for _, mapping := range section.Mappings.All() {
 			for _, lhs := range mapping.LHS {
 				if lhs == combination {
@@ -208,21 +212,32 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 								// Remove the (W) marker and return the rest
 								output := strings.Replace(rhs[1], "(W)", "", 1)
 								// Mark this as a special category so virama isn't added
-								return core.LookupResult{Output: output, Category: "word_boundary"}
+								result = core.LookupResult{Output: output, Category: "word_boundary", Found: true}
+								found = true
+								return false // Stop iteration
 							}
 						} else if category == "vowels" && a.context.LatestLookup.Category == "consonants" {
 							// Use matra if the previous character is a consonant
-							return core.LookupResult{Output: rhs[1], Category: category}
+							result = core.LookupResult{Output: rhs[1], Category: category, Found: true}
+							found = true
+							return false // Stop iteration
 						}
 					}
 
 					// Use first option as default
-					return core.LookupResult{Output: rhs[0], Category: category}
+					result = core.LookupResult{Output: rhs[0], Category: category, Found: true}
+					found = true
+					return false // Stop iteration
 				}
 			}
 		}
+		return true // Continue to next category
+	})
+
+	if found {
+		return result
 	}
-	return core.LookupResult{Output: "", Category: "other"} // No match found
+	return core.LookupResult{Output: "", Category: "other", Found: false} // No match found
 }
 
 // getCategoryForRHS determines which category a character belongs to

@@ -8,6 +8,10 @@ import (
 )
 
 func (a *Aksharamala) Reversliterate(input string) (string, error) {
+	// Reset context for a clean state
+	a.context = types.NewContext()
+	a.context.Input = input
+
 	virama, viramaMode, err := types.ParseVirama(a.activeScheme.Metadata.Virama)
 	if err != nil {
 		return "", err
@@ -17,6 +21,8 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 	runes := []rune(input)
 
 	for i := 0; i < len(runes); {
+		a.context.Position = i
+
 		// 1. Try full conjunct matches first
 		fullStr := string(runes[i:])
 		lookup := a.lookup(fullStr)
@@ -47,8 +53,12 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 		switch lookup.Category {
 		case "consonants":
 			result.WriteString(lookup.Output)
-			if !matraUpNext {
-				result.WriteString(virama)
+			if !matraUpNext { // No virama if matra is up next
+				if viramaMode == types.NormalMode {
+					result.WriteString(virama)
+				} else if viramaMode == types.SmartMode && !a.context.IsSeparator() {
+					result.WriteString(virama)
+				}
 			}
 		case "matras":
 			if lookup.Output != "\u0000" { // Ignore empty matra

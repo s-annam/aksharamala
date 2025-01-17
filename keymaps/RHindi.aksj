@@ -73,9 +73,7 @@
       {"lhs":["६"],"rhs":["6"]},
       {"lhs":["७"],"rhs":["7"]},
       {"lhs":["८"],"rhs":["8"]},
-      {"lhs":["९"],"rhs":["9"]},
-      {"lhs":["॰"],"rhs":["_ABBR_"],"comment":"Hindi abbreviation sign"},
-      {"lhs":["."],"rhs":["\\."],"comment":"ASCII period"}
+      {"lhs":["९"],"rhs":["9"]}
     ],
     "matras": [
       {"lhs":["ा"],"rhs":["aa"]},
@@ -94,20 +92,23 @@
       {"lhs":["ॢ"],"rhs":["LLi"],"comment":"Vocalic L sign"},
       {"lhs":["ॣ"],"rhs":["LLI"],"comment":"Vocalic LL sign"},
       {"lhs":["्"],"rhs":["\u0000"]},
-      {"lhs":["ँ"],"rhs":[".N"],"comment":"candrabindu"},
+      {"lhs":["ँ"],"rhs":[".N"],"comment":"candrabindu"}
+    ],
+    "others": [
+      {"lhs":["ॐ"],"rhs":["_AUM_"], "comment":"om"},
+      {"lhs":["।"],"rhs":["."],"comment":"danda"},
+      {"lhs":["॥"],"rhs":[".."],"comment":"double danda"},
       {"lhs":["ं"],"rhs":["M"],"comment":"anusvara"},
       {"lhs":["ः"],"rhs":["H"],"comment":"visarga"},
+      {"lhs":["ँ"],"rhs":[".N"],"comment":"candrabindu"},
       {"lhs":["॑"],"rhs":["\\`"],"comment":"udatta"},
       {"lhs":["॒"],"rhs":["\\_"],"comment":"anudatta"},
       {"lhs":["॓"],"rhs":["`"],"comment":"grave accent"},
       {"lhs":["॔"],"rhs":["\\/"],"comment":"acute accent"},
-      {"lhs":["ऽ"],"rhs":[".a"]}
-    ],
-    "others": [
-      {"lhs":["ॐ"],"rhs":["AUM"]},
-      {"lhs":["।"],"rhs":["."],"comment":"danda"},
-      {"lhs":["॥"],"rhs":[".."],"comment":"double danda"}
-    ],
+      {"lhs":["ऽ"],"rhs":[".a"]},
+      {"lhs":["॰"],"rhs":["_ABBR_"],"comment":"Sanskrit abbreviation sign"},
+      {"lhs":["."],"rhs":["\\."],"comment":"ASCII period"}
+  ],
     "vowels": [
       {"lhs":["अ"],"rhs":["a"]},
       {"lhs":["आ"],"rhs":["A"]},

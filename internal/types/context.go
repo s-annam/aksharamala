@@ -2,6 +2,7 @@ package types
 
 import (
 	"strings"
+	"unicode"
 
 	"aks.go/internal/core"
 )
@@ -45,23 +46,19 @@ type ContextualRule struct {
 // IsSeparator checks if the next character in the input is a separator (whitespace, punctuation, etc.)
 // or if we're at the end of input. A separator is any character that's not part of a consonant or vowel.
 func (ctx *Context) IsSeparator() bool {
-	// Check if we're at the end of the input
-	if ctx.Position >= len(ctx.Input) {
+	// Get all runes from the input
+	runes := []rune(ctx.Input)
+
+	// Check if we're at the last position
+	if ctx.Position+1 >= len(runes) {
 		return true
 	}
 
-	// Get the next character
-	nextChar := ctx.Input[ctx.Position+1:]
-	if len(nextChar) == 0 {
-		return true
-	}
+	// Get the next rune
+	nextRune := runes[ctx.Position+1]
 
-	// Check if it's a whitespace, punctuation, or any non-letter character
-	next := nextChar[0]
-	return next == ' ' || next == '.' || next == ',' || next == '?' || next == '!' ||
-		next == ';' || next == ':' || next == '(' || next == ')' || next == '[' ||
-		next == ']' || next == '{' || next == '}' || next == '-' || next == '_' ||
-		next == '\n' || next == '\t' || next == '\r'
+	// Check if it's a separator (whitespace, punctuation, or non-letter)
+	return unicode.IsSpace(nextRune) || unicode.IsPunct(nextRune) || !unicode.IsLetter(nextRune)
 }
 
 // ShouldApplyRule determines if a contextual rule should be applied based on all conditions

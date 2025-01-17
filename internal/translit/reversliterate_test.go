@@ -22,25 +22,25 @@ func TestReversliterate(t *testing.T) {
 		expected string
 		desc     string
 	}{
-		// Basic consonants (should include 'a' in smart mode)
-		{"क", "ka", "single consonant"},
-		{"ख", "kha", "single aspirated consonant"},
-		{"ग", "ga", "single voiced consonant"},
+		// Basic consonants (should not include 'a' in smart mode)
+		{"क", "k", "single consonant"},
+		{"ख", "kh", "single aspirated consonant"},
+		{"ग", "g", "single voiced consonant"},
 
 		// Conjuncts and clusters
-		{"क्ष", "xa", "special conjunct ksha"},
-		{"ज्ञ", "GYa", "special conjunct gya"},
-		{"क्क", "kka", "geminated consonant"},
-		{"त्त", "tta", "geminated dental"},
+		{"क्ष", "x", "special conjunct ksha"},
+		{"ज्ञ", "GY", "special conjunct gya"},
+		{"क्क", "kk", "geminated consonant"},
+		{"त्त", "tt", "geminated dental"},
 
 		// Words with implicit 'a'
 		{"नमस्ते", "namaste", "basic word with conjunct"},
-		{"प्रेम", "prema", "word with ra-conjunct"},
+		{"प्रेम", "prem", "word with ra-conjunct"},
 		{"क्षमा", "xamaa", "word starting with special conjunct"},
-		{"ज्ञान", "GYaana", "word with special conjunct and long vowel"},
+		{"ज्ञान", "GYan", "word with special conjunct and long vowel"},
 
 		// Complex cases
-		{"संस्कृत", "saMskRRita", "complex word with anusvara and vocalic r"},
+		{"संस्कृत", "saMskRRit", "complex word with anusvara and vocalic r"},
 		{"हिंदी", "hiMdI", "word with anusvara and long vowel"},
 	}
 
@@ -72,16 +72,16 @@ func TestReversliterate(t *testing.T) {
 		expected string
 		desc     string
 	}{
-		// Basic consonants (should not include 'a' in normal mode)
-		{"क", "k", "single consonant"},
-		{"ख", "kh", "single aspirated consonant"},
-		{"ग", "g", "single voiced consonant"},
+		// Basic consonants (should include 'a' in normal mode)
+		{"क", "ka", "single consonant"},
+		{"ख", "kha", "single aspirated consonant"},
+		{"ग", "ga", "single voiced consonant"},
 
 		// Special consonants and clusters
-		{"क्ष", "x", "special conjunct ksha"},
-		{"ज्ञ", "GY", "special conjunct gya"},
-		{"क्क", "k", "geminated initial k"}, // Different from smart mode!
-		{"त्त", "t", "geminated initial t"}, // Different from smart mode!
+		{"क्ष", "xa", "special conjunct ksha"},
+		{"ज्ञ", "GYa", "special conjunct gya"},
+		{"क्क", "kka", "geminated initial k"}, // Different from smart mode!
+		{"त्त", "tta", "geminated initial t"}, // Different from smart mode!
 
 		// Sanskrit words
 		{"धर्म", "dharma", "basic word with ra-conjunct"},

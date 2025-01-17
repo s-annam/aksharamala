@@ -55,53 +55,29 @@ func (a *Aksharamala) lookupForReversliteration(str string) core.LookupResult {
 }
 
 func (a *Aksharamala) Reversliterate(input string) (string, error) {
-	_, viramaMode, err := types.ParseVirama(a.activeScheme.Metadata.Virama)
+	virama, viramaMode, err := types.ParseVirama(a.activeScheme.Metadata.Virama)
 	if err != nil {
 		return "", err
 	}
 
 	var result strings.Builder
 	runes := []rune(input)
-	var lastResult core.LookupResult
 
 	for i := 0; i < len(runes); {
 		// 1. Try full conjunct matches first
 		fullStr := string(runes[i:])
 		lookup := a.lookupForReversliteration(fullStr)
 		if lookup.Found && lookup.Category == "conjuncts" {
-			if viramaMode == types.SmartMode {
-				result.WriteString(lookup.Output + "a")
+			if viramaMode == types.NormalMode {
+				result.WriteString(lookup.Output + virama)
 			} else {
 				result.WriteString(lookup.Output)
 			}
-			lastResult = lookup
 			i += utf8.RuneCountInString(fullStr) // Skip the full conjunct
 			continue
 		}
 
-		// 2. Look for geminated consonants
-		if i+2 < len(runes) {
-			currentChar := string(runes[i])
-			currentLookup := a.lookupForReversliteration(currentChar)
-			if currentLookup.Category == "consonants" {
-				if string(runes[i+1]) == "्" {
-					nextChar := string(runes[i+2])
-					nextLookup := a.lookupForReversliteration(nextChar)
-					if nextLookup.Found && nextLookup.Output == currentLookup.Output {
-						if viramaMode == types.SmartMode {
-							result.WriteString(currentLookup.Output + currentLookup.Output + "a")
-						} else {
-							result.WriteString(currentLookup.Output)
-						}
-						lastResult = currentLookup
-						i += 3
-						continue
-					}
-				}
-			}
-		}
-
-		// 3. Single character handling
+		// 2. Single character handling
 		lookup = a.lookupForReversliteration(string(runes[i]))
 		if !lookup.Found {
 			result.WriteString(string(runes[i]))
@@ -109,22 +85,28 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 			continue
 		}
 
+		// 3. Check if the next charcter is a matra
+		matraUpNext := false
+		if i+1 < len(runes) && a.lookupForReversliteration(string(runes[i+1])).Category == "matras" {
+			matraUpNext = true
+		}
+
 		switch lookup.Category {
 		case "consonants":
-			if lastResult.Category == "consonants" && viramaMode == types.SmartMode && lookup.AltOutput != "" {
-				result.WriteString(lookup.AltOutput)
-			} else if viramaMode == types.SmartMode {
-				result.WriteString(lookup.Output + "a")
-			} else {
-				result.WriteString(lookup.Output)
+			result.WriteString(lookup.Output)
+			if viramaMode == types.NormalMode {
+				if !matraUpNext {
+					result.WriteString(virama)
+				}
 			}
 		case "matras":
-			result.WriteString(lookup.Output)
+			if lookup.Output != "\u0000" { // Ignore empty matra
+				result.WriteString(lookup.Output)
+			}
 		case "vowels", "others", "digits":
 			result.WriteString(lookup.Output)
 		}
 
-		lastResult = lookup
 		i++
 	}
 

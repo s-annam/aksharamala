@@ -59,15 +59,6 @@ func (m *Mappings) Validate(category, schemeID string) error {
 	return nil
 }
 
-// ToLookupTable adds mappings to a LookupTable with the specified category.
-func (m *Mappings) ToLookupTable(category string, table LookupTable) {
-	for _, entry := range m.entries {
-		for _, lhs := range entry.LHS {
-			table[lhs] = LookupResult{Output: entry.RHS[0], Category: category}
-		}
-	}
-}
-
 // All returns all mappings in the collection as a slice.
 // This is used both for general access and JSON marshaling.
 func (m *Mappings) All() []Mapping {
@@ -77,19 +68,6 @@ func (m *Mappings) All() []Mapping {
 // NewMappings initializes a Mappings instance from a slice of Mapping.
 func NewMappings(entries []Mapping) Mappings {
 	return Mappings{entries: entries}
-}
-
-// Lookup performs a lookup for the given LHS and returns the corresponding RHS.
-// It returns a boolean indicating if the mapping was found.
-func (m *Mappings) Lookup(lhs string) (string, bool) {
-	for _, entry := range m.entries {
-		for _, lhsCandidate := range entry.LHS {
-			if lhsCandidate == lhs {
-				return entry.RHS[0], true
-			}
-		}
-	}
-	return "", false
 }
 
 // ValidateAll checks the integrity of all mappings in the collection.

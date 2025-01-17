@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"aks.go/internal/core"
 )
@@ -134,24 +135,21 @@ func (s *TransliterationScheme) Validate() error {
 		return fmt.Errorf("mandatory fields missing: %s", strings.Join(missingFields, ", "))
 	}
 
-	return nil
-}
-
-// BuildLookupTable constructs a precomputed lookup table from a transliteration scheme.
-// It returns the constructed lookup table.
-func BuildLookupTable(scheme *TransliterationScheme) core.LookupTable {
-	table := make(core.LookupTable)
-	for category, section := range scheme.Categories {
-		for _, mapping := range section.Mappings.All() {
-			for _, lhs := range mapping.LHS {
-				table[lhs] = core.LookupResult{
-					Output:   mapping.RHS[0],
-					Category: category,
+	// Additional validation for Reversliteration schemes
+	if s.Scheme == "Unicode" {
+		for category, section := range s.Categories {
+			for _, mapping := range section.Mappings.All() {
+				for _, lhs := range mapping.LHS {
+					if utf8.RuneCountInString(lhs) > 1 && category != "conjuncts" {
+						return fmt.Errorf("in Unicode scheme '%s', category '%s' contains multi-character sequence '%s' - should be in conjuncts section",
+							s.ID, category, lhs)
+					}
 				}
 			}
 		}
 	}
-	return table
+
+	return nil
 }
 
 // ToCompactTransliterationScheme converts a TransliterationScheme to a CompactTransliterationScheme.

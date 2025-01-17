@@ -54,6 +54,28 @@ func (a *Aksharamala) TransliterateWithKeymap(id, input string) (string, error) 
 	return a.Transliterate(input), nil
 }
 
+// TransliterateWithDirection performs transliteration in either direction based on the scheme type.
+// If the active scheme is Unicode, it performs reversliteration.
+// Otherwise, it performs normal transliteration.
+func (a *Aksharamala) TransliterateWithDirection(id, input string) (string, error) {
+	if err := a.SetActiveKeymap(id); err != nil {
+		return "", err
+	}
+
+	// Check if this is a Unicode scheme
+	if a.activeScheme.Scheme == "Unicode" {
+		return a.Reversliterate(input)
+	}
+
+	// Regular transliteration
+	return a.Transliterate(input), nil
+}
+
+// IsUnicodeScheme returns true if the current active scheme is a Unicode scheme
+func (a *Aksharamala) IsUnicodeScheme() bool {
+	return a.activeScheme != nil && a.activeScheme.Scheme == "Unicode"
+}
+
 // Transliterate performs transliteration for the input string using the active scheme.
 // Returns the transliterated string.
 func (a *Aksharamala) Transliterate(input string) string {
@@ -102,7 +124,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 
 					// Only add virama for regular consonants, not for word boundary markers
 					if lookupResult.Category != "word_boundary" {
-						nextCategory := a.getCategory(lookupResult.Output)
+						nextCategory := a.getCategoryForRHS(lookupResult.Output)
 						if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
 							result.WriteString(a.viramaHandler.Virama)
 						}
@@ -135,7 +157,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 
 				// Only add virama for regular consonants, not for word boundary markers
 				if lookupResult.Category != "word_boundary" {
-					nextCategory := a.getCategory(lookupResult.Output)
+					nextCategory := a.getCategoryForRHS(lookupResult.Output)
 					if a.viramaHandler.ShouldInsertVirama(lookupResult.Output, nextCategory) {
 						result.WriteString(a.viramaHandler.Virama)
 					}
@@ -193,7 +215,7 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 							return core.LookupResult{Output: rhs[1], Category: category}
 						}
 					}
-					
+
 					// Use first option as default
 					return core.LookupResult{Output: rhs[0], Category: category}
 				}
@@ -203,9 +225,8 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 	return core.LookupResult{Output: "", Category: "other"} // No match found
 }
 
-// getCategory determines the category of the output character.
-// Returns the category as a string.
-func (a *Aksharamala) getCategory(output string) string {
+// getCategoryForRHS determines which category a character belongs to
+func (a *Aksharamala) getCategoryForRHS(output string) string {
 	for category, section := range a.activeScheme.Categories {
 		for _, mapping := range section.Mappings.All() {
 			for _, rhs := range mapping.RHS {

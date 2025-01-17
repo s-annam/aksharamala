@@ -131,52 +131,6 @@ func TestFullJSONOutput(t *testing.T) {
 	}
 }
 
-// TestBuildLookupTable tests the building of a lookup table from a TransliterationScheme.
-// It verifies that the lookup table is constructed correctly based on the scheme.
-func TestBuildLookupTable(t *testing.T) {
-	scheme := &TransliterationScheme{
-		Categories: map[string]Section{
-			"consonants": {
-				Mappings: core.NewMappings([]core.Mapping{
-					{LHS: []string{"k"}, RHS: []string{"क"}},
-					{LHS: []string{"kh"}, RHS: []string{"ख"}},
-				}),
-			},
-			"vowels": {
-				Mappings: core.NewMappings([]core.Mapping{
-					{LHS: []string{"a"}, RHS: []string{"अ"}},
-				}),
-			},
-		},
-	}
-
-	table := BuildLookupTable(scheme)
-
-	// Test valid lookups
-	tests := []struct {
-		input    string
-		expected core.LookupResult
-	}{
-		{"k", core.LookupResult{Output: "क", Category: "consonants"}},
-		{"a", core.LookupResult{Output: "अ", Category: "vowels"}},
-	}
-
-	for _, test := range tests {
-		result := table.Lookup(test.input)
-		if result != test.expected {
-			t.Errorf("For input '%s': expected %+v, got %+v", test.input, test.expected, result)
-		} else {
-			t.Logf("For input '%s': got expected result %+v", test.input, result)
-		}
-	}
-
-	// Test invalid lookup
-	result := table.Lookup("z")
-	if result.Output != "" || result.Category != "other" {
-		t.Errorf("For input 'z': expected empty output and 'other' category, got %+v", result)
-	}
-}
-
 // TestFindMapping tests the FindMapping method of TransliterationScheme.
 // It verifies that mappings can be found by any of their LHS entries.
 func TestFindMapping(t *testing.T) {
@@ -206,12 +160,12 @@ func TestFindMapping(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		searchLHS     []string
-		wantSection   string
-		wantIndex     int
-		wantFound     bool
-		description   string
+		name        string
+		searchLHS   []string
+		wantSection string
+		wantIndex   int
+		wantFound   bool
+		description string
 	}{
 		{
 			name:        "find by first LHS entry",

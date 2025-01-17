@@ -1,22 +1,39 @@
 package core
 
 // LookupResult represents the result of a lookup operation.
-// It contains the output string and the category of the character.
 type LookupResult struct {
-	Output   string // The transliterated output for the character
-	Category string // The category of the character (e.g., consonant, vowel)
+	Output    string // Primary output (first RHS)
+	AltOutput string // Alternate output (second RHS)
+	Category  string // Category of the mapping
+	Found     bool   // Whether the lookup found a match
 }
 
-// Precomputed lookup table for efficient transliteration.
+// LookupTable maps input strings to their lookup results
 type LookupTable map[string]LookupResult
 
-// Lookup performs a fast lookup using the precomputed table.
-// It takes a character as input and returns the corresponding LookupResult.
-// If the character is not found, it returns a LookupResult with an empty output
-// and the category set to "other".
+// Lookup performs a fast lookup using the table
 func (table LookupTable) Lookup(char string) LookupResult {
 	if result, exists := table[char]; exists {
 		return result
 	}
-	return LookupResult{Output: "", Category: "other"}
+	return LookupResult{Found: false, Category: "other"}
+}
+
+// Lookup maintains the same simple interface but uses direct mapping
+func (m *Mappings) Lookup(lhs string) (string, bool) {
+	// Create a simple lookup table just from this mapping's entries
+	table := make(LookupTable)
+	for _, entry := range m.entries {
+		for _, lhsEntry := range entry.LHS {
+			if len(entry.RHS) > 0 {
+				table[lhsEntry] = LookupResult{
+					Output: entry.RHS[0],
+					Found:  true,
+				}
+			}
+		}
+	}
+
+	result := table.Lookup(lhs)
+	return result.Output, result.Found
 }

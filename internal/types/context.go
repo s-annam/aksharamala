@@ -44,16 +44,28 @@ type ContextualRule struct {
 }
 
 // IsSeparator checks if we're at a word boundary position in the input
-func (ctx *Context) IsSeparator() bool {
+func (ctx *Context) IsSeparator(optMatchLen ...int) bool {
 	// Get all runes from the input
 	runes := []rune(ctx.Input)
 
-	// Get the next position
-	length := ctx.LatestLookup.MatchLength
+	// Determine which match length to use
+
+	// Get the match length from the latest lookup
+	matchLen := ctx.LatestLookup.MatchLength
+
+	// If no lookup is found, default to 1
 	if !ctx.LatestLookup.Found {
-		length = 1
+		matchLen = 1
 	}
-	nextPos := ctx.Position + length
+
+	// Override with custom match length if provided
+	// This is used for when IsSeparator is called from lookup
+	if len(optMatchLen) > 0 && optMatchLen[0] > 0 {
+		matchLen = optMatchLen[0]
+	}
+
+	// Get the next position
+	nextPos := ctx.Position + matchLen
 
 	// Check if we're at the end of input
 	if nextPos >= len(runes) {

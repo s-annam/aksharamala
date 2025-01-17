@@ -191,11 +191,7 @@ func (a *Aksharamala) Transliterate(input string) string {
 // lookup finds the transliteration for the given string.
 // Returns the LookupResult for the character.
 func (a *Aksharamala) lookup(combination string) core.LookupResult {
-	var result core.LookupResult
-	found := false
-
-	orderedCats := a.activeScheme.OrderedCategoriesMap()
-	orderedCats.Range(func(category string, section types.Section) bool {
+	for category, section := range a.activeScheme.Categories {
 		for _, mapping := range section.Mappings.All() {
 			for _, lhs := range mapping.LHS {
 				if lhs == combination {
@@ -210,50 +206,40 @@ func (a *Aksharamala) lookup(combination string) core.LookupResult {
 					if len(rhs) > 1 {
 						// Check if the second option has a word boundary condition
 						if strings.Contains(rhs[1], "(W)") {
-							if a.context.IsSeparator() {
+							if a.context.IsSeparator(matchLen) {
 								// Remove the (W) marker and return the rest
 								output := strings.Replace(rhs[1], "(W)", "", 1)
 								// Mark this as a special category so virama isn't added
-								result = core.LookupResult{
+								return core.LookupResult{
 									Output:      output,
 									Category:    "word_boundary",
 									Found:       true,
 									MatchLength: matchLen,
 								}
-								found = true
-								return false // Stop iteration
 							}
 						} else if category == "vowels" && a.context.LatestLookup.Category == "consonants" {
 							// Use matra if the previous character is a consonant
-							result = core.LookupResult{
+							return core.LookupResult{
 								Output:      rhs[1],
 								Category:    category,
 								Found:       true,
 								MatchLength: matchLen,
 							}
-							found = true
-							return false // Stop iteration
 						}
 					}
 
 					// Use first option as default
-					result = core.LookupResult{
+					return core.LookupResult{
 						Output:      rhs[0],
 						Category:    category,
 						Found:       true,
 						MatchLength: matchLen,
 					}
-					found = true
-					return false // Stop iteration
 				}
 			}
 		}
-		return true // Continue to next category
-	})
-
-	if found {
-		return result
 	}
+
 	// No match found
 	return core.LookupResult{
 		Output:      "",

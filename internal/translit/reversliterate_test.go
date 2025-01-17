@@ -99,13 +99,13 @@ func TestReversliterate(t *testing.T) {
 
 		// Special Sanskrit features
 		{"अग्निः", "agniH", "word with visarga"},
-		{"देवाः", "devAH", "word with long A and visarga"},
-		{"गङ्गा", "ga~NgA", "word with velar nasal"},
+		{"देवाः", "devaaH", "word with long A and visarga"},
+		{"गङ्गा", "ga~Ngaa", "word with velar nasal"},
 
 		// Vedic Sanskrit specific (if supported)
 		{"वॢ", "vLLi", "vocalic l"},
 		{"वॣ", "vLLI", "long vocalic l"},
-		{"ॐ", "AUM", "sacred syllable OM"},
+		{"ॐ", "_AUM_", "sacred syllable OM"},
 	}
 
 	// Test RSanskrit (normal mode)

@@ -64,7 +64,7 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 	var lastResult core.LookupResult
 
 	for i := 0; i < len(runes); {
-		// Try to find a conjunct first - start with the longest possible sequence
+		// Try conjuncts first
 		maxLen := len(runes) - i
 		foundConjunct := false
 
@@ -84,29 +84,37 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 			}
 		}
 
-		if !foundConjunct {
-			// Single character processing
-			lookup := a.lookupForReversliteration(string(runes[i]))
-			if !lookup.Found {
-				result.WriteString(string(runes[i]))
-				i++
-				continue
-			}
+		if foundConjunct {
+			continue
+		}
 
-			if lookup.Category == "consonants" {
-				if lastResult.Category == "consonants" && viramaMode == types.SmartMode && lookup.AltOutput != "" {
-					result.WriteString(lookup.AltOutput)
-				} else if viramaMode == types.SmartMode {
-					result.WriteString(lookup.Output + "a")
-				} else {
-					result.WriteString(lookup.Output)
-				}
+		// Handle single character
+		lookup := a.lookupForReversliteration(string(runes[i]))
+		if !lookup.Found {
+			result.WriteString(string(runes[i]))
+			i++
+			continue
+		}
+
+		switch lookup.Category {
+		case "consonants":
+			if lastResult.Category == "consonants" && viramaMode == types.SmartMode && lookup.AltOutput != "" {
+				result.WriteString(lookup.AltOutput)
+			} else if viramaMode == types.SmartMode {
+				result.WriteString(lookup.Output + "a")
 			} else {
 				result.WriteString(lookup.Output)
 			}
-			lastResult = lookup
-			i++
+		case "matras":
+			// For matras, just output the base form (first RHS)
+			// This handles cases like े -> e (not ae)
+			result.WriteString(lookup.Output)
+		case "vowels", "others", "digits":
+			result.WriteString(lookup.Output)
 		}
+
+		lastResult = lookup
+		i++
 	}
 
 	return result.String(), nil

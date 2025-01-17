@@ -2,6 +2,7 @@ package translit
 
 import (
 	"strings"
+	"unicode/utf8"
 
 	"aks.go/internal/core"
 	"aks.go/internal/types"
@@ -64,32 +65,44 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 	var lastResult core.LookupResult
 
 	for i := 0; i < len(runes); {
-		// Try conjuncts first
-		maxLen := len(runes) - i
-		foundConjunct := false
-
-		for length := maxLen; length > 1; length-- {
-			candidateStr := string(runes[i : i+length])
-			lookup := a.lookupForReversliteration(candidateStr)
-			if lookup.Found && lookup.Category == "conjuncts" {
-				if viramaMode == types.SmartMode {
-					result.WriteString(lookup.Output + "a")
-				} else {
-					result.WriteString(lookup.Output)
-				}
-				lastResult = lookup
-				i += length
-				foundConjunct = true
-				break
+		// 1. Try full conjunct matches first
+		fullStr := string(runes[i:])
+		lookup := a.lookupForReversliteration(fullStr)
+		if lookup.Found && lookup.Category == "conjuncts" {
+			if viramaMode == types.SmartMode {
+				result.WriteString(lookup.Output + "a")
+			} else {
+				result.WriteString(lookup.Output)
 			}
-		}
-
-		if foundConjunct {
+			lastResult = lookup
+			i += utf8.RuneCountInString(fullStr) // Skip the full conjunct
 			continue
 		}
 
-		// Handle single character
-		lookup := a.lookupForReversliteration(string(runes[i]))
+		// 2. Look for geminated consonants
+		if i+2 < len(runes) {
+			currentChar := string(runes[i])
+			currentLookup := a.lookupForReversliteration(currentChar)
+			if currentLookup.Category == "consonants" {
+				if string(runes[i+1]) == "्" {
+					nextChar := string(runes[i+2])
+					nextLookup := a.lookupForReversliteration(nextChar)
+					if nextLookup.Found && nextLookup.Output == currentLookup.Output {
+						if viramaMode == types.SmartMode {
+							result.WriteString(currentLookup.Output + currentLookup.Output + "a")
+						} else {
+							result.WriteString(currentLookup.Output)
+						}
+						lastResult = currentLookup
+						i += 3
+						continue
+					}
+				}
+			}
+		}
+
+		// 3. Single character handling
+		lookup = a.lookupForReversliteration(string(runes[i]))
 		if !lookup.Found {
 			result.WriteString(string(runes[i]))
 			i++
@@ -106,8 +119,6 @@ func (a *Aksharamala) Reversliterate(input string) (string, error) {
 				result.WriteString(lookup.Output)
 			}
 		case "matras":
-			// For matras, just output the base form (first RHS)
-			// This handles cases like े -> e (not ae)
 			result.WriteString(lookup.Output)
 		case "vowels", "others", "digits":
 			result.WriteString(lookup.Output)

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: aksharamala-web
+    runtime: go
+    repo: https://github.com/s-annam/aksharamala
+    branch: main
+    plan: free
+    buildCommand: go build -o server ./cmd/webserver
+    startCommand: ./server
+    envVars:
+      - key: PORT
+        value: 8080

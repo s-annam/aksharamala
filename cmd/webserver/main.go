@@ -70,29 +70,50 @@ func main() {
 
 	// Map the given text using the selected keymap
 	http.HandleFunc("/api/m", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		// Handle OPTIONS (CORS preflight request)
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 
-		var req TransliterationRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+		var text, keymapID string
+
+		if r.Method == http.MethodGet {
+			// Extract parameters from the URL for GET requests
+			query := r.URL.Query()
+			text = query.Get("text")
+			keymapID = query.Get("keymapId")
+
+			if text == "" || keymapID == "" {
+				http.Error(w, "Missing required parameters: text and keymapId", http.StatusBadRequest)
+				return
+			}
+		} else if r.Method == http.MethodPost {
+			// Decode JSON request body for POST requests
+			var req TransliterationRequest
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				http.Error(w, "Invalid request body", http.StatusBadRequest)
+				return
+			}
+			text = req.Text
+			keymapID = req.KeymapID
+		} else {
+			// Reject other methods
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
-		// Perform transliteration using your engine
-		result, err := aksharamala.TransliterateWithKeymap(req.KeymapID, req.Text)
+		// Perform transliteration
+		result, err := aksharamala.TransliterateWithKeymap(keymapID, text)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		response := TransliterationResponse{
-			Result: result,
-		}
+		response := TransliterationResponse{Result: result}
 
-		w.Header().Set("Content-Type", "application/json")
+		// ✅ Ensure correct UTF-8 encoding
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(response)
 	})
 

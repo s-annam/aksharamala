@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import Footer from './Footer'
 
+// Load API Base URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+
 const Navbar = () => {
   return (
     <nav className="bg-blue-600 text-white shadow-md fixed top-0 w-full z-10">
@@ -40,7 +43,7 @@ function App() {
 
   const fetchKeymaps = async () => {
     try {
-      const response = await fetch('/api/keymaps')
+      const response = await fetch(`${API_BASE_URL}/api/keymaps`) // ✅ Use dynamic API base URL
       const data = await response.json()
       setKeymaps(data)
     } catch (error) {
@@ -53,7 +56,7 @@ function App() {
 
     setIsLoading(true)
     try {
-      const response = await fetch('/api/m', {
+      const response = await fetch(`${API_BASE_URL}/api/m`, { // ✅ Use dynamic API base URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -151,7 +154,7 @@ function App() {
               />
             </div>
 
-            {/* Arrow Button */}
+            {/* Transliterate Button */}
             <div className="flex items-center justify-center">
               <button
                 onClick={handleTransliterate}

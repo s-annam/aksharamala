@@ -4,7 +4,7 @@
 
 Aksharamala is a **transliteration system** that dates back to the **glorious days of dot-matrix printers and MS-DOS**. Originally developed in **1989** as a college project—when transliteration wasn't exactly a hot topic—it allowed typing in Indian languages on personal computers. The founders, fueled by passion (and probably some late-night coding marathons), revisited the idea in the early 2000s, building a **Windows application using system hooks, C++, and MFC**.
 
-After a long dormancy, `Aksharamala` is undergoing a **complete revival in 2025**, rewritten in **Go** with **JSON-based keymaps** for flexibility, extensibility, and integration into modern AI-driven environments."
+After a long dormancy, `Aksharamala` is undergoing a **complete revival in 2025**, rewritten in **Go** with **JSON-based keymaps** for flexibility, extensibility, and integration into modern AI-driven environments.
 
 ---
 

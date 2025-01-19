@@ -1,10 +1,10 @@
 # Aksharamala - Transliteration for Indian Languages
 
 ## Overview
-`aksharamala` is a modern, extensible transliteration system for Indian languages, reimagining the original Aksharamala project (2000-2005) in Go. It provides developers with a robust, portable, and cloud-compatible toolkit to handle transliteration across languages and scripts efficiently.
+`Aksharamala` is a modern, extensible transliteration system for Indian languages, reviving and expanding upon the original Aksharamala project, which dates back to 1989 as a college project and was later commercialized in the early 2000s. This version, rewritten in Go, brings advanced transliteration capabilities with a focus on portability, cloud integration, and extensibility.
 
 ## Purpose
-Indian language data often exists in legacy formats or custom encodings, making it inaccessible to modern applications. `aksharamala` bridges this gap by providing tools to convert and transliterate such data into standardized Unicode representations. This empowers developers to preserve and modernize historical content while supporting future innovations.
+Indian language data often exists in legacy formats or custom encodings, making it inaccessible to modern applications. `Aksharamala bridges this gap by providing tools to convert and transliterate such data into standardized Unicode representations. It also facilitates **cross-language transliteration**, allowing conversion from **Sanskrit to Hindi, Telugu, or other Indic scripts**. With a new focus on **AI-driven text processing**, Aksharamala aims to integrate seamlessly into **modern NLP and cloud-based systems**.
 
 ## Features
 - **Transliteration Engine**:
@@ -30,7 +30,7 @@ Indian language data often exists in legacy formats or custom encodings, making 
 $ git clone https://github.com/s-annam/aksharamala.git
 
 # Navigate to the directory
-$ cd aks.go
+$ cd aksharamala
 
 # Build the project
 $ go build ./cmd/aksharamala
@@ -58,7 +58,7 @@ go run ./cmd/akt_converter convert -input myfile.akt -output myfile.aksj -dry-ru
 4. **Logger**:
    - Provides configurable logging (debug/production modes).
 
-See the following architecture diagram for a detailed overview of the components and their interactions:
+**Architecture Overview**: The diagram below illustrates the core components and their interactions.
 
 ```mermaid
 flowchart TB
@@ -126,12 +126,10 @@ flowchart TB
 * **Dynamic Language Support:** Add runtime language detection and mapping support to handle multi-script input dynamically.
 * **API Integration:** Develop REST APIs for transliteration tasks, enabling integration with other tools and systems.
 
-See the the list of issues and planned enhancements in the Issues section that are more immediate. Please reaach out if you are interested in contributing.
+See the the list of issues and planned enhancements in the [Issues](https://github.com/s-annam/aksharamala/issues) section that are more immediate. **Please reach out if you’d like to contribute!**
 
 ## History
-`aks.go` builds upon the legacy Aksharamala project, originally developed as an Indic transliteration system for Windows 2000/XP. By transitioning to Go, `aks.go` modernizes the original concepts and makes them accessible via cloud-based APIs and modern development environments.
-
-For a detailed history, see [history.md](docs/history.md).
+**Aksharamala** in 2025 builds upon the legacy `Aksharamala` project, which was first developed as a transliteration tool in 1989 (Turbo Pascal), later expanded into a commercial product for Windows (C++/MFC) in the early 2000s, and now revived in Go for modern use cases. For a detailed history, see [HISTORY.md](HISTORY.md).
 
 ## Contributing
 Contributions are welcome! Please read [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details on our process.

@@ -14,7 +14,7 @@ const Footer = () => {
       </a>
       {' | '}
       <a 
-        href="https://github.com/s-annam/aksharamala/blob/main/CONTRIBUTE.md" 
+        href="https://github.com/s-annam/aksharamala/blob/main/CONTRIBUTING.md" 
         target="_blank" 
         rel="noopener noreferrer" 
         className="text-primary-700 hover:text-primary-900 underline decoration-2 underline-offset-2 mx-2"

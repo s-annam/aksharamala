@@ -1,24 +1,33 @@
-import { Typography, IconButton } from '@mui/material';
-import { Settings } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, IconButton, Tooltip } from '@mui/material';
+import { Brightness4, Brightness7 } from '@mui/icons-material';
+import { useThemeContext } from './ThemeProvider';
 
 const Navbar = () => {
-  return (
-    <nav className="w-full border-b border-gray-300 dark:border-gray-700 px-4 py-3 flex justify-between items-center">
-      {/* Logo & Title (Left-Aligned) */}
-      <div className="flex items-center space-x-3">
-        <img src="/og-image.png" alt="Aksharamala Logo" className="h-8 w-auto" />
-        <Typography variant="h6" className="font-bold text-lg">
-          Aksharamala
-        </Typography>
-      </div>
+  const { darkMode, toggleTheme } = useThemeContext();
 
-      {/* Future User Links (Right-Aligned) */}
-      <div className="flex items-center space-x-3">
-        <IconButton color="inherit" aria-label="Settings">
-          <Settings />
+  return (
+    <AppBar position="static" elevation={0} 
+      sx={{ 
+        backgroundColor: darkMode ? '#1A1A1A' : '#ffffff', 
+        color: darkMode ? '#f0f0f0' : '#222',
+        borderBottom: darkMode ? '1px solid #444' : '1px solid #ddd'
+        }}
+    >
+      <Toolbar className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <img src="/og-image.png" alt="Aksharamala Logo" className="h-8 w-auto" />
+          <Typography variant="h6" className="font-bold text-lg">
+            Aksharamala
+          </Typography>
+        </div>
+
+      <Tooltip title="Toggle Theme">
+        <IconButton onClick={toggleTheme} color="inherit">
+          {darkMode ? <Brightness7 /> : <Brightness4 />}
         </IconButton>
-      </div>
-    </nav>
+      </Tooltip>
+      </Toolbar>
+    </AppBar>
   );
 };
 

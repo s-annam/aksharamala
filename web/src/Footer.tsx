@@ -1,10 +1,12 @@
-const Footer = () => {
-  return (
-    <footer className="w-full border-t border-gray-300 dark:border-gray-700 px-6 py-4 flex justify-between items-center text-sm text-gray-700 dark:text-gray-300">
-      {/* Logo */}
-      <img src="/og-image.png" alt="Aksharamala Logo" className="h-5 w-auto opacity-75" />
+import { useThemeContext } from './ThemeProvider';
 
-      {/* Copyright & Links (Centered) */}
+const Footer = () => {
+  const { darkMode } = useThemeContext();
+
+  return (
+    <footer className={`w-full px-6 py-4 flex justify-center items-center text-sm border-t ${
+      darkMode ? 'bg-[#1A1A1A] text-gray-400 border-gray-700' : 'bg-gray-100 text-gray-700 border-gray-300'
+    }`}>
       <p>© {new Date().getFullYear()} Aksharamala. All Rights Reserved.</p>
 
       {/* External Links */}

@@ -1,0 +1,3 @@
+[submodule "win"]
+	path = win
+	url = https://github.com/s-annam/aks.win.git

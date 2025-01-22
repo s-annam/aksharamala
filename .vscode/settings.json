@@ -1,8 +1,10 @@
 {
+    "css.lint.unknownAtRules": "ignore",
+    "clang-format.executable": "c:/tools/clang/bin/clang-format.exe",
+    "editor.formatOnSave": true,
     "files.associations": {
         "*.aksj": "json"
     },
-    "css.lint.unknownAtRules": "ignore",
     "files.exclude": {
         "node_modules/": true
     },

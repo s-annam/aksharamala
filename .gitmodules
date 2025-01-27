@@ -1,6 +1,3 @@
 [submodule "windows"]
 	path = windows
 	url = https://github.com/s-annam/aks.win.git
-[submodule "aT5"]
-	path = aT5
-	url = https://github.com/s-annam/aksharamalaT5.git
